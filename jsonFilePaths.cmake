@@ -7,8 +7,8 @@
 
 # JSON library source files.
 set( JSON_SOURCES
-     ${MODULES_DIR}/standard/json/src/json.c )
+     ${MODULE_ROOT_DIR}/source/json.c )
 
 # JSON library Public Include directories.
 set( JSON_INCLUDE_PUBLIC_DIRS
-     ${MODULES_DIR}/standard/json/include )
+     ${MODULE_ROOT_DIR}/include )
