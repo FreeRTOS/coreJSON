@@ -83,7 +83,7 @@ if( EXISTS ${CMOCK_DIR}/src )
     # Add build targets for CMock and Unit, required for unit testing.
     add_cmock_targets()
 
-    # Add function to enable CMOck based tests and coverage.
+    # Add function to enable CMock based tests and coverage.
     include("${MODULE_ROOT_DIR}/tools/cmock/create_test.cmake")
 
     # Include build configuration for unit tests of JSON.
