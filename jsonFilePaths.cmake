@@ -5,6 +5,9 @@
 # Files specific to the repository such as test runner, platform tests
 # are not added to the variables.
 
+# Root directory of the JSON library.
+set( MODULE_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "JSON source root." )
+
 # JSON library source files.
 set( JSON_SOURCES
      ${MODULE_ROOT_DIR}/source/json.c )
