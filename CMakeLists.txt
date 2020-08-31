@@ -1,6 +1,8 @@
+# ============================ Repo configurations =============================
+
 # Project information.
 cmake_minimum_required( VERSION 3.13.0 )
-project( coreMqtt
+project( coreJSON
          VERSION 4.0.2
          LANGUAGES C )
 
@@ -18,7 +20,9 @@ endif()
 
 # Set global path variables.
 get_filename_component(__MODULE_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}" ABSOLUTE)
-set(MODULE_ROOT_DIR ${__MODULE_ROOT_DIR} CACHE INTERNAL "JSON source root.")
+set( MODULE_ROOT_DIR ${__MODULE_ROOT_DIR} CACHE INTERNAL "JSON source root." )
+set( UNIT_TEST_DIR ${MODULE_ROOT_DIR}/test/unit-test CACHE INTERNAL "JSON unit test directory." )
+set( CMOCK_DIR ${UNIT_TEST_DIR}/CMock CACHE INTERNAL "CMock library source directory." )
 
 # Configure options to always show in CMake GUI.
 option( BUILD_CLONE_SUBMODULES
@@ -36,6 +40,8 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 
+# ====================== coreJSON library configurations =======================
+
 # Include filepaths for source and include.
 include(jsonFilePaths.cmake)
 
@@ -51,13 +57,14 @@ set_target_properties( json PROPERTIES FOLDER libraries/standard )
 source_group( include FILES include/json.h )
 source_group( src FILES ${JSON_SOURCES} )
 
-# Include CMock build configuration.
-include( test/cmock_build.cmake )
+# ============================ Test configurations =============================
 
-set(CMOCK_SRC_DIR ${MODULE_ROOT_DIR}/test/CMock/src)
+# Include CMock build configuration.
+include( ${UNIT_TEST_DIR}/cmock_build.cmake )
+
 # Check if the CMock source directory exists, and if not present, clone the submodule
 # if BUILD_CLONE_SUBMODULES configuration is enabled. 
-if( NOT EXISTS ${CMOCK_SRC_DIR} )
+if( NOT EXISTS ${CMOCK_DIR}/src )
     # Attempt to clone CMock.
     if( ${BUILD_CLONE_SUBMODULES} )
         clone_cmock()
@@ -67,7 +74,7 @@ if( NOT EXISTS ${CMOCK_SRC_DIR} )
 endif()
 
 # Add unit test and coverage configuration only if CMock directory exists.
-if( EXISTS ${CMOCK_SRC_DIR} )
+if( EXISTS ${CMOCK_DIR}/src )
 
     # Use CTest utility for managing test runs. This has to be added BEFORE
     # definiting test targets with add_test()
@@ -79,8 +86,8 @@ if( EXISTS ${CMOCK_SRC_DIR} )
     # Add function to enable CMOck based tests and coverage.
     include("${MODULE_ROOT_DIR}/tools/cmock/create_test.cmake")
 
-    # Include build configuration for unit tests of MQTT.
-    add_subdirectory( test )
+    # Include build configuration for unit tests of JSON.
+    add_subdirectory( ${UNIT_TEST_DIR} )
     
     # Add a target for running coverage on tests.
     add_custom_target(coverage
