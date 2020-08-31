@@ -31,7 +31,7 @@ option( BUILD_CLONE_SUBMODULES
 
 include( CMakeDependentOption )
 CMAKE_DEPENDENT_OPTION( BUILD_SHARED_LIBS
-                        "Set this to ON to build all libraries as shared libraries. When OFF, libraries build as static libraries."
+                        "Set this to ON to build JSON as a shared library. When OFF, JSON will build as a static library."
                         ON "${ALLOW_SHARED_LIBRARIES}"
                         OFF )
 
