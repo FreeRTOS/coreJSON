@@ -1,4 +1,4 @@
-include("../jsonFilePaths.cmake")
+include("../../jsonFilePaths.cmake")
 project ("json unit test")
 
 # ====================  Define your project name (edit) ========================
