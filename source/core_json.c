@@ -539,6 +539,8 @@ static bool_ strnEq( const char * a,
  * @param[in] buf  The buffer to parse.
  * @param[in,out] start  The index at which to begin.
  * @param[in] max  The size of the buffer.
+ * @param[in] literal  The type of literal.
+ * @param[in] length  The length of the literal.
  *
  * @return true if the literal was present;
  * false otherwise.
@@ -912,6 +914,7 @@ static void skipObjectScalars( const char * buf,
  * @param[in] buf  The buffer to parse.
  * @param[in,out] start  The index at which to begin.
  * @param[in] max  The size of the buffer.
+ * @param[in] mode  The first character of an array '[' or object '{'.
  */
 static void skipScalars( const char * buf,
                          size_t * start,
@@ -932,7 +935,11 @@ static void skipScalars( const char * buf,
     }
 }
 
+/**
+ * @brief Determines the maximum level of nesting in a JSON document.
+ */
 #ifndef JSON_MAX_DEPTH
+    /* Default value for the maximum depth of a JSON document. */
     #define JSON_MAX_DEPTH    32
 #endif
 
