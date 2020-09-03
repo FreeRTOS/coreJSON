@@ -19,8 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef JSON_H_
-#define JSON_H_
+#ifndef CORE_JSON_H_
+#define CORE_JSON_H_
 
 #include <stddef.h>
 
@@ -115,4 +115,4 @@ JSONStatus_t JSON_Search( char * buf,
                           char ** outValue,
                           size_t * outValueLength );
 
-#endif /* ifndef JSON_H_ */
+#endif /* ifndef CORE_JSON_H_ */
