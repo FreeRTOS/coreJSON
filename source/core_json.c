@@ -19,6 +19,11 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/**
+ * @file core_json.c
+ * @brief Implements the user-facing functions in core_json.h.
+ */
+
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
