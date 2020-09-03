@@ -1,0 +1,112 @@
+/**
+@mainpage Overview
+@brief JSON Library
+
+<p>JSON (JavaScript Object Notation) is a data interchange format consisting of documents that contain key-value pairs and array data types. 
+This library is able to both validate and parse a JSON document by returning the value
+associated with any key. This library was designed with the following requirements in mind:</p>
+
+<ul>
+<li>Identify any malformed JSON document and return an appropriate error.</li>
+<li>Successfully parse a JSON document and return the value associated with any key.</li>
+<li>Handle different data types for values such as objects, integers, real numbers, arrays, booleans, and unicode strings.</li>
+<li>Allocate any memory used on the stack.</li>
+</ul>
+
+@section json_memory_requirements Memory Requirements
+@brief Memory requirements of the JSON library.
+
+The configurations for memory estimation are defined <a href="https://github.com/FreeRTOS/FreeRTOS/tree/lts-development/tools/memory_estimator" target="_blank" rel="noopener noreferrer">here</a>.
+
+<table>
+    <tr>
+        <td colspan="3"><b>Code Size of [<FIXME: Library name and version>](example generated with GCC for ARM Cortex-M)</b></td>
+    </tr>
+    <tr>
+        <td><b>File</b></td>
+        <td><b>With -O1 Optimisation</b></td>
+        <td><b>With -Os Optimisation</b></td>
+    </tr>
+    <tr>
+        <td>[<FIXME: library source, add more rows for more source>]</td>
+        <td>[<FIXME: Code size>]</td>
+        <td>[<FIXME: Code size>]</td>
+    </tr>
+    <tr>
+        <td><b>Total estimates</b></td>
+        <td>[<FIXME: Total code size>]</td>
+        <td>[<FIXME: Total code size>]</td>
+    </tr>
+</table>
+ */
+
+/**
+@page json_design Design
+JSON Library Design
+
+[<FIXME: Some useful design information.>]
+*/
+
+/**
+@page json_config Configurations
+@brief Configurations of the JSON library.
+<!-- @par configpagestyle allows the @section titles to be styled according to style.css -->
+@par configpagestyle
+
+Configuration settings are C pre-processor constants. They can be set with a \#define in the config file (json_config.h) or by using a compiler option such as -D in gcc.
+
+@section [<FIXME: Library compile time configuration macro>]
+<br>
+@copydoc [<FIXME: Library compile time configuration macro>]
+
+@section [<FIXME: Library compile time configuration macro>]
+<br>
+@copydoc [<FIXME: Library compile time configuration macro>]
+
+@section [<FIXME: Library compile time configuration macro>]
+<br>
+@copydoc [<FIXME: Library compile time configuration macro>]
+*/
+
+/**
+@page json_functions Functions
+@brief Primary functions of the JSON library:<br><br>
+@subpage json_validate_function <br>
+@subpage json_search_function <br>
+
+@page json_validate_function JSON_Validate
+@snippet core_json.h declare_json_validate
+@copydoc JSON_Validate
+
+@page json_search_function JSON_Search
+@snippet core_json.h declare_json_search
+@copydoc JSON_Search
+*/
+
+<!-- We do not use doxygen ALIASes here because there have been issues in the past versions with "^^" newlines within the alias definition. -->
+/**
+@defgroup json_enum_types Enumerated Types
+@brief Enumerated types of the JSON library
+*/
+
+/**
+@defgroup json_callback_types Callback Types
+@brief Callback function pointer types of the JSON library
+*/
+
+/**
+@defgroup json_struct_types Parameter Structures
+@brief Structures passed as parameters to [<[FIXME: Library name>] library functions](@ref json_functions)
+
+These structures are passed as parameters to library functions. Documentation for these structures will state the functions associated with each parameter structure and the purpose of each member.
+*/
+
+/**
+@defgroup json_basic_types Basic Types
+@brief Primitive types of the JSON library.
+*/
+
+/**
+@defgroup json_constants Constants
+@brief Constants defined in the JSON library
+*/
