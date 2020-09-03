@@ -11,4 +11,4 @@ set( JSON_SOURCES
 
 # JSON library Public Include directories.
 set( JSON_INCLUDE_PUBLIC_DIRS
-     ${CMAKE_CURRENT_LIST_DIR}/include )
+     ${CMAKE_CURRENT_LIST_DIR}/source/include )
