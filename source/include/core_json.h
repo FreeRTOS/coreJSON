@@ -30,7 +30,7 @@
 #include <stddef.h>
 
 /**
- * @ingroup mqtt_enum_types
+ * @ingroup json_enum_types
  * @brief Return codes from JSON library functions.
  */
 typedef enum

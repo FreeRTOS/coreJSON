@@ -29,14 +29,45 @@
 #include <stdint.h>
 #include "core_json.h"
 
+/**
+ * @ingroup json_enum_types
+ * @brief A means to typedef true and false as 1 and 0 respectively.
+ */
 typedef enum
 {
-    true = 1, false = 0
+    true = 1,
+    false = 0
 } bool_;
 
+/**
+ * @brief Determine if an ASCII character is a number.
+ *
+ * @param[in] x  The ASCII character to check.
+ *
+ * @return true if the ASCII character is a number;
+ * false otherwise.
+ */
 #define isdigit_( x )    ( ( x >= '0' ) && ( x <= '9' ) )
+
+/**
+ * @brief Determine if an ASCII character is a control character.
+ *
+ * @param[in] x  The ASCII character to check.
+ *
+ * @return true if the ASCII character is a control character;
+ * false otherwise.
+ */
 #define iscntrl_( x )    ( ( x >= '\0' ) && ( x < ' ' ) )
-/* NB. This is whitespace as defined by the JSON standard (ECMA-404). */
+
+/**
+ * @brief Determine if an ASCII character is whitespace as defined by the 
+ * JSON standard (ECMA-404).
+ *
+ * @param[in] x  The ASCII character to check.
+ *
+ * @return true if the ASCII character is whitespace;
+ * false otherwise.
+ */
 #define isspace_( x )    ( ( x == ' ' ) || ( x == '\t' ) || ( x == '\n' ) || ( x == '\r' ) )
 
 /**
@@ -280,7 +311,24 @@ static uint8_t hexToInt( char c )
     return n;
 }
 
+/**
+ * @brief Determine if a lone surrogate character is high.
+ *
+ * @param[in] x  The lone surrogate character to check.
+ *
+ * @return true if the lone surrogate character is high;
+ * false otherwise.
+ */
 #define isHighSurrogate( x )    ( ( ( x ) >= 0xD800U ) && ( ( x ) <= 0xDBFFU ) )
+
+/**
+ * @brief Determine if a lone surrogate character is low.
+ *
+ * @param[in] x  The lone surrogate character to check.
+ *
+ * @return true if the lone surrogate character is low;
+ * false otherwise.
+ */
 #define isLowSurrogate( x )     ( ( ( x ) >= 0xDC00U ) && ( ( x ) <= 0xDFFFU ) )
 
 /**
@@ -568,6 +616,11 @@ static bool_ skipLiteral( const char * buf,
 
     return ret;
 }
+
+/**
+ * \def skipLit_(x)
+ * Determines of a literal is true, false, or null.
+ */
 
 /**
  * @brief Advance buffer index beyond a JSON literal.
@@ -936,7 +989,8 @@ static void skipScalars( const char * buf,
 }
 
 /**
- * @brief Determines the maximum level of nesting in a JSON document.
+ * @brief Determines the maximum level of nesting for arrays and objects in a
+ * JSON document.
  */
 #ifndef JSON_MAX_DEPTH
     /* Default value for the maximum depth of a JSON document. */
@@ -1026,6 +1080,13 @@ static JSONStatus_t skipCollection( const char * buf,
 }
 
 /**
+ * @brief Determines whether to validate collections only.
+ */
+#ifdef IN_DOXYGEN
+    #define JSON_VALIDATE_COLLECTIONS_ONLY
+#endif /* IN_DOXYGEN */
+
+/**
  * See core_json.h for docs.
  *
  * Verify that the entire buffer contains exactly one scalar
@@ -1048,6 +1109,7 @@ JSONStatus_t JSON_Validate( const char * buf,
     else
     {
         skipSpace( buf, &i, max );
+
         #ifndef JSON_VALIDATE_COLLECTIONS_ONLY
             if( skipAnyScalar( buf, &i, max ) == true )
             {
