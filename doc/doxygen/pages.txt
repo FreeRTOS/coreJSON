@@ -20,7 +20,7 @@ The configurations for memory estimation are defined <a href="https://github.com
 
 <table>
     <tr>
-        <td colspan="3"><b>Code Size of [<FIXME: Library name and version>](example generated with GCC for ARM Cortex-M)</b></td>
+        <td colspan="3"><b>Code Size of JSON LTS rc1 (example generated with GCC for ARM Cortex-M)</b></td>
     </tr>
     <tr>
         <td><b>File</b></td>
@@ -53,19 +53,15 @@ JSON Library Design
 <!-- @par configpagestyle allows the @section titles to be styled according to style.css -->
 @par configpagestyle
 
-Configuration settings are C pre-processor constants. They can be set with a \#define in the config file (json_config.h) or by using a compiler option such as -D in gcc.
+Configuration settings are C pre-processor constants. They can be set with a \#define in the header file (core_json.h) or by using a compiler option such as -D in gcc.
 
-@section [<FIXME: Library compile time configuration macro>]
+@section JSON_MAX_DEPTH
 <br>
-@copydoc [<FIXME: Library compile time configuration macro>]
+@copydoc JSON_MAX_DEPTH
 
-@section [<FIXME: Library compile time configuration macro>]
+@section JSON_VALIDATE_COLLECTIONS_ONLY
 <br>
-@copydoc [<FIXME: Library compile time configuration macro>]
-
-@section [<FIXME: Library compile time configuration macro>]
-<br>
-@copydoc [<FIXME: Library compile time configuration macro>]
+@copydoc JSON_VALIDATE_COLLECTIONS_ONLY
 */
 
 /**
@@ -96,7 +92,7 @@ Configuration settings are C pre-processor constants. They can be set with a \#d
 
 /**
 @defgroup json_struct_types Parameter Structures
-@brief Structures passed as parameters to [<[FIXME: Library name>] library functions](@ref json_functions)
+@brief Structures passed as parameters to [JSON library functions](@ref json_functions)
 
 These structures are passed as parameters to library functions. Documentation for these structures will state the functions associated with each parameter structure and the purpose of each member.
 */

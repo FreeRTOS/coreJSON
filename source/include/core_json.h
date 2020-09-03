@@ -19,20 +19,29 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/**
+ * @file core_json.h
+ * @brief User-facing functions of the JSON library.
+ */
+
 #ifndef CORE_JSON_H_
 #define CORE_JSON_H_
 
 #include <stddef.h>
 
+/**
+ * @ingroup mqtt_enum_types
+ * @brief Return codes from JSON library functions.
+ */
 typedef enum
 {
-    JSONPartial = 0,
-    JSONSuccess,
-    JSONIllegalDocument,
-    JSONMaxDepthExceeded,
-    JSONNotFound,
-    JSONNullParameter,
-    JSONBadParameter
+    JSONPartial = 0,      /**< @brief JSON document is valid so far but incomplete. */
+    JSONSuccess,          /**< @brief JSON document is valid and complete. */
+    JSONIllegalDocument,  /**< @brief JSON document is invalid or malformed. */
+    JSONMaxDepthExceeded, /**< @brief JSON document has collections that exceed #JSON_MAX_DEPTH. */
+    JSONNotFound,         /**< @brief Query key could not be found in the JSON document. */
+    JSONNullParameter,    /**< @brief Pointer parameter passed to a function is NULL. */
+    JSONBadParameter      /**< @brief Query key is empty, or any subpart is empty, or max is 0. */
 } JSONStatus_t;
 
 /**
@@ -55,8 +64,10 @@ typedef enum
  * (e.g., string, boolean, number).  To require that a valid document
  * contain an object or array, define JSON_VALIDATE_COLLECTIONS_ONLY.
  */
+/* @[declare_json_validate] */
 JSONStatus_t JSON_Validate( const char * buf,
                             size_t max );
+/* @[declare_json_validate] */
 
 /**
  * @brief Find a key in a JSON object and output a pointer to its value.
@@ -84,6 +95,8 @@ JSONStatus_t JSON_Validate( const char * buf,
  * a null character at the end of the value, so long as the character
  * replaced is put back before running another search.
  *
+ * <b>Example</b>
+ * @code{c}
  *     result = JSON_Search(buf, bufLength, key, keyLength, '.',
  *                          value, valueLength);
  *     if( result == JSONSuccess )
@@ -93,6 +106,7 @@ JSONStatus_t JSON_Validate( const char * buf,
  *         printf("Found: %s -> %s\n", key, value);
  *         value[valueLength] = save;
  *     }
+ * @endcode
  *
  * @return #JSONSuccess if the queryKey is found and the value output;
  * #JSONNullParameter if any pointer parameters are NULL;
@@ -107,6 +121,7 @@ JSONStatus_t JSON_Validate( const char * buf,
  * @note JSON_Search() performs validation, but stops upon finding a matching
  * key and its value.  To validate the entire JSON document, use JSON_Validate().
  */
+/* @[declare_json_search] */
 JSONStatus_t JSON_Search( char * buf,
                           size_t max,
                           char * queryKey,
@@ -114,5 +129,6 @@ JSONStatus_t JSON_Search( char * buf,
                           char separator,
                           char ** outValue,
                           size_t * outValueLength );
+/* @[declare_json_search] */
 
 #endif /* ifndef CORE_JSON_H_ */
