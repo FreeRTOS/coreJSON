@@ -1,8 +1,8 @@
 include("../../jsonFilePaths.cmake")
-project ("json unit test")
+project ("core_json unit test")
 
 # ====================  Define your project name (edit) ========================
-set(project_name "json")
+set(project_name "core_json")
 
 # =====================  Create your mock here  (edit)  ========================
 # ================= Create the library under test here (edit) ==================
