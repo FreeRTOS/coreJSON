@@ -7,7 +7,7 @@
 
 # JSON library source files.
 set( JSON_SOURCES
-     ${CMAKE_CURRENT_LIST_DIR}/source/json.c )
+     ${CMAKE_CURRENT_LIST_DIR}/source/core_json.c )
 
 # JSON library Public Include directories.
 set( JSON_INCLUDE_PUBLIC_DIRS

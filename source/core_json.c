@@ -22,7 +22,7 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "json.h"
+#include "core_json.h"
 
 typedef enum
 {
@@ -1009,7 +1009,7 @@ static JSONStatus_t skipCollection( const char * buf,
 }
 
 /**
- * See json.h for docs.
+ * See core_json.h for docs.
  *
  * Verify that the entire buffer contains exactly one scalar
  * or collection within optional whitespace.
@@ -1234,7 +1234,7 @@ static JSONStatus_t search( char * buf,
 }
 
 /**
- * See json.h for docs.
+ * See core_json.h for docs.
  *
  * Handle a nested search by iterating over the parts of the queryKey.
  */
