@@ -46,15 +46,15 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 include(jsonFilePaths.cmake)
 
 # JSON library target.
-add_library( json
+add_library( core_json
              ${JSON_SOURCES} )
 
 # JSON public include path.
-target_include_directories( json PUBLIC ${JSON_INCLUDE_PUBLIC_DIRS} )
+target_include_directories( core_json PUBLIC ${JSON_INCLUDE_PUBLIC_DIRS} )
 
 # Organization of JSON in IDE projects.
-set_target_properties( json PROPERTIES FOLDER libraries/standard )
-source_group( include FILES include/json.h )
+set_target_properties( core_json PROPERTIES FOLDER libraries/standard )
+source_group( include FILES source/include/core_json.h )
 source_group( src FILES ${JSON_SOURCES} )
 
 # ============================ Test configurations =============================
@@ -92,7 +92,7 @@ if( EXISTS ${CMOCK_DIR}/src )
     # Add a target for running coverage on tests.
     add_custom_target(coverage
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/tools/cmock/coverage.cmake
-        DEPENDS cmock unity json_utest
+        DEPENDS cmock unity core_json_utest
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 endif()
