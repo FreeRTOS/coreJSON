@@ -67,7 +67,7 @@ typedef enum
  * <b>Example</b>
  * @code{c}
  *     // Variables used in this example.
- *     JSONStatus_t jsonStatus;
+ *     JSONStatus_t result;
  *     char * buf = "{\"foo\":\"abc\",\"bar\":{\"foo\":\"xyz\"}";
  *     size_t bufLength = sizeof( buf ) - 1;
  *
@@ -131,7 +131,7 @@ JSONStatus_t JSON_Validate( const char * buf,
  * <b>Example</b>
  * @code{c}
  *     // Variables used in this example.
- *     JSONStatus_t jsonStatus;
+ *     JSONStatus_t result;
  *     char * buf = "{\"foo\":\"abc\",\"bar\":{\"foo\":\"xyz\"}";
  *     size_t bufLength = sizeof( buf ) - 1;
  *     char * key = "bar.foo";
@@ -139,21 +139,22 @@ JSONStatus_t JSON_Validate( const char * buf,
  *     char * value;
  *     size_t valueLength;
  *
+ *     // If you know the JSON document is valid, this call is not necessary.
  *     result = JSON_Validate( buf, bufLength );
  *
  *     if( result == JSONSuccess )
  *     {
- *         result = JSON_Search(buf, bufLength, key, keyLength, '.',
- *                              &value, &valueLength);
+ *         result = JSON_Search( buf, bufLength, key, keyLength, '.',
+ *                               &value, &valueLength );
  *     }
  *
  *     if( result == JSONSuccess )
  *     {
- *         char save = value[valueLength];
- *         value[valueLength] = '\0';
+ *         char save = value[ valueLength ];
+ *         value[ valueLength ] = '\0';
  *         // "Found: bar.foo -> xyz\n" will be printed.
- *         printf("Found: %s -> %s\n", key, value);
- *         value[valueLength] = save;
+ *         printf( "Found: %s -> %s\n", key, value );
+ *         value[ valueLength ] = save;
  *     }
  * @endcode
  */
