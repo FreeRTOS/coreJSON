@@ -54,7 +54,7 @@ if( result == JSONSuccess )
 ```
 
 
-## Building Unit Tests
+## Building unit tests
 
 ### Platform Prerequisites
 
