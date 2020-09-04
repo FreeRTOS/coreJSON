@@ -50,6 +50,13 @@ typedef enum
  * @param[in] buf  The buffer to parse.
  * @param[in] max  The size of the buffer.
  *
+ * @note The maximum nesting depth may be specified by defining the macro
+ * JSON_MAX_DEPTH.  The default is 32 of sizeof(char).
+ *
+ * @note By default, a valid JSON document may contain a single element
+ * (e.g., string, boolean, number).  To require that a valid document
+ * contain an object or array, define JSON_VALIDATE_COLLECTIONS_ONLY.
+ *
  * @return #JSONSuccess if the buffer contents are valid JSON;
  * #JSONNullParameter if buf is NULL;
  * #JSONBadParameter if max is 0;
@@ -57,12 +64,24 @@ typedef enum
  * #JSONMaxDepthExceeded if object and array nesting exceeds a threshold;
  * #JSONPartial if the buffer contents are potentially valid but incomplete.
  *
- * @note The maximum nesting depth may be specified by defining the macro
- * JSON_MAX_DEPTH.  The default is 32 of sizeof(char).
+ * <b>Example</b>
+ * @code{c}
+ *     // Variables used in this example.
+ *     JSONStatus_t jsonStatus;
+ *     char * buf = "{\"foo\":\"abc\",\"bar\":{\"foo\":\"xyz\"}";
+ *     size_t bufLength = sizeof( buf ) - 1;
  *
- * @note By default, a valid JSON document may contain a single element
- * (e.g., string, boolean, number).  To require that a valid document
- * contain an object or array, define JSON_VALIDATE_COLLECTIONS_ONLY.
+ *     result = JSON_Validate( buf, bufLength );
+ *
+ *     if( result == JSONSuccess )
+ *     {
+ *         // JSON document is valid.
+ *     }
+ *     else
+ *     {
+ *         // JSON document is invalid.
+ *     }
+ * @endcode
  */
 /* @[declare_json_validate] */
 JSONStatus_t JSON_Validate( const char * buf,
@@ -70,7 +89,23 @@ JSONStatus_t JSON_Validate( const char * buf,
 /* @[declare_json_validate] */
 
 /**
- * @brief Find a key in a JSON object and output a pointer to its value.
+ * @brief Find a key in a JSON object and output the pointer @p outValue
+ * to its value.
+ *
+ * The JSON document must contain an object (e.g., <code>{"key":"value"}</code>).
+ * Any value may also be an object and so forth to a maximum depth.  A search
+ * may descend through nested objects when the queryKey contains matching
+ * key strings joined by a separator.
+ *
+ * For example, if buf contains <code>{"foo":"abc","bar":{"foo":"xyz"}}</code>,
+ * then a search for 'foo' would output <code>abc</code>, 'bar' would output
+ * <code>{"foo":"xyz"}</code>, and a search for 'bar.foo' would output
+ * <code>xyz</code> (given separator is specified as '.').
+ *
+ * On success, the pointer @p outValue points to a location in buf.  No null
+ * termination is done for the value.  For valid JSON it is safe to place
+ * a null character at the end of the value, so long as the character
+ * replaced is put back before running another search.
  *
  * @param[in] buf  The buffer to search.
  * @param[in] max  size of the buffer.
@@ -80,33 +115,11 @@ JSONStatus_t JSON_Validate( const char * buf,
  * @param[out] outValue  A pointer to receive the address of the value found.
  * @param[out] outValueLength  A pointer to receive the length of the value found.
  *
- * The JSON document must contain an object (e.g., '{"key":"value"}'). Any
- * value may also be an object and so forth to a maximum depth.  A search
- * may descend through nested objects when the queryKey contains matching
- * key strings joined by a separator.
+ * @note The maximum nesting depth may be specified by defining the macro
+ * JSON_MAX_DEPTH.  The default is 32 of sizeof(char).
  *
- * For example, if buf contains '{"foo":"abc","bar":{"foo":"xyz"}}', then a
- * search for 'foo' would output 'abc', 'bar' would output '{"foo":"xyz"}',
- * and a search for 'bar.foo' would output 'xyz' (given separator is
- * specified as '.').
- *
- * On success, the pointer to the value points to a location in buf.  No null
- * termination is done for the value.  For valid JSON it is safe to place
- * a null character at the end of the value, so long as the character
- * replaced is put back before running another search.
- *
- * <b>Example</b>
- * @code{c}
- *     result = JSON_Search(buf, bufLength, key, keyLength, '.',
- *                          value, valueLength);
- *     if( result == JSONSuccess )
- *     {
- *         char save = value[valueLength];
- *         value[valueLength] = '\0';
- *         printf("Found: %s -> %s\n", key, value);
- *         value[valueLength] = save;
- *     }
- * @endcode
+ * @note JSON_Search() performs validation, but stops upon finding a matching
+ * key and its value. To validate the entire JSON document, use JSON_Validate().
  *
  * @return #JSONSuccess if the queryKey is found and the value output;
  * #JSONNullParameter if any pointer parameters are NULL;
@@ -115,11 +128,34 @@ JSONStatus_t JSON_Validate( const char * buf,
  * #JSONMaxDepthExceeded if object and array nesting exceeds a threshold;
  * #JSONNotFound if the queryKey is NOT found.
  *
- * @note The maximum nesting depth may be specified by defining the macro
- * JSON_MAX_DEPTH.  The default is 32 of sizeof(char).
+ * <b>Example</b>
+ * @code{c}
+ *     // Variables used in this example.
+ *     JSONStatus_t jsonStatus;
+ *     char * buf = "{\"foo\":\"abc\",\"bar\":{\"foo\":\"xyz\"}";
+ *     size_t bufLength = sizeof( buf ) - 1;
+ *     char * key = "bar.foo";
+ *     size_t keyLength = sizeof( key ) - 1;
+ *     char * value;
+ *     size_t valueLength;
  *
- * @note JSON_Search() performs validation, but stops upon finding a matching
- * key and its value.  To validate the entire JSON document, use JSON_Validate().
+ *     result = JSON_Validate( buf, bufLength );
+ *
+ *     if( result == JSONSuccess )
+ *     {
+ *         result = JSON_Search(buf, bufLength, key, keyLength, '.',
+ *                              &value, &valueLength);
+ *     }
+ *
+ *     if( result == JSONSuccess )
+ *     {
+ *         char save = value[valueLength];
+ *         value[valueLength] = '\0';
+ *         // "Found: bar.foo -> xyz\n" will be printed.
+ *         printf("Found: %s -> %s\n", key, value);
+ *         value[valueLength] = save;
+ *     }
+ * @endcode
  */
 /* @[declare_json_search] */
 JSONStatus_t JSON_Search( char * buf,
