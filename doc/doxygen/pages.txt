@@ -28,14 +28,14 @@ The configurations for memory estimation are defined <a href="https://github.com
         <td><b>With -Os Optimisation</b></td>
     </tr>
     <tr>
-        <td>[<FIXME: library source, add more rows for more source>]</td>
-        <td>[<FIXME: Code size>]</td>
-        <td>[<FIXME: Code size>]</td>
+        <td>core_json.c</td>
+        <td>4.3K</td>
+        <td>3.5K</td>
     </tr>
     <tr>
         <td><b>Total estimates</b></td>
-        <td>[<FIXME: Total code size>]</td>
-        <td>[<FIXME: Total code size>]</td>
+        <td>4.3K</td>
+        <td>3.5K</td>
     </tr>
 </table>
  */
@@ -44,7 +44,27 @@ The configurations for memory estimation are defined <a href="https://github.com
 @page json_design Design
 JSON Library Design
 
-[<FIXME: Some useful design information.>]
+<h3>Memory Usage</h3>
+<p>
+All memory used by the JSON library is allocated on the stack. This makes it an
+ideal choice for running on memory-constrained microcontrollers. As a consequence,
+no state is kept between invocations, so the document must be re-parsed for each key lookup.
+</p>
+
+<h3>Parsing Strictness</h3>
+<p>
+Input validation is necessary for strong security posture. As such, in addition
+to validating all supported JSON data types, unicode strings are also checked
+for illegal multibyte sequences.
+</p>
+
+<h3>Compliance & Coverage</h3>
+<p>
+Like our other libraries, the JSON library is designed to be compliant with ISO C90
+and MISRA C. All functions are written to have minimal complexity, and 
+several test cases are used to cover every path of execution and achieve
+100% branch coverage.
+</p>
 */
 
 /**
