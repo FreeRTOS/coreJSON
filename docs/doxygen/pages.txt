@@ -1,6 +1,6 @@
 /**
 @mainpage Overview
-@brief JSON Library
+@brief coreJSON Library
 
 <p>JSON (JavaScript Object Notation) is a data interchange format consisting of documents that contain key-value pairs and array data types. 
 This library is able to both validate and parse a JSON document by returning the value
