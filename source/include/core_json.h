@@ -73,14 +73,8 @@ typedef enum
  *
  *     result = JSON_Validate( buf, bufLength );
  *
- *     if( result == JSONSuccess )
- *     {
- *         // JSON document is valid.
- *     }
- *     else
- *     {
- *         // JSON document is invalid.
- *     }
+ *     // JSON document is valid.
+ *     assert( result == JSONSuccess );
  * @endcode
  */
 /* @[declare_json_validate] */
@@ -139,7 +133,7 @@ JSONStatus_t JSON_Validate( const char * buf,
  *     char * value;
  *     size_t valueLength;
  *
- *     // If you know the JSON document is valid, this call is not necessary.
+ *     // Calling JSON_Validate() is not necessary if the document is guaranteed to be valid.
  *     result = JSON_Validate( buf, bufLength );
  *
  *     if( result == JSONSuccess )
