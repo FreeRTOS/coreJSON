@@ -4,42 +4,22 @@ This repository contains an ISO C90-compliant JSON library that is able to both 
 
 ## Reference Examples
 
-#### Validating a JSON document
 ```c
 // Variables used in this example.
 JSONStatus_t result;
 char * buf = "{\"foo\":\"abc\",\"bar\":{\"foo\":\"xyz\"}";
 size_t bufLength = sizeof( buf ) - 1;
- 
-result = JSON_Validate( buf, bufLength );
- 
-if( result == JSONSuccess )
-{
-    // JSON document is valid.
-}
-else
-{
-    // JSON document is invalid.
-}
-```
-
-#### Finding a value from a JSON document given a query key
-```c
-// Variables used in this example.
-JSONStatus_t result;
-char * buf = "{\"foo\":\"abc\",\"bar\":{\"foo\":\"xyz\"}";
-size_t bufLength = sizeof( buf ) - 1;
-char * key = "bar.foo";
-size_t keyLength = sizeof( key ) - 1;
+char * queryKey = "bar.foo";
+size_t queryKeyLength = sizeof( queryKey ) - 1;
 char * value;
 size_t valueLength;
  
-// If you know the JSON document is valid, this call is not necessary.
+// Calling JSON_Validate() is not necessary if the document is guaranteed to be valid.
 result = JSON_Validate( buf, bufLength );
  
 if( result == JSONSuccess )
 {
-    result = JSON_Search( buf, bufLength, key, keyLength, '.',
+    result = JSON_Search( buf, bufLength, queryKey, queryKeyLength, '.',
                           &value, &valueLength );
 }
  
@@ -47,11 +27,12 @@ if( result == JSONSuccess )
 {
     char save = value[ valueLength ];
     value[ valueLength ] = '\0';
-    // "Found: bar.foo -> xyz\n" will be printed.
-    printf( "Found: %s -> %s\n", key, value );
+    // "Found: bar.foo -> xyz" will be printed.
+    printf( "Found: %s -> %s\n", queryKey, value );
     value[ valueLength ] = save;
 }
 ```
+A search may descend through nested objects when the `queryKey` contains matching key strings joined by a separator (e.g. `.`). In the example above, `bar` has the value `{"foo":"xyz"}`. Therefore, a search for query key `bar.foo` would output `xyz`.
 
 
 ## Building Unit Tests
