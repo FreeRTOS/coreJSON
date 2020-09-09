@@ -57,5 +57,6 @@ jobs:
           sudo apt-get install -y libclang-9-dev
       - name: Run Doxygen And Verify Stdout Is Empty
         run: |
+          if [ ! -d docs/doxygen/ ]; then exit 0; fi
           doxygen docs/doxygen/config.doxyfile 2>&1 | tee doxyoutput.txt
           if [[ "$(wc -c < doxyoutput.txt | bc)" = "0" ]]; then exit 0; else exit 1; fi
