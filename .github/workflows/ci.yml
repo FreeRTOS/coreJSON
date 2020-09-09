@@ -1,12 +1,10 @@
 name: CI Checks
-
 on:
   push:
     branches: ["**"]
   pull_request:
     branches: [master]
   workflow_dispatch:
-
 jobs:
   unittest:
     runs-on: ubuntu-latest
@@ -16,10 +14,10 @@ jobs:
       - name: Build
         run: |
           sudo apt-get install -y lcov
-          cmake -S . -B build/ \
+          cmake -S test/unit-test -B build/ \
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_C_FLAGS='--coverage -Wall -Wextra -DNDEBUG'
+          -DCMAKE_C_FLAGS='--coverage -Wall -Wextra -Werror -DNDEBUG'
           make -C build/ all
       - name: Test
         run: |
@@ -31,7 +29,7 @@ jobs:
           make -C build/ coverage
           lcov --rc lcov_branch_coverage=1 --remove build/coverage.info '*test*' --output-file build/coverage.info
           lcov --rc lcov_branch_coverage=1 --remove build/coverage.info '*CMakeCCompilerId*' --output-file build/coverage.info
-          lcov --rc lcov_branch_coverage=1 --remove build/coverage.info '*third-party*' --output-file build/coverage.info
+          lcov --rc lcov_branch_coverage=1 --remove build/coverage.info '*mocks*' --output-file build/coverage.info
           lcov --list build/coverage.info
       - name: lcov-cop
         uses: ChicagoFlutter/lcov-cop@v1.0.2
@@ -59,6 +57,5 @@ jobs:
           sudo apt-get install -y libclang-9-dev
       - name: Run Doxygen And Verify Stdout Is Empty
         run: |
-          if [ ! -d docs/doxygen/ ]; then exit 0; fi
-          doxygen docs/doxygen/config.doxyfile | tee doxyoutput.txt
+          doxygen docs/doxygen/config.doxyfile 2>&1 | tee doxyoutput.txt
           if [[ "$(wc -c < doxyoutput.txt | bc)" = "0" ]]; then exit 0; else exit 1; fi
