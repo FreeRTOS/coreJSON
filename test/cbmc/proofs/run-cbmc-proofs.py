@@ -37,7 +37,7 @@ executes these tasks in parallel.
 
 The tool is roughly equivalent to doing this:
 
-        litani init --project "FreeRTOS coreMQTT";
+        litani init --project "FreeRTOS coreJSON";
 
         find . -name cbmc-batch.yaml | while read -r proof; do
             pushd $(dirname ${proof});
@@ -81,7 +81,7 @@ def get_args():
     }, {
             "flags": ["--project-name"],
             "metavar": "NAME",
-            "default": "FreeRTOS coreMQTT",
+            "default": "FreeRTOS coreJSON",
             "help": "Project name for report. Default: %(default)s",
     }, {
 
@@ -200,7 +200,7 @@ async def configure_proof_dirs(queue, counter, kissat_path):
 
 
 # PROJECT SPECIFIC
-# This is here because MQTT requires that CBMC use an external solver called
+# This is here because JSON requires that CBMC use an external solver called
 # Kissat to ensure timely proof runs.
 def get_kissat_path(use_native_solver):
     if use_native_solver:
@@ -211,7 +211,7 @@ def get_kissat_path(use_native_solver):
             Could not find 'kissat' executable. Either install kissat or
             pass the '--use-native-solver' flag (not recommended).
 
-            By default, MQTT uses the 'kissat' SAT solver to run the CBMC
+            By default, JSON uses the 'kissat' SAT solver to run the CBMC
             proofs, as this is much faster than CBMC's default solver. You will
             need to build kissat and put it in your $PATH.  You can get kissat
             from https://github.com/arminbiere/kissat
