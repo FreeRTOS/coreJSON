@@ -12,7 +12,7 @@ function(create_test test_name
     add_custom_command(OUTPUT ${test_name}_runner.c
                   COMMAND ruby
                     ${CMOCK_DIR}/vendor/unity/auto/generate_test_runner.rb
-                    ${CMAKE_SOURCE_DIR}/tools/cmock/project.yml
+                    ${MODULE_ROOT_DIR}/tools/cmock/project.yml
                     ${test_src_absolute}
                     ${test_name}_runner.c
                   DEPENDS ${test_src}

@@ -1,5 +1,4 @@
-include("../../jsonFilePaths.cmake")
-project ("core_json unit test")
+include( ${MODULE_ROOT_DIR}/jsonFilePaths.cmake )
 
 # ====================  Define your project name (edit) ========================
 set(project_name "core_json")
