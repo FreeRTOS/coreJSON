@@ -43,7 +43,7 @@ A search may descend through nested objects when the `queryKey` contains matchin
 - For running unit tests, Ruby 2.0.0 or later is additionally required for the CMock test framework (that we use).
 - For running the coverage target, gcov is additionally required.
 
-### Steps to build **Library** and **Unit Tests**
+### Steps to build Unit Tests
 
 1. Go to the root directory of this repository.
 
