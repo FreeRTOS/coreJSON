@@ -11,3 +11,6 @@ TAGS-*
 # Emitted by Arpa
 arpa_cmake/
 Makefile.arpa
+
+# Emitted by litani
+.litani_cache_dir
