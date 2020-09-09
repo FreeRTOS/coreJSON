@@ -47,11 +47,13 @@ A search may descend through nested objects when the `queryKey` contains matchin
 
 1. Go to the root directory of this repository.
 
-1. Run *cmake* while inside build directory: `cmake -S ../test -B build -DBUILD_CLONE_SUBMODULES=ON `
+1. Create build directory: `mkdir build && cd build`
 
-1. Run this command to build the library and unit tests: `make -C build all`
+1. Run *cmake* while inside build directory: `cmake -S ../test/unit-test `
 
-1. The built library will be present in `build/lib` folder, and generated test executables will be present in `build/bin/tests` folder.
+1. Run this command to build the library and unit tests: `make all`
+
+1. The generated test executables will be present in `build/bin/tests` folder.
 
 1. Run `ctest` to execute all tests and view the test run summary.
 
