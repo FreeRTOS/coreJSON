@@ -16,5 +16,6 @@ PROOF_SOURCES += $(PROOF_STUB)/skipUTF8.c
 
 include ../Makefile-json.common
 
-$(PROOFDIR)/core_json.c: $(SRCDIR)/source/core_json.c
-	sed -E '1s/^/#include "core_json_annex.h" /; s/^static //; s/bool_ skip(Escape|UTF8)\b/&_/' $< > $@
+# Substitution command to pass to sed for patching core_json.c. The
+# characters " and # must be escaped with backslash.
+CORE_JSON_SED_EXPR = 1s/^/\#include \"core_json_annex.h\" /; s/^static //; s/bool_ skip(Escape|UTF8)\b/&_/
