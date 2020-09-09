@@ -1,6 +1,6 @@
 ## coreJSON Library
 
-A JSON parser in C complying with the official ECMA-404 - JSON Data Interchange Standard
+A parser strictly enforcing the ECMA-404 JSON standard, suitable for microcontrollers
 
 ## Reference example
 
