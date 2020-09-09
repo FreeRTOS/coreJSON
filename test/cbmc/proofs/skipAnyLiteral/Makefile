@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 HARNESS_FILE=skipAnyLiteral_harness
+PROOF_UID=skipAnyLiteral
 
 # This value was experimentally chosen to provide 100% coverage
 # without tripping unwinding assertions and without exhausting memory.
