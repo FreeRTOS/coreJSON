@@ -2,7 +2,7 @@
 
 A JSON parser written in C compliant with the official ECMA-404 - JSON Data Interchange Standard.
 
-## Reference examples
+## Reference example
 
 ```c
 #include <stdio.h>
@@ -47,15 +47,15 @@ A search may descend through nested objects when the `queryKey` contains matchin
 
 ## Building coreJSON
 
-A compiler that supports **C89 or later** such as `gcc` is required to build the library.
+A compiler that supports **C89 or later** such as *gcc* is required to build the library.
 
-For instance, if the example above is copied to a file named `example.c`, `gcc` can be used like so:
+For instance, if the example above is copied to a file named `example.c`, *gcc* can be used like so:
 ```bash
 gcc -I source/include example.c source/core_json.c -o example
 ./example
 ```
 
-`gcc` can also produce an output file to be linked:
+*gcc* can also produce an output file to be linked:
 ```bash
 gcc -I source/include -c source/core_json.c
 ```
