@@ -14,5 +14,6 @@ UNWINDSET += strnEq.0:$(CBMC_MAX_BUFSIZE)
 
 include ../Makefile-json.common
 
-$(PROOFDIR)/core_json.c: $(SRCDIR)/source/core_json.c
-	sed 's/^static //' $< > $@
+# Substitution command to pass to sed for patching core_json.c. The
+# characters " and # must be escaped with backslash.
+CORE_JSON_SED_EXPR = s/^static //
