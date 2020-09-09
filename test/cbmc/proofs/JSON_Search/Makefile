@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 HARNESS_FILE=JSON_Search_harness
+PROOF_UID=JSON_Search
 
 # These values were experimentally chosen to provide 100% coverage
 # without tripping unwinding assertions and without exhausting memory.
