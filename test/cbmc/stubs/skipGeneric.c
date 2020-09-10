@@ -34,7 +34,7 @@ static bool_ skipGeneric( const char * buf,
     bool_ ret = false;
 
     assert( ( buf != NULL ) && ( start != NULL ) );
-    assert( ( min > 0 ) && ( max > 0 ) );
+    assert( min > 0 );
 
     if( *start < max )
     {
