@@ -68,7 +68,7 @@ jobs:
           with:
             ref: master
             repository: aws/aws-iot-device-sdk-embedded-C
-        - run: rm -r libraries/standard/coreJSON
+        - run: rm -rf libraries/standard/coreJSON
         - name: Clone This Repo
           uses: actions/checkout@v2
           with:
