@@ -283,32 +283,7 @@ static uint8_t hexToInt( char c )
 }
 
 /**
- * @brief Determine if a lone surrogate character is high.
- *
- * @param[in] x  The lone surrogate character to check.
- *
- * @return true if the lone surrogate character is high;
- * false otherwise.
- */
-#define isHighSurrogate( x )    ( ( ( x ) >= 0xD800U ) && ( ( x ) <= 0xDBFFU ) )
-
-/**
- * @brief Determine if a lone surrogate character is low.
- *
- * @param[in] x  The lone surrogate character to check.
- *
- * @return true if the lone surrogate character is low;
- * false otherwise.
- */
-#define isLowSurrogate( x )     ( ( ( x ) >= 0xDC00U ) && ( ( x ) <= 0xDFFFU ) )
-
-/**
- * @def HEX_ESCAPE_LENGTH
- * The length of a hex escape (e.g \\u1234)
- */
-
-/**
- * @brief Advance buffer index beyond a \\u Unicode escape sequence.
+ * @brief Advance buffer index beyond a \u Unicode escape sequence.
  *
  * @param[in] buf  The buffer to parse.
  * @param[in,out] start  The index at which to begin.
@@ -323,8 +298,10 @@ static uint8_t hexToInt( char c )
  * @return true if a valid escape sequence was present;
  * false otherwise.
  *
- * @note For the sake of security, \\u0000 is disallowed.
+ * @note For the sake of security, \u0000 is disallowed.
  */
+#define isHighSurrogate( x )    ( ( ( x ) >= 0xD800U ) && ( ( x ) <= 0xDBFFU ) )
+#define isLowSurrogate( x )     ( ( ( x ) >= 0xDC00U ) && ( ( x ) <= 0xDFFFU ) )
 
 /* MISRA Rule 17.2 prohibits recursion due to the
  * risk of exceeding available stack space.  In this
@@ -404,7 +381,7 @@ static bool_ skipHexEscape( const char * buf,
  * @return true if a valid escape sequence was present;
  * false otherwise.
  *
- * @note For the sake of security, \\NUL is disallowed.
+ * @note For the sake of security, \NUL is disallowed.
  */
 static bool_ skipEscape( const char * buf,
                          size_t * start,
@@ -592,11 +569,6 @@ static bool_ skipLiteral( const char * buf,
 
     return ret;
 }
-
-/**
- * @def skipLit_(x)
- * A helper macro function to determine if a literal is true, false, or null.
- */
 
 /**
  * @brief Advance buffer index beyond a JSON literal.
@@ -964,11 +936,6 @@ static void skipScalars( const char * buf,
     }
 }
 
-#ifndef JSON_MAX_DEPTH
-    /* Default value for the maximum depth of a JSON document. */
-    #define JSON_MAX_DEPTH    32
-#endif
-
 /**
  * @brief Advance buffer index beyond a collection and handle nesting.
  *
@@ -984,6 +951,9 @@ static void skipScalars( const char * buf,
  * #JSONMaxDepthExceeded if object and array nesting exceeds a threshold;
  * #JSONPartial if the buffer contents are potentially valid but incomplete.
  */
+#ifndef JSON_MAX_DEPTH
+    #define JSON_MAX_DEPTH    32
+#endif
 static JSONStatus_t skipCollection( const char * buf,
                                     size_t * start,
                                     size_t max )
