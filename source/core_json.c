@@ -40,7 +40,6 @@ typedef enum
 #define iscntrl_( x )    ( ( x >= '\0' ) && ( x < ' ' ) )
 /* NB. This is whitespace as defined by the JSON standard (ECMA-404). */
 #define isspace_( x )    ( ( x == ' ' ) || ( x == '\t' ) || ( x == '\n' ) || ( x == '\r' ) )
-/** @endcond */
 
 /**
  * @brief Advance buffer index beyond whitespace.
@@ -965,10 +964,6 @@ static void skipScalars( const char * buf,
     }
 }
 
-/**
- * @brief Determines the maximum level of nesting for arrays and objects in a
- * JSON document.
- */
 #ifndef JSON_MAX_DEPTH
     /* Default value for the maximum depth of a JSON document. */
     #define JSON_MAX_DEPTH    32
@@ -1056,12 +1051,7 @@ static JSONStatus_t skipCollection( const char * buf,
     return ret;
 }
 
-/**
- * @brief Determines whether a valid document must contain an object or array.
- */
-#ifdef IN_DOXYGEN
-    #define JSON_VALIDATE_COLLECTIONS_ONLY
-#endif /* IN_DOXYGEN */
+/** @endcond */
 
 /**
  * See core_json.h for docs.
