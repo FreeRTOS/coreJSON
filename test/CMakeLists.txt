@@ -47,7 +47,7 @@ target_include_directories( coverity_analysis PUBLIC ${JSON_INCLUDE_PUBLIC_DIRS}
 include( unit-test/cmock_build.cmake )
 
 # Check if the CMock source directory exists, and if not present, clone the submodule
-# if BUILD_CLONE_SUBMODULES configuration is enabled. 
+# if BUILD_CLONE_SUBMODULES configuration is enabled.
 if( NOT EXISTS ${CMOCK_DIR}/src )
     # Attempt to clone CMock.
     if( ${BUILD_CLONE_SUBMODULES} )
