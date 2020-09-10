@@ -21,7 +21,7 @@
 
 /**
  * @file core_json.h
- * @brief User-facing functions of the JSON library.
+ * @brief Include this header file to use coreJSON in your application.
  */
 
 #ifndef CORE_JSON_H_
@@ -31,7 +31,7 @@
 
 /**
  * @ingroup json_enum_types
- * @brief Return codes from JSON library functions.
+ * @brief Return codes from coreJSON library functions.
  */
 typedef enum
 {

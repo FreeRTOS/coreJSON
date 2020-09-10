@@ -21,7 +21,7 @@
 
 /**
  * @file core_json.c
- * @brief Implements the user-facing functions in core_json.h.
+ * @brief The source file that implements the user-facing functions in core_json.h.
  */
 
 #include <assert.h>
@@ -29,46 +29,18 @@
 #include <stdint.h>
 #include "core_json.h"
 
-/**
- * @ingroup json_enum_types
- * @brief A means to typedef true and false as 1 and 0 respectively.
- */
+/** @cond DO_NOT_DOCUMENT */
 typedef enum
 {
     true = 1,
     false = 0
 } bool_;
 
-/**
- * @brief Determine if an ASCII character is a number.
- *
- * @param[in] x  The ASCII character to check.
- *
- * @return true if the ASCII character is a number;
- * false otherwise.
- */
 #define isdigit_( x )    ( ( x >= '0' ) && ( x <= '9' ) )
-
-/**
- * @brief Determine if an ASCII character is a control character.
- *
- * @param[in] x  The ASCII character to check.
- *
- * @return true if the ASCII character is a control character;
- * false otherwise.
- */
 #define iscntrl_( x )    ( ( x >= '\0' ) && ( x < ' ' ) )
-
-/**
- * @brief Determine if an ASCII character is whitespace as defined by the 
- * JSON standard (ECMA-404).
- *
- * @param[in] x  The ASCII character to check.
- *
- * @return true if the ASCII character is whitespace;
- * false otherwise.
- */
+/* NB. This is whitespace as defined by the JSON standard (ECMA-404). */
 #define isspace_( x )    ( ( x == ' ' ) || ( x == '\t' ) || ( x == '\n' ) || ( x == '\r' ) )
+/** @endcond */
 
 /**
  * @brief Advance buffer index beyond whitespace.
@@ -332,6 +304,11 @@ static uint8_t hexToInt( char c )
 #define isLowSurrogate( x )     ( ( ( x ) >= 0xDC00U ) && ( ( x ) <= 0xDFFFU ) )
 
 /**
+ * @def HEX_ESCAPE_LENGTH
+ * The length of a hex escape (e.g \\u1234)
+ */
+
+/**
  * @brief Advance buffer index beyond a \\u Unicode escape sequence.
  *
  * @param[in] buf  The buffer to parse.
@@ -368,7 +345,7 @@ static bool_ skipHexEscape( const char * buf,
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
-    #define HEX_ESCAPE_LENGTH  ( 6U )  /* e.g., \u1234 */
+    #define HEX_ESCAPE_LENGTH  ( 6U ) /* e.g., \u1234 */
     end = i + HEX_ESCAPE_LENGTH;
 
     if( ( end < max ) && ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
@@ -618,8 +595,8 @@ static bool_ skipLiteral( const char * buf,
 }
 
 /**
- * \def skipLit_(x)
- * Determines of a literal is true, false, or null.
+ * @def skipLit_(x)
+ * A helper macro function to determine if a literal is true, false, or null.
  */
 
 /**
@@ -1080,7 +1057,7 @@ static JSONStatus_t skipCollection( const char * buf,
 }
 
 /**
- * @brief Determines whether to validate collections only.
+ * @brief Determines whether a valid document must contain an object or array.
  */
 #ifdef IN_DOXYGEN
     #define JSON_VALIDATE_COLLECTIONS_ONLY
@@ -1110,6 +1087,7 @@ JSONStatus_t JSON_Validate( const char * buf,
     {
         skipSpace( buf, &i, max );
 
+        /** @cond DO_NOT_DOCUMENT */
         #ifndef JSON_VALIDATE_COLLECTIONS_ONLY
             if( skipAnyScalar( buf, &i, max ) == true )
             {
@@ -1117,6 +1095,7 @@ JSONStatus_t JSON_Validate( const char * buf,
             }
             else
         #endif
+        /** @endcond */
         {
             ret = skipCollection( buf, &i, max );
         }

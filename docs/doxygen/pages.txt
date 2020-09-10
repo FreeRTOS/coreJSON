@@ -2,16 +2,11 @@
 @mainpage Overview
 @brief coreJSON Library
 
-<p>JSON (JavaScript Object Notation) is a data interchange format consisting of documents that contain key-value pairs and array data types. 
-This library is able to both validate and parse a JSON document by returning the value
-associated with any key. This library was designed with the following requirements in mind:</p>
-
-<ul>
-<li>Identify any malformed JSON document and return an appropriate error.</li>
-<li>Successfully parse a JSON document and return the value associated with any key.</li>
-<li>Handle different data types for values such as objects, integers, real numbers, arrays, booleans, and unicode strings.</li>
-<li>Allocate any memory used on the stack.</li>
-</ul>
+<p>
+A parser that supports key lookups while also strictly enforcing the ECMA-404 JSON standard. 
+The library is written in C and designed to be compliant with ISO C90 and MISRA C. It has proven safe memory use 
+and no heap allocation, making it suitable for IoT microcontrollers, but also fully portable to other platforms.
+</p>
 
 @section json_memory_requirements Memory Requirements
 @brief Memory requirements of the JSON library.
@@ -20,7 +15,7 @@ The configurations for memory estimation are defined <a href="https://github.com
 
 <table>
     <tr>
-        <td colspan="3"><b>Code Size of JSON LTS rc1 (example generated with GCC for ARM Cortex-M)</b></td>
+        <td colspan="3"><b>Code Size of coreJSON (example generated with GCC for ARM Cortex-M)</b></td>
     </tr>
     <tr>
         <td><b>File</b></td>
@@ -46,24 +41,23 @@ JSON Library Design
 
 <h3>Memory Usage</h3>
 <p>
-All memory used by the JSON library is allocated on the stack. This makes it an
-ideal choice for running on memory-constrained microcontrollers. As a consequence,
-no state is kept between invocations, so the document must be re-parsed for each key lookup.
+All functions in the JSON library operate only on the buffers provided and use only
+local variables on the stack. In order to support static-only usage, we made a 
+trade-off to re-parse as necessary so that we would not need to keep state.
 </p>
 
 <h3>Parsing Strictness</h3>
 <p>
-Input validation is necessary for strong security posture. As such, in addition
-to validating all supported JSON data types, unicode strings are also checked
-for illegal multibyte sequences.
+Input validation is necessary for strong security posture. As such, the parser 
+strictly enforces the ECMA-404 JSON standard. Additionally, JSON documents are  
+checked for illegal UTF8 sequences, and strings have unicode hex escapes validated.
 </p>
 
 <h3>Compliance & Coverage</h3>
 <p>
-Like our other libraries, the JSON library is designed to be compliant with ISO C90
-and MISRA C. All functions are written to have minimal complexity, and 
-several test cases are used to cover every path of execution and achieve
-100% branch coverage.
+The JSON library is designed to be compliant with ISO C90 and MISRA C.
+All functions are written to have minimal complexity. Unit tests and CBMC proofs 
+are written to cover every path of execution and achieve 100% branch coverage.
 </p>
 */
 
