@@ -29,23 +29,23 @@ typedef enum
     true = 1, false = 0
 } bool_;
 
-#define boolEnum( x ) ( ( x == true ) || ( x == false ) )
+#define boolEnum( x )         ( ( x == true ) || ( x == false ) )
 
 /* parameter check fail values for JSON API functions */
-#define parameterEnum( x )  ( ( x == JSONNullParameter ) || ( x == JSONBadParameter ) )
+#define parameterEnum( x )    ( ( x == JSONNullParameter ) || ( x == JSONBadParameter ) )
 
 /* These 3 enums represent all the ways skipCollection() can fail. */
 #define skipCollectionFailEnum( x ) \
     ( ( x == JSONPartial ) || ( x == JSONIllegalDocument ) || ( x == JSONMaxDepthExceeded ) )
 
 /* All possible return values for skipCollection() */
-#define skipCollectionEnum( x )  ( skipCollectionFailEnum( x ) || ( x == JSONSuccess ) )
+#define skipCollectionEnum( x )    ( skipCollectionFailEnum( x ) || ( x == JSONSuccess ) )
 
 /* All possible return values for JSON_Validate() */
-#define jsonValidateEnum( x )  ( skipCollectionEnum( x ) || parameterEnum( x ) )
+#define jsonValidateEnum( x )      ( skipCollectionEnum( x ) || parameterEnum( x ) )
 
 /* All possible return values for JSON_Search() */
-#define jsonSearchEnum( x )  ( jsonValidateEnum( x ) || ( x == JSONNotFound ) )
+#define jsonSearchEnum( x )        ( jsonValidateEnum( x ) || ( x == JSONNotFound ) )
 
 /*
  * These are declarations for the (normally) static functions from core_json.c.

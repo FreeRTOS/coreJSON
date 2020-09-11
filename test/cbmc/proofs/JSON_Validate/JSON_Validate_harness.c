@@ -44,5 +44,4 @@ void harness()
     ret = JSON_Validate( buf, max );
 
     __CPROVER_assert( jsonValidateEnum( ret ), "The return value is a subset of JSONStatus_t." );
-
 }
