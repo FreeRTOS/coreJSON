@@ -8,6 +8,7 @@ The proof runs in a few seconds and provides complete coverage of:
 * hexToInt()
 * skipEscape()
 * skipHexEscape()
+* skipOneHexEscape()
 
 To run the proof.
 * Add cbmc, goto-cc, goto-instrument, goto-analyzer, and cbmc-viewer

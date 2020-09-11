@@ -4,8 +4,11 @@ ascii
 bf
 bmp
 buf
+bufferlength
 buflength
 com
+cond
+corejson
 coverity
 dbff
 dc
@@ -13,7 +16,10 @@ df
 dfff
 ecma
 ef
+endcode
+endcond
 endif
+enum
 enums
 fb
 fc
@@ -24,6 +30,7 @@ ffff
 foo
 ifndef
 inc
+ingroup
 json
 jsonbadparameter
 jsonillegaldocument
@@ -31,6 +38,7 @@ jsonmaxdepthexceeded
 jsonnotfound
 jsonnullparameter
 jsonpartial
+jsonstatus
 jsonsuccess
 keylength
 len
