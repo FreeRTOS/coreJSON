@@ -17,9 +17,6 @@
 # COMPILE_FLAGS =
 COMPILE_FLAGS += -ansi
 
-PROJECT_NAME = "FreeRTOS coreJSON"
-LITANI = $(SRCDIR)/test/cbmc/litani/litani
-
 # Flags to pass to goto-cc for linking (typically those passed to gcc)
 # LINK_FLAGS =
 
