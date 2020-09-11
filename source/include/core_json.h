@@ -27,7 +27,7 @@
 #ifndef CORE_JSON_H_
 #define CORE_JSON_H_
 
-#include <stddef.h>
+#include <stddef.h> 
 
 /**
  * @ingroup json_enum_types

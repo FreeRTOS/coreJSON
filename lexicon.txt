@@ -4,8 +4,10 @@ ascii
 bf
 bmp
 buf
-buflength
+bufferlength
 com
+cond
+corejson
 coverity
 dbff
 dc
