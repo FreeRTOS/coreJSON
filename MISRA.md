@@ -8,7 +8,7 @@ Deviations from the MISRA standard are listed below:
 ### Ignored by [Coverity Configuration](https://github.com/aws/aws-iot-device-sdk-embedded-C/blob/master/tools/coverity/misra.config)
 | Deviation | Category | Justification |
 | :-: | :-: | :-: |
-| Directive 4.9 | Advisory | Allow inclusion of function like macros. The `assert` macro is used throughout the library for parameter validation. |
+| Directive 4.9 | Advisory | Allow inclusion of function like macros. |
 | Rule 3.1 | Required | Allow nested comments. C++ style `//` comments are used in example code within Doxygen documentation blocks. |
 | Rule 15.4 | Advisory | Allow more then one `break` statement to terminate a loop. |
 | Rule 19.2 | Advisory | Allow a `union` of a signed and unsigned type of identical sizes. |
