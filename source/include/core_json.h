@@ -68,10 +68,10 @@ typedef enum
  * @code{c}
  *     // Variables used in this example.
  *     JSONStatus_t result;
- *     char * buf = "{\"foo\":\"abc\",\"bar\":{\"foo\":\"xyz\"}";
- *     size_t bufLength = sizeof( buf ) - 1;
+ *     char buffer[] = "{\"foo\":\"abc\",\"bar\":{\"foo\":\"xyz\"}}";
+ *     size_t bufferLength = sizeof( buffer ) - 1;
  *
- *     result = JSON_Validate( buf, bufLength );
+ *     result = JSON_Validate( buffer, bufferLength );
  *
  *     // JSON document is valid.
  *     assert( result == JSONSuccess );
@@ -126,28 +126,31 @@ JSONStatus_t JSON_Validate( const char * buf,
  * @code{c}
  *     // Variables used in this example.
  *     JSONStatus_t result;
- *     char * buf = "{\"foo\":\"abc\",\"bar\":{\"foo\":\"xyz\"}";
- *     size_t bufLength = sizeof( buf ) - 1;
- *     char * key = "bar.foo";
- *     size_t keyLength = sizeof( key ) - 1;
+ *     char buffer[] = "{\"foo\":\"abc\",\"bar\":{\"foo\":\"xyz\"}}";
+ *     size_t bufferLength = sizeof( buffer ) - 1;
+ *     char queryKey[] = "bar.foo";
+ *     size_t queryKeyLength = sizeof( queryKey ) - 1;
  *     char * value;
  *     size_t valueLength;
- *
+ *     
  *     // Calling JSON_Validate() is not necessary if the document is guaranteed to be valid.
- *     result = JSON_Validate( buf, bufLength );
- *
+ *     result = JSON_Validate( buffer, bufferLength );
+ *     
  *     if( result == JSONSuccess )
  *     {
- *         result = JSON_Search( buf, bufLength, key, keyLength, '.',
+ *         result = JSON_Search( buffer, bufferLength, queryKey, queryKeyLength, '.',
  *                               &value, &valueLength );
  *     }
- *
+ *     
  *     if( result == JSONSuccess )
  *     {
+ *         // The pointer "value" will point to a location in the "buffer".
  *         char save = value[ valueLength ];
+ *         // After saving the character, set it to a null byte for printing.
  *         value[ valueLength ] = '\0';
- *         // "Found: bar.foo -> xyz\n" will be printed.
- *         printf( "Found: %s -> %s\n", key, value );
+ *         // "Found: bar.foo -> xyz" will be printed.
+ *         printf( "Found: %s -> %s\n", queryKey, value );
+ *         // Restore the original character.
  *         value[ valueLength ] = save;
  *     }
  * @endcode

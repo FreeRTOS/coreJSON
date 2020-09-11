@@ -1074,6 +1074,8 @@ JSONStatus_t JSON_Validate( const char * buf,
     return ret;
 }
 
+/** @cond DO_NOT_DOCUMENT */
+
 /**
  * @brief Output indexes for the next key-value pair of an object.
  *
@@ -1250,6 +1252,8 @@ static JSONStatus_t search( char * buf,
 
     return ret;
 }
+
+/** @endcond */
 
 /**
  * See core_json.h for docs.
