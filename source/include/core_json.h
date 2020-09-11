@@ -38,7 +38,7 @@ typedef enum
     JSONPartial = 0,      /**< @brief JSON document is valid so far but incomplete. */
     JSONSuccess,          /**< @brief JSON document is valid and complete. */
     JSONIllegalDocument,  /**< @brief JSON document is invalid or malformed. */
-    JSONMaxDepthExceeded, /**< @brief JSON document has nesting that exceeds #JSON_MAX_DEPTH. */
+    JSONMaxDepthExceeded, /**< @brief JSON document has nesting that exceeds JSON_MAX_DEPTH. */
     JSONNotFound,         /**< @brief Query key could not be found in the JSON document. */
     JSONNullParameter,    /**< @brief Pointer parameter passed to a function is NULL. */
     JSONBadParameter      /**< @brief Query key is empty, or any subpart is empty, or max is 0. */

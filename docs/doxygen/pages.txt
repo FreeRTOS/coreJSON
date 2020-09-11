@@ -62,23 +62,6 @@ are written to cover every path of execution and achieve 100% branch coverage.
 */
 
 /**
-@page json_config Configurations
-@brief Configurations of the JSON library.
-<!-- @par configpagestyle allows the @section titles to be styled according to style.css -->
-@par configpagestyle
-
-Configuration settings are C pre-processor constants. They can be set with a \#define in the header file (core_json.h) or by using a compiler option such as -D in gcc.
-
-@section JSON_MAX_DEPTH
-<br>
-@copydoc JSON_MAX_DEPTH
-
-@section JSON_VALIDATE_COLLECTIONS_ONLY
-<br>
-@copydoc JSON_VALIDATE_COLLECTIONS_ONLY
-*/
-
-/**
 @page json_functions Functions
 @brief Primary functions of the JSON library:<br><br>
 @subpage json_validate_function <br>
