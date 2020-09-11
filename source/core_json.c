@@ -19,14 +19,21 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/**
+ * @file core_json.c
+ * @brief The source file that implements the user-facing functions in core_json.h.
+ */
+
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 #include "core_json.h"
 
+/** @cond DO_NOT_DOCUMENT */
 typedef enum
 {
-    true = 1, false = 0
+    true = 1,
+    false = 0
 } bool_;
 
 #define isdigit_( x )    ( ( x >= '0' ) && ( x <= '9' ) )
@@ -314,7 +321,7 @@ static bool_ skipHexEscape( const char * buf,
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
-    #define HEX_ESCAPE_LENGTH  ( 6U )  /* e.g., \u1234 */
+#define HEX_ESCAPE_LENGTH    ( 6U )   /* e.g., \u1234 */
     end = i + HEX_ESCAPE_LENGTH;
 
     if( ( end < max ) && ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
@@ -533,6 +540,8 @@ static bool_ strnEq( const char * a,
  * @param[in] buf  The buffer to parse.
  * @param[in,out] start  The index at which to begin.
  * @param[in] max  The size of the buffer.
+ * @param[in] literal  The type of literal.
+ * @param[in] length  The length of the literal.
  *
  * @return true if the literal was present;
  * false otherwise.
@@ -906,6 +915,7 @@ static void skipObjectScalars( const char * buf,
  * @param[in] buf  The buffer to parse.
  * @param[in,out] start  The index at which to begin.
  * @param[in] max  The size of the buffer.
+ * @param[in] mode  The first character of an array '[' or object '{'.
  */
 static void skipScalars( const char * buf,
                          size_t * start,
@@ -1011,6 +1021,8 @@ static JSONStatus_t skipCollection( const char * buf,
     return ret;
 }
 
+/** @endcond */
+
 /**
  * See core_json.h for docs.
  *
@@ -1034,6 +1046,8 @@ JSONStatus_t JSON_Validate( const char * buf,
     else
     {
         skipSpace( buf, &i, max );
+
+        /** @cond DO_NOT_DOCUMENT */
         #ifndef JSON_VALIDATE_COLLECTIONS_ONLY
             if( skipAnyScalar( buf, &i, max ) == true )
             {
@@ -1041,6 +1055,7 @@ JSONStatus_t JSON_Validate( const char * buf,
             }
             else
         #endif
+        /** @endcond */
         {
             ret = skipCollection( buf, &i, max );
         }
@@ -1058,6 +1073,8 @@ JSONStatus_t JSON_Validate( const char * buf,
 
     return ret;
 }
+
+/** @cond DO_NOT_DOCUMENT */
 
 /**
  * @brief Output indexes for the next key-value pair of an object.
@@ -1235,6 +1252,8 @@ static JSONStatus_t search( char * buf,
 
     return ret;
 }
+
+/** @endcond */
 
 /**
  * See core_json.h for docs.
