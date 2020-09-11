@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 HARNESS_FILE=JSON_Search_harness
-PROOF_UID=JSON_Search
 
 # These values were experimentally chosen to provide 100% coverage
 # without tripping unwinding assertions and without exhausting memory.
@@ -24,6 +23,5 @@ PROOF_SOURCES += $(PROOF_STUB)/skipString.c
 
 include ../Makefile-json.common
 
-# Substitution command to pass to sed for patching core_json.c. The
-# characters " and # must be escaped with backslash.
-CORE_JSON_SED_EXPR = 1s/^/\#include \"core_json_annex.h\" /; s/^static //; s/(bool_|void|JSONStatus_t) skip(AnyScalar|Collection|Space|SpaceAndComma|String)\b/&_/
+$(PROOFDIR)/core_json.c: $(SRCDIR)/source/core_json.c
+	sed -E '1s/^/#include "core_json_annex.h" /; s/^static //; s/(bool_|void|JSONStatus_t) skip(AnyScalar|Collection|Space|SpaceAndComma|String)\b/&_/' $< > $@
