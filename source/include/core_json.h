@@ -27,7 +27,7 @@
 #ifndef CORE_JSON_H_
 #define CORE_JSON_H_
 
-#include <stddef.h> 
+#include <stddef.h>
 
 /**
  * @ingroup json_enum_types
@@ -132,16 +132,16 @@ JSONStatus_t JSON_Validate( const char * buf,
  *     size_t queryKeyLength = sizeof( queryKey ) - 1;
  *     char * value;
  *     size_t valueLength;
- *     
+ *
  *     // Calling JSON_Validate() is not necessary if the document is guaranteed to be valid.
  *     result = JSON_Validate( buffer, bufferLength );
- *     
+ *
  *     if( result == JSONSuccess )
  *     {
  *         result = JSON_Search( buffer, bufferLength, queryKey, queryKeyLength, '.',
  *                               &value, &valueLength );
  *     }
- *     
+ *
  *     if( result == JSONSuccess )
  *     {
  *         // The pointer "value" will point to a location in the "buffer".
