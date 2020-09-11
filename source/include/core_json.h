@@ -158,7 +158,7 @@ JSONStatus_t JSON_Validate( const char * buf,
 /* @[declare_json_search] */
 JSONStatus_t JSON_Search( char * buf,
                           size_t max,
-                          char * queryKey,
+                          const char * queryKey,
                           size_t queryKeyLength,
                           char separator,
                           char ** outValue,
