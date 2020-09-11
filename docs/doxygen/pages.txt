@@ -4,8 +4,8 @@
 @brief coreJSON Library
 
 <p>
-A parser that supports key lookups while also strictly enforcing the ECMA-404 JSON standard. 
-The library is written in C and designed to be compliant with ISO C90 and MISRA C. It has proven safe memory use 
+A parser that supports key lookups while also strictly enforcing the ECMA-404 JSON standard.
+The library is written in C and designed to be compliant with ISO C90 and MISRA C. It has proven safe memory use
 and no heap allocation, making it suitable for IoT microcontrollers, but also fully portable to other platforms.
 </p>
 
@@ -43,21 +43,21 @@ JSON Library Design
 <h3>Memory Usage</h3>
 <p>
 All functions in the JSON library operate only on the buffers provided and use only
-local variables on the stack. In order to support static-only usage, we made a 
+local variables on the stack. In order to support static-only usage, we made a
 trade-off to re-parse as necessary so that we would not need to keep state.
 </p>
 
 <h3>Parsing Strictness</h3>
 <p>
-Input validation is necessary for strong security posture. As such, the parser 
-strictly enforces the ECMA-404 JSON standard. Additionally, JSON documents are  
+Input validation is necessary for strong security posture. As such, the parser
+strictly enforces the ECMA-404 JSON standard. Additionally, JSON documents are
 checked for illegal UTF8 sequences, and strings have unicode hex escapes validated.
 </p>
 
 <h3>Compliance & Coverage</h3>
 <p>
 The JSON library is designed to be compliant with ISO C90 and MISRA C.
-All functions are written to have minimal complexity. Unit tests and CBMC proofs 
+All functions are written to have minimal complexity. Unit tests and CBMC proofs
 are written to cover every path of execution and achieve 100% branch coverage.
 </p>
 */
