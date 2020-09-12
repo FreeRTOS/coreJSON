@@ -1,6 +1,6 @@
 name : "coreJSON"
 version: "1.0.0"
-description: |-
+description: |
   "A parser strictly enforcing the ECMA-404 JSON standard, suitable for microcontrollers. \n"
 dependencies:
  - name: "CMock"
