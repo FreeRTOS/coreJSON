@@ -5,7 +5,8 @@ The coreJSON library files conform to the [MISRA C:2012](https://www.misra.org.u
 guidelines, with some noted exceptions. Compliance is checked with Coverity static analysis.
 Deviations from the MISRA standard are listed below:
 
-### Ignored by [Coverity Configuration](https://github.com/aws/aws-iot-device-sdk-embedded-C/blob/master/tools/coverity/misra.config)
+### Ignored by [Coverity Configuration](tools/coverity/misra.config)
+
 | Deviation | Category | Justification |
 | :-: | :-: | :-: |
 | Directive 4.9 | Advisory | Allow inclusion of function like macros. |
