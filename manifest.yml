@@ -2,10 +2,4 @@ name : "coreJSON"
 version: "1.0.0"
 description: |
   "A parser strictly enforcing the ECMA-404 JSON standard, suitable for microcontrollers. \n"
-dependencies:
- - name: "CMock"
-   version: "2.5.2"
-   repository:
-     type: "git"
-     url:  "https://github.com/ThrowTheSwitch/CMock"
 license: "MIT"
