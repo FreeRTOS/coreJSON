@@ -15,7 +15,7 @@ Deviations from the MISRA standard are listed below:
 | Rule 20.12 | Required | Allow use of `assert()`, which uses a parameter in both expanded and raw forms. |
 
 ### Flagged by Coverity
-None.
+*None.*
 
 ### Suppressed with Coverity Comments
 *None.*
