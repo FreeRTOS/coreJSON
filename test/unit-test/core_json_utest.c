@@ -551,6 +551,10 @@ void test_JSON_Validate_Illegal_Documents( void )
                                 CUT_AFTER_COMMA_SEPARATOR_LENGTH );
     TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
 
+    jsonStatus = JSON_Validate( CUT_AFTER_KEY,
+                                CUT_AFTER_KEY_LENGTH );
+    TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
+
     jsonStatus = JSON_Validate( TRAILING_COMMA_AFTER_VALUE,
                                 TRAILING_COMMA_AFTER_VALUE_LENGTH );
     TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
