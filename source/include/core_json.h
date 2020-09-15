@@ -1,4 +1,5 @@
 /*
+ * coreJSON V1.0.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -158,7 +159,7 @@ JSONStatus_t JSON_Validate( const char * buf,
 /* @[declare_json_search] */
 JSONStatus_t JSON_Search( char * buf,
                           size_t max,
-                          char * queryKey,
+                          const char * queryKey,
                           size_t queryKeyLength,
                           char separator,
                           char ** outValue,

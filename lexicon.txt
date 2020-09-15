@@ -5,6 +5,7 @@ bf
 bmp
 buf
 bufferlength
+cbmc
 com
 cond
 corejson
@@ -18,6 +19,7 @@ ef
 endcode
 endcond
 endif
+enum
 enums
 fb
 fc
@@ -36,6 +38,7 @@ jsonmaxdepthexceeded
 jsonnotfound
 jsonnullparameter
 jsonpartial
+jsonstatus
 jsonsuccess
 keylength
 len

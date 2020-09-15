@@ -1,4 +1,5 @@
 /*
+ * coreJSON V1.0.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -36,10 +37,19 @@ typedef enum
     false = 0
 } bool_;
 
-#define isdigit_( x )    ( ( x >= '0' ) && ( x <= '9' ) )
-#define iscntrl_( x )    ( ( x >= '\0' ) && ( x < ' ' ) )
+/* A compromise to satisfy both MISRA and CBMC */
+typedef union
+{
+    char c;
+    uint8_t u;
+} char_;
+
+#define isdigit_( x )    ( ( ( x ) >= '0' ) && ( ( x ) <= '9' ) )
+#define iscntrl_( x )    ( ( ( x ) >= '\0' ) && ( ( x ) < ' ' ) )
 /* NB. This is whitespace as defined by the JSON standard (ECMA-404). */
-#define isspace_( x )    ( ( x == ' ' ) || ( x == '\t' ) || ( x == '\n' ) || ( x == '\r' ) )
+#define isspace_( x )                          \
+    ( ( ( x ) == ' ' ) || ( ( x ) == '\t' ) || \
+      ( ( x ) == '\n' ) || ( ( x ) == '\r' ) )
 
 /**
  * @brief Advance buffer index beyond whitespace.
@@ -112,7 +122,7 @@ static bool_ shortestUTF8( size_t length,
     bool_ ret = false;
     uint32_t min, max;
 
-    assert( ( length >= 2 ) && ( length <= 4 ) );
+    assert( ( length >= 2U ) && ( length <= 4U ) );
 
     switch( length )
     {
@@ -171,20 +181,20 @@ static bool_ skipUTF8MultiByte( const char * buf,
     bool_ ret = false;
     size_t i, bitCount, j;
     uint32_t value = 0;
-    uint8_t c;
+    char_ c;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
     assert( i < max );
-    assert( buf[ i ] < 0 );
+    assert( buf[ i ] < '\0' );
 
-    c = ( 0x80U | ( buf[ i ] & 0x7F ) );
+    c.c = buf[ i ];
 
-    if( ( c > 0xC1U ) && ( c < 0xF5U ) )
+    if( ( c.u > 0xC1U ) && ( c.u < 0xF5U ) )
     {
-        bitCount = countHighBits( c );
-        value = ( ( uint32_t ) c ) & ( ( ( uint32_t ) 1 << ( 7U - bitCount ) ) - 1U );
+        bitCount = countHighBits( c.u );
+        value = ( ( uint32_t ) c.u ) & ( ( ( uint32_t ) 1 << ( 7U - bitCount ) ) - 1U );
 
         /* The bit count is 1 greater than the number of bytes,
          * e.g., when j is 2, we skip one more byte. */
@@ -197,13 +207,15 @@ static bool_ skipUTF8MultiByte( const char * buf,
                 break;
             }
 
+            c.c = buf[ i ];
+
             /* Additional bytes must match 10xxxxxx. */
-            if( ( buf[ i ] >= 0 ) || ( ( buf[ i ] & 0x40 ) != 0 ) )
+            if( ( c.u & 0xC0U ) != 0x80U )
             {
                 break;
             }
 
-            value = ( value << 6U ) | ( buf[ i ] & 0x3F );
+            value = ( value << 6U ) | ( c.u & 0x3FU );
         }
 
         if( ( j == 0U ) && ( shortestUTF8( bitCount, value ) == true ) )
@@ -237,7 +249,7 @@ static bool_ skipUTF8( const char * buf,
     if( *start < max )
     {
         /* an ASCII byte */
-        if( buf[ *start ] >= 0 )
+        if( buf[ *start ] >= '\0' )
         {
             *start += 1U;
             ret = true;
@@ -256,39 +268,98 @@ static bool_ skipUTF8( const char * buf,
  *
  * @param[in] c  The character to convert.
  *
- * @return the integer value upon success or UINT8_MAX on failure.
+ * @return the integer value upon success or NOT_A_HEX_CHAR on failure.
  */
+#define NOT_A_HEX_CHAR    ( 0x10U )
 static uint8_t hexToInt( char c )
 {
-    uint8_t n;
+    char_ n;
+
+    n.c = c;
 
     if( ( c >= 'a' ) && ( c <= 'f' ) )
     {
-        n = 10U + ( uint8_t ) ( c - 'a' );
+        n.c -= 'a';
+        n.u += 10U;
     }
     else if( ( c >= 'A' ) && ( c <= 'F' ) )
     {
-        n = 10U + ( uint8_t ) ( c - 'A' );
+        n.c -= 'A';
+        n.u += 10U;
     }
     else if( isdigit_( c ) )
     {
-        n = ( uint8_t ) ( c - '0' );
+        n.c -= '0';
     }
     else
     {
-        n = UINT8_MAX;
+        n.u = NOT_A_HEX_CHAR;
     }
 
-    return n;
+    return n.u;
 }
 
 /**
- * @brief Advance buffer index beyond a \u Unicode escape sequence.
+ * @brief Advance buffer index beyond a single \u Unicode
+ * escape sequence and output the value.
  *
  * @param[in] buf  The buffer to parse.
  * @param[in,out] start  The index at which to begin.
  * @param[in] max  The size of the buffer.
- * @param[in] requireLowSurrogate  true when a low surrogate is required.
+ * @param[out] outValue  The value of the hex digits.
+ *
+ * @return true if a valid escape sequence was present;
+ * false otherwise.
+ *
+ * @note For the sake of security, \u0000 is disallowed.
+ */
+static bool_ skipOneHexEscape( const char * buf,
+                               size_t * start,
+                               size_t max,
+                               uint16_t * outValue )
+{
+    bool_ ret = false;
+    size_t i, end;
+    uint16_t value = 0;
+
+    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert( outValue != NULL );
+
+    i = *start;
+#define HEX_ESCAPE_LENGTH    ( 6U )   /* e.g., \u1234 */
+    end = i + HEX_ESCAPE_LENGTH;
+
+    if( ( end < max ) && ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
+    {
+        for( i += 2U; i < end; i++ )
+        {
+            uint8_t n = hexToInt( buf[ i ] );
+
+            if( n == NOT_A_HEX_CHAR )
+            {
+                break;
+            }
+
+            value = ( value << 4U ) | n;
+        }
+    }
+
+    if( ( i == end ) && ( value > 0U ) )
+    {
+        ret = true;
+        *outValue = value;
+        *start = i;
+    }
+
+    return ret;
+}
+
+/**
+ * @brief Advance buffer index beyond one or a pair of \u Unicode escape sequences.
+ *
+ * @param[in] buf  The buffer to parse.
+ * @param[in,out] start  The index at which to begin.
+ * @param[in] max  The size of the buffer.
  *
  * Surrogate pairs are two escape sequences that together denote
  * a code point outside the Basic Multilingual Plane.  They must
@@ -303,63 +374,35 @@ static uint8_t hexToInt( char c )
 #define isHighSurrogate( x )    ( ( ( x ) >= 0xD800U ) && ( ( x ) <= 0xDBFFU ) )
 #define isLowSurrogate( x )     ( ( ( x ) >= 0xDC00U ) && ( ( x ) <= 0xDFFFU ) )
 
-/* MISRA Rule 17.2 prohibits recursion due to the
- * risk of exceeding available stack space.  In this
- * function, recursion is limited to exactly one level;
- * the recursive call sets the final argument to true
- * which satisfies the base case. */
-/* coverity[misra_c_2012_rule_17_2_violation] */
 static bool_ skipHexEscape( const char * buf,
                             size_t * start,
-                            size_t max,
-                            bool_ requireLowSurrogate )
+                            size_t max )
 {
     bool_ ret = false;
-    size_t i, end;
-    uint16_t value = 0;
+    size_t i;
+    uint16_t value;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
-#define HEX_ESCAPE_LENGTH    ( 6U )   /* e.g., \u1234 */
-    end = i + HEX_ESCAPE_LENGTH;
 
-    if( ( end < max ) && ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
+    if( skipOneHexEscape( buf, &i, max, &value ) == true )
     {
-        for( i += 2U; i < end; i++ )
+        if( isHighSurrogate( value ) )
         {
-            uint8_t n = hexToInt( buf[ i ] );
-
-            if( n == UINT8_MAX )
-            {
-                break;
-            }
-
-            value = ( value << 4U ) | n;
-        }
-
-        if( ( i == end ) && ( value > 0U ) )
-        {
-            if( requireLowSurrogate == true )
-            {
-                if( isLowSurrogate( value ) )
-                {
-                    ret = true;
-                }
-            }
-            else if( isHighSurrogate( value ) )
-            {
-                /* low surrogate must follow */
-                ret = skipHexEscape( buf, &i, max, true );
-            }
-            else if( isLowSurrogate( value ) )
-            {
-                /* premature low surrogate */
-            }
-            else
+            if( ( skipOneHexEscape( buf, &i, max, &value ) == true ) &&
+                ( isLowSurrogate( value ) ) )
             {
                 ret = true;
             }
+        }
+        else if( isLowSurrogate( value ) )
+        {
+            /* premature low surrogate */
+        }
+        else
+        {
+            ret = true;
         }
     }
 
@@ -404,7 +447,7 @@ static bool_ skipEscape( const char * buf,
                 break;
 
             case 'u':
-                ret = skipHexEscape( buf, &i, max, false );
+                ret = skipHexEscape( buf, &i, max );
                 break;
 
             case '"':
@@ -587,7 +630,7 @@ static bool_ skipAnyLiteral( const char * buf,
     bool_ ret = false;
 
 #define skipLit_( x ) \
-    ( skipLiteral( buf, start, max, x, ( sizeof( x ) - 1U ) ) == true )
+    ( skipLiteral( buf, start, max, ( x ), ( sizeof( x ) - 1U ) ) == true )
 
     if( skipLit_( "true" ) || skipLit_( "false" ) || skipLit_( "null" ) )
     {
@@ -1262,7 +1305,7 @@ static JSONStatus_t search( char * buf,
  */
 JSONStatus_t JSON_Search( char * buf,
                           size_t max,
-                          char * queryKey,
+                          const char * queryKey,
                           size_t queryKeyLength,
                           char separator,
                           char ** outValue,
