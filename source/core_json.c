@@ -51,6 +51,12 @@ typedef union
     ( ( ( x ) == ' ' ) || ( ( x ) == '\t' ) || \
       ( ( x ) == '\n' ) || ( ( x ) == '\r' ) )
 
+#define isOpenBracket_( x )     ( ( ( x ) == '{' ) || ( ( x ) == '[' ) )
+#define isCloseBracket_( x )    ( ( ( x ) == '}' ) || ( ( x ) == ']' ) )
+/* NB. The numeric values of the open and close bracket pairs differ by 2. */
+#define isMatchingBracket_( x, y ) \
+    ( isOpenBracket_( x ) && isCloseBracket_( y ) && ( ( x ) == ( ( y ) - 2 ) ) )
+
 /**
  * @brief Advance buffer index beyond whitespace.
  *
@@ -852,7 +858,7 @@ static bool_ skipSpaceAndComma( const char * buf,
         i++;
         skipSpace( buf, &i, max );
 
-        if( ( i < max ) && ( buf[ i ] != '}' ) && ( buf[ i ] != ']' ) )
+        if( ( i < max ) && !isCloseBracket_( buf[ i ] ) )
         {
             ret = true;
             *start = i;
@@ -903,7 +909,8 @@ static void skipArrayScalars( const char * buf,
  *
  * In JSON, objects consist of comma-separated key-value pairs.
  * A key is always a string (a scalar) while a value may be a
- * scalar, an object, or an array.
+ * scalar, an object, or an array.  A colon must appear between
+ * each key and value.
  *
  * @param[in] buf  The buffer to parse.
  * @param[in,out] start  The index at which to begin.
@@ -916,6 +923,7 @@ static void skipObjectScalars( const char * buf,
                                size_t max )
 {
     size_t i;
+    bool_ comma;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
@@ -938,18 +946,25 @@ static void skipObjectScalars( const char * buf,
         i++;
         skipSpace( buf, &i, max );
 
+        if( ( i < max ) && isOpenBracket_( buf[ i ] ) )
+        {
+            *start = i;
+            break;
+        }
+
         if( skipAnyScalar( buf, &i, max ) != true )
         {
             break;
         }
 
-        if( skipSpaceAndComma( buf, &i, max ) != true )
+        comma = skipSpaceAndComma( buf, &i, max );
+        *start = i;
+
+        if( comma != true )
         {
             break;
         }
     }
-
-    *start = i;
 }
 
 /**
@@ -965,7 +980,7 @@ static void skipScalars( const char * buf,
                          size_t max,
                          char mode )
 {
-    assert( ( mode == '[' ) || ( mode == '{' ) );
+    assert( isOpenBracket_( mode ) );
 
     skipSpace( buf, start, max );
 
@@ -1028,15 +1043,21 @@ static JSONStatus_t skipCollection( const char * buf,
                 }
 
                 stack[ depth ] = c;
+                skipScalars( buf, &i, max, stack[ depth ] );
                 break;
 
             case '}':
             case ']':
 
-                if( depth > 0 )
+                if( ( depth > 0 ) && isMatchingBracket_( stack[ depth ], c ) )
                 {
                     depth--;
-                    ( void ) skipSpaceAndComma( buf, &i, max );
+
+                    if( skipSpaceAndComma( buf, &i, max ) == true )
+                    {
+                        skipScalars( buf, &i, max, stack[ depth ] );
+                    }
+
                     break;
                 }
 
@@ -1052,8 +1073,6 @@ static JSONStatus_t skipCollection( const char * buf,
         {
             break;
         }
-
-        skipScalars( buf, &i, max, stack[ depth ] );
     }
 
     if( ret == JSONSuccess )
