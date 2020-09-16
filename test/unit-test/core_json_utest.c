@@ -123,6 +123,15 @@
     "\":{\"" SECOND_QUERY_KEY "\" : \"" COMPLETE_QUERY_KEY_ANSWER "\",}}"
 #define TRAILING_COMMA_AFTER_VALUE_LENGTH                  ( sizeof( TRAILING_COMMA_AFTER_VALUE ) - 1 )
 
+#define MISSING_COMMA_AFTER_VALUE                          "{\"foo\":{}\"bar\":\"abc\"}"
+#define MISSING_COMMA_AFTER_VALUE_LENGTH                   ( sizeof( MISSING_COMMA_AFTER_VALUE ) - 1 )
+
+#define MISSING_VALUE_AFTER_KEY                            "{\"foo\":{\"bar\":}}"
+#define MISSING_VALUE_AFTER_KEY_LENGTH                     ( sizeof( MISSING_VALUE_AFTER_KEY ) - 1 )
+
+#define MISMATCHED_BRACKETS                                "{\"foo\":{\"bar\":\"xyz\"]}"
+#define MISMATCHED_BRACKETS_LENGTH                         ( sizeof( MISMATCHED_BRACKETS ) - 1 )
+
 #define INCORRECT_OBJECT_SEPARATOR                         "{\"foo\": \"bar\"; \"bar\": \"foo\"}"
 #define INCORRECT_OBJECT_SEPARATOR_LENGTH                  ( sizeof( INCORRECT_OBJECT_SEPARATOR ) - 1 )
 
@@ -542,8 +551,24 @@ void test_JSON_Validate_Illegal_Documents( void )
                                 CUT_AFTER_COMMA_SEPARATOR_LENGTH );
     TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
 
+    jsonStatus = JSON_Validate( CUT_AFTER_KEY,
+                                CUT_AFTER_KEY_LENGTH );
+    TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
+
     jsonStatus = JSON_Validate( TRAILING_COMMA_AFTER_VALUE,
                                 TRAILING_COMMA_AFTER_VALUE_LENGTH );
+    TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
+
+    jsonStatus = JSON_Validate( MISSING_COMMA_AFTER_VALUE,
+                                MISSING_COMMA_AFTER_VALUE_LENGTH );
+    TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
+
+    jsonStatus = JSON_Validate( MISSING_VALUE_AFTER_KEY,
+                                MISSING_VALUE_AFTER_KEY_LENGTH );
+    TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
+
+    jsonStatus = JSON_Validate( MISMATCHED_BRACKETS,
+                                MISMATCHED_BRACKETS_LENGTH );
     TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
 
     jsonStatus = JSON_Validate( NUL_ESCAPE, NUL_ESCAPE_LENGTH );
@@ -716,10 +741,6 @@ void test_JSON_Validate_Partial_Documents( void )
 
     jsonStatus = JSON_Validate( CUT_AFTER_OBJECT_START_MARKER,
                                 CUT_AFTER_OBJECT_START_MARKER_LENGTH );
-    TEST_ASSERT_EQUAL( JSONPartial, jsonStatus );
-
-    jsonStatus = JSON_Validate( CUT_AFTER_KEY,
-                                CUT_AFTER_KEY_LENGTH );
     TEST_ASSERT_EQUAL( JSONPartial, jsonStatus );
 }
 
