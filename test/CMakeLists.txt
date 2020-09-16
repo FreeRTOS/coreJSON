@@ -38,7 +38,7 @@ include( ${MODULE_ROOT_DIR}/jsonFilePaths.cmake )
 # Target for Coverity analysis that builds the library.
 add_library( coverity_analysis
              ${JSON_SOURCES} )
-# MQTT public include path.
+# JSON public include path.
 target_include_directories( coverity_analysis PUBLIC ${JSON_INCLUDE_PUBLIC_DIRS} )
 
 #  ====================================  Test Configuration ========================================
