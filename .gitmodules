@@ -10,3 +10,7 @@
 	path = test/cbmc/litani
 	url = https://github.com/awslabs/aws-build-accumulator
 	update = none
+[submodule "test/unit-test/Unity"]
+	path = test/unit-test/Unity
+	url = https://github.com/ThrowTheSwitch/Unity
+	update = none
