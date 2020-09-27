@@ -29,7 +29,6 @@ set(real_name "${project_name}_real")
 create_real_library(${real_name}
                     "${real_source_files}"
                     "${real_include_directories}"
-                    "${mock_name}"
         )
 
 list(APPEND utest_link_list
