@@ -1,6 +1,5 @@
 # Taken from amazon-freertos repository
 :unity:
-  :mock_prefix: mock_
   :when_no_prototypes: :warn
   :enforce_strict_ordering: TRUE
   :treat_as:
