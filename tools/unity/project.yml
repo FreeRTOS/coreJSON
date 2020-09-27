@@ -1,4 +1,3 @@
-# Taken from amazon-freertos repository
 :unity:
   :when_no_prototypes: :warn
   :enforce_strict_ordering: TRUE
