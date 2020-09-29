@@ -24,7 +24,7 @@ set( UNITY_DIR ${UNIT_TEST_DIR}/Unity CACHE INTERNAL "Unity library source direc
 # Configure options to always show in CMake GUI.
 option( BUILD_CLONE_SUBMODULES
         "Set this to ON to automatically clone any required Git submodules. When OFF, submodules must be manually cloned."
-        ON )
+        OFF )
 
 # Set output directories.
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
