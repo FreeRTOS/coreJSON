@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Clone This Repo
         uses: actions/checkout@v2
-      - name: Checkout Unity submodule
-        run: git submodule update --checkout --init --recursive test/unit-test/Unity
       - name: Build
         run: |
           sudo apt-get install -y lcov
