@@ -3,7 +3,7 @@ macro( clone_unity )
         find_package( Git REQUIRED )
         message( "Cloning submodule Unity." )
         execute_process( COMMAND rm -rf ${UNITY_DIR}
-                         COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive ${UNITY_DIR}
+                         COMMAND ${GIT_EXECUTABLE} submodule update --checkout --init --recursive ${UNITY_DIR}
                         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
                         RESULT_VARIABLE UNITY_CLONE_RESULT )
 
