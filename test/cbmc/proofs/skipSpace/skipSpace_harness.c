@@ -41,6 +41,7 @@ void harness()
 
     /* buf must not be NULL */
     buf = malloc( max );
+    __CPROVER_assume( buf != NULL );
 
     skipSpace( buf, &start, max );
 

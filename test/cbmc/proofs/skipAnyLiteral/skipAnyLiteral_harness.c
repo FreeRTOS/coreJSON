@@ -42,6 +42,7 @@ void harness()
 
     /* buf must not be NULL */
     buf = malloc( max );
+    __CPROVER_assume( buf != NULL );
 
     ret = skipAnyLiteral( buf, &start, max );
 
