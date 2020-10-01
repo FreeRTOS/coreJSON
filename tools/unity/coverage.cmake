@@ -37,7 +37,7 @@ endforeach()
 
 # generate Junit style xml output
 execute_process(COMMAND ruby
-    ${CMOCK_DIR}/vendor/unity/auto/parse_output.rb
+    ${UNITY_DIR}/auto/parse_output.rb
                     -xml ${REPORT_FILE}
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             )
