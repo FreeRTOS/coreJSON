@@ -51,11 +51,11 @@ typedef union
     ( ( ( x ) == ' ' ) || ( ( x ) == '\t' ) || \
       ( ( x ) == '\n' ) || ( ( x ) == '\r' ) )
 
-#define isOpenBracket_( x )     ( ( ( x ) == '{' ) || ( ( x ) == '[' ) )
-#define isCloseBracket_( x )    ( ( ( x ) == '}' ) || ( ( x ) == ']' ) )
-/* NB. The numeric values of the open and close bracket pairs differ by 2. */
-#define isMatchingBracket_( x, y ) \
-    ( isOpenBracket_( x ) && isCloseBracket_( y ) && ( ( x ) == ( ( y ) - 2 ) ) )
+#define isOpenBracket_( x )           ( ( ( x ) == '{' ) || ( ( x ) == '[' ) )
+#define isCloseBracket_( x )          ( ( ( x ) == '}' ) || ( ( x ) == ']' ) )
+#define isCurlyPair_( x, y )          ( ( ( x ) == '{' ) && ( ( y ) == '}' ) )
+#define isSquarePair_( x, y )         ( ( ( x ) == '[' ) && ( ( y ) == ']' ) )
+#define isMatchingBracket_( x, y )    ( isCurlyPair_( x, y ) || isSquarePair_( x, y ) )
 
 /**
  * @brief Advance buffer index beyond whitespace.
