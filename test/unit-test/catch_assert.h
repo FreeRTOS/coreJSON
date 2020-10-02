@@ -35,6 +35,7 @@
 
 #include <setjmp.h>
 #include <signal.h>
+#include <unistd.h>
 
 #ifndef CATCH_JMPBUF
     #define CATCH_JMPBUF    waypoint_
@@ -44,7 +45,7 @@ jmp_buf CATCH_JMPBUF;
 
 static void catchHandler_( int signal )
 {
-    longjmp( CATCH_JMPBUF, 1 );
+    longjmp( CATCH_JMPBUF, signal );
 }
 
 #define catch_assert( x )                       \
