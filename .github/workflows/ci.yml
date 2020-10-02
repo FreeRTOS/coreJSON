@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Build
         run: |
-          sudo apt-get install -y lcov
+          sudo apt-get install -y lcov sed
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
@@ -97,7 +97,7 @@ jobs:
       - name: Install Uncrustify
         run: sudo apt-get install uncrustify
       - name: Run Uncrustify
-        run: find . -iname "*.[hc]" -exec uncrustify --check -c tools/uncrustify.cfg {} +
+        run: find . -iname "*.[hc]" -exec uncrustify --check -c tools/uncrustify.cfg -l C {} +
       - name: Check For Trailing Whitespace
         run: |
           set +e

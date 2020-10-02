@@ -1471,7 +1471,7 @@ void test_JSON_Max_Depth( void )
  */
 void test_JSON_asserts( void )
 {
-    char buf[ ] = "x", queryKey[ ] = "y";
+    char buf[] = "x", queryKey[] = "y";
     size_t start = 1, max = 1, length = 1;
     uint16_t u = 0;
     size_t key, keyLength, value, valueLength;
