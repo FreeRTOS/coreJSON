@@ -35,6 +35,7 @@
 
 /* Include paths for public enums, structures, and macros. */
 #include "core_json.h"
+#include "core_json_annex.h"
 
 
 /* Sample test from the docs. */

@@ -43,10 +43,13 @@
 
 jmp_buf CATCH_JMPBUF;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
 static void catchHandler_( int signal )
 {
     longjmp( CATCH_JMPBUF, signal );
 }
+#pragma GCC diagnostic pop
 
 #define catch_assert( x )                    \
     do {                                     \
