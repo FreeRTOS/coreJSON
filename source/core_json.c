@@ -1164,7 +1164,7 @@ static bool_ nextKeyValuePair( const char * buf,
                                size_t * valueLength )
 {
     bool_ ret = true;
-    size_t i, keyStart, valueStart;
+    size_t i, keyStart, valueStart = 0U;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
     assert( ( key != NULL ) && ( keyLength != NULL ) );
