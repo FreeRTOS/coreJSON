@@ -73,21 +73,29 @@ doxygen docs/doxygen/config.doxyfile
 
 ## Building unit tests
 
+### Checkout Unity Submodule
+By default, the submodules in this repository are configured with `update=none` in [.gitmodules](.gitmodules) to avoid increasing clone time and disk space usage of other repositories (like [amazon-freertos](https://github.com/aws/amazon-freertos) that submodule this repository.
+
+To build unit tests, the submodule dependency of Unity is required. Use the following command to clone the submodule:
+```
+git submodule update --checkout --init --recursive --test/unit-test/Unity
+```
+
 ### Platform Prerequisites
 
 - For running unit tests
     - C90 compiler like gcc
     - CMake 3.13.0 or later
-    - Ruby 2.0.0 or later is additionally required for the CMock test framework (that we use).
+    - Ruby 2.0.0 or later is additionally required for the Unity test framework (that we use).
 - For running the coverage target, gcov is additionally required.
 
 ### Steps to build Unit Tests
 
-1. Go to the root directory of this repository.
+1. Go to the root directory of this repository. (Make sure that the **Unity** submodule is cloned as described [above](#checkout-unity-submodule).)
 
 1. Create build directory: `mkdir build && cd build`
 
-1. Run *cmake* while inside build directory: `cmake -S ../test `
+1. Run *cmake* while inside build directory: `cmake -S ../test`
 
 1. Run this command to build the library and unit tests: `make all`
 

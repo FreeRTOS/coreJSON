@@ -42,6 +42,7 @@ jsonstatus
 jsonsuccess
 keylength
 len
+longjmp
 min
 misra
 msb
@@ -73,6 +74,7 @@ skipspace
 skipspaceandcomma
 skipstring
 skiputf
+stderr
 sublicense
 uint
 unescaped
