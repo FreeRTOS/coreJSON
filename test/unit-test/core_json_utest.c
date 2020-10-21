@@ -28,11 +28,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "unity.h"
+#include "catch_assert.h"
 
 /* Include paths for public enums, structures, and macros. */
 #include "core_json.h"
+#include "core_json_annex.h"
 
 
 /* Sample test from the docs. */
@@ -131,6 +134,9 @@
 
 #define MISMATCHED_BRACKETS                                "{\"foo\":{\"bar\":\"xyz\"]}"
 #define MISMATCHED_BRACKETS_LENGTH                         ( sizeof( MISMATCHED_BRACKETS ) - 1 )
+
+#define MISMATCHED_BRACKETS2                               "{\"foo\":[\"bar\",\"xyz\"}}"
+#define MISMATCHED_BRACKETS2_LENGTH                        ( sizeof( MISMATCHED_BRACKETS ) - 1 )
 
 #define INCORRECT_OBJECT_SEPARATOR                         "{\"foo\": \"bar\"; \"bar\": \"foo\"}"
 #define INCORRECT_OBJECT_SEPARATOR_LENGTH                  ( sizeof( INCORRECT_OBJECT_SEPARATOR ) - 1 )
@@ -569,6 +575,10 @@ void test_JSON_Validate_Illegal_Documents( void )
 
     jsonStatus = JSON_Validate( MISMATCHED_BRACKETS,
                                 MISMATCHED_BRACKETS_LENGTH );
+    TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
+
+    jsonStatus = JSON_Validate( MISMATCHED_BRACKETS2,
+                                MISMATCHED_BRACKETS2_LENGTH );
     TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
 
     jsonStatus = JSON_Validate( NUL_ESCAPE, NUL_ESCAPE_LENGTH );
@@ -1455,4 +1465,128 @@ void test_JSON_Max_Depth( void )
 
     free( maxNestedArray );
     free( maxNestedObject );
+}
+
+/**
+ * @brief Trip all asserts in internal functions.
+ */
+void test_JSON_asserts( void )
+{
+    char buf[] = "x", queryKey[] = "y";
+    size_t start = 1, max = 1, length = 1;
+    uint16_t u = 0;
+    size_t key, keyLength, value, valueLength;
+    char * outValue;
+
+    catch_assert( skipSpace( NULL, &start, max ) );
+    catch_assert( skipSpace( buf, NULL, max ) );
+    /* assert: max != 0 */
+    catch_assert( skipSpace( buf, &start, 0 ) );
+
+    /* first argument is length; assert: 2 <= length <= 4 */
+    catch_assert( shortestUTF8( 1, u ) );
+    catch_assert( shortestUTF8( 5, u ) );
+
+    catch_assert( skipUTF8MultiByte( NULL, &start, max ) );
+    catch_assert( skipUTF8MultiByte( buf, NULL, max ) );
+    catch_assert( skipUTF8MultiByte( buf, &start, 0 ) );
+    /* assert: start < max */
+    catch_assert( skipUTF8MultiByte( buf, &start, max ) );
+    /* assert: buf[0] < '\0' */
+    catch_assert( skipUTF8MultiByte( buf, &start, ( start + 1 ) ) );
+
+    catch_assert( skipUTF8( NULL, &start, max ) );
+    catch_assert( skipUTF8( buf, NULL, max ) );
+    catch_assert( skipUTF8( buf, &start, 0 ) );
+
+    catch_assert( skipOneHexEscape( NULL, &start, max, &u ) );
+    catch_assert( skipOneHexEscape( buf, NULL, max, &u ) );
+    catch_assert( skipOneHexEscape( buf, &start, 0, &u ) );
+    catch_assert( skipOneHexEscape( buf, &start, max, NULL ) );
+
+    catch_assert( skipHexEscape( NULL, &start, max ) );
+    catch_assert( skipHexEscape( buf, NULL, max ) );
+    catch_assert( skipHexEscape( buf, &start, 0 ) );
+
+    catch_assert( skipEscape( NULL, &start, max ) );
+    catch_assert( skipEscape( buf, NULL, max ) );
+    catch_assert( skipEscape( buf, &start, 0 ) );
+
+    catch_assert( skipString( NULL, &start, max ) );
+    catch_assert( skipString( buf, NULL, max ) );
+    catch_assert( skipString( buf, &start, 0 ) );
+
+    catch_assert( strnEq( NULL, buf, max ) );
+    catch_assert( strnEq( buf, NULL, max ) );
+
+    catch_assert( skipLiteral( NULL, &start, max, "lit", length ) );
+    catch_assert( skipLiteral( buf, NULL, max, "lit", length ) );
+    catch_assert( skipLiteral( buf, &start, 0, "lit", length ) );
+    catch_assert( skipLiteral( buf, &start, max, NULL, length ) );
+
+    catch_assert( skipDigits( NULL, &start, max ) );
+    catch_assert( skipDigits( buf, NULL, max ) );
+    catch_assert( skipDigits( buf, &start, 0 ) );
+
+    catch_assert( skipDecimals( NULL, &start, max ) );
+    catch_assert( skipDecimals( buf, NULL, max ) );
+    catch_assert( skipDecimals( buf, &start, 0 ) );
+
+    catch_assert( skipExponent( NULL, &start, max ) );
+    catch_assert( skipExponent( buf, NULL, max ) );
+    catch_assert( skipExponent( buf, &start, 0 ) );
+
+    catch_assert( skipNumber( NULL, &start, max ) );
+    catch_assert( skipNumber( buf, NULL, max ) );
+    catch_assert( skipNumber( buf, &start, 0 ) );
+
+    catch_assert( skipSpaceAndComma( NULL, &start, max ) );
+    catch_assert( skipSpaceAndComma( buf, NULL, max ) );
+    catch_assert( skipSpaceAndComma( buf, &start, 0 ) );
+
+    catch_assert( skipArrayScalars( NULL, &start, max ) );
+    catch_assert( skipArrayScalars( buf, NULL, max ) );
+    catch_assert( skipArrayScalars( buf, &start, 0 ) );
+
+    catch_assert( skipObjectScalars( NULL, &start, max ) );
+    catch_assert( skipObjectScalars( buf, NULL, max ) );
+    catch_assert( skipObjectScalars( buf, &start, 0 ) );
+
+    /* assert: mode is '[' or '{' */
+    catch_assert( skipScalars( buf, &start, max, '(' ) );
+
+    catch_assert( skipCollection( NULL, &start, max ) );
+    catch_assert( skipCollection( buf, NULL, max ) );
+    catch_assert( skipCollection( buf, &start, 0 ) );
+
+    catch_assert( nextKeyValuePair( NULL, &start, max, &key, &keyLength, &value, &valueLength ) );
+    catch_assert( nextKeyValuePair( buf, NULL, max, &key, &keyLength, &value, &valueLength ) );
+    catch_assert( nextKeyValuePair( buf, &start, 0, &key, &keyLength, &value, &valueLength ) );
+    catch_assert( nextKeyValuePair( buf, &start, max, NULL, &keyLength, &value, &valueLength ) );
+    catch_assert( nextKeyValuePair( buf, &start, max, &key, NULL, &value, &valueLength ) );
+    catch_assert( nextKeyValuePair( buf, &start, max, &key, &keyLength, NULL, &valueLength ) );
+    catch_assert( nextKeyValuePair( buf, &start, max, &key, &keyLength, &value, NULL ) );
+
+    catch_assert( search( NULL, max, queryKey, keyLength, &outValue, &valueLength ) );
+    catch_assert( search( buf, max, NULL, keyLength, &outValue, &valueLength ) );
+    catch_assert( search( buf, max, queryKey, keyLength, NULL, &valueLength ) );
+    catch_assert( search( buf, max, queryKey, keyLength, &outValue, NULL ) );
+}
+
+/**
+ * @brief These checks are not otherwise reached.
+ */
+void test_JSON_unreached( void )
+{
+    char buf[ 2 ];
+    size_t start, max;
+
+    /* return false when start >= max */
+    start = max = 1;
+    TEST_ASSERT_EQUAL( false, skipUTF8( "abc", &start, max ) );
+
+    /* return false when buf[ 0 ] != '\\' */
+    buf[ 0 ] = 'x';
+    start = 0;
+    TEST_ASSERT_EQUAL( false, skipEscape( buf, &start, sizeof( buf ) ) );
 }
