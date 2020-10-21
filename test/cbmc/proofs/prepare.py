@@ -36,12 +36,6 @@ def create_cbmc_batch_yaml(folder):
                                   error.stderr.strip())) from None
 
 
-def create_cbmc_batch_yaml_files(root='.'):
-    """Create cbmc-batch.yaml in all directories under root."""
-
-    for folder, _, files in os.walk(root):
-        if CBMC_BATCH_YAML in files and MAKEFILE in files:
-            create_cbmc_batch_yaml(folder)
 
 
 def prepare():
