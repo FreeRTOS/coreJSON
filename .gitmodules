@@ -1,6 +1,6 @@
-[submodule "test/unit-test/CMock"]
-	path = test/unit-test/CMock
-	url = https://github.com/ThrowTheSwitch/CMock
+[submodule "test/unit-test/Unity"]
+	path = test/unit-test/Unity
+	url = https://github.com/ThrowTheSwitch/Unity
 	update = none
 [submodule "test/cbmc/aws-templates-for-cbmc-proofs"]
 	path = test/cbmc/aws-templates-for-cbmc-proofs
