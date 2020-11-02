@@ -1,5 +1,5 @@
 name : "coreJSON"
-version: "v1.0.0"
+version: "v1.0.1"
 description: |
   "A parser strictly enforcing the ECMA-404 JSON standard, suitable for microcontrollers. \n"
 license: "MIT"
