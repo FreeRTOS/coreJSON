@@ -34,7 +34,6 @@ void harness()
     size_t max;
     char * queryKey = NULL;
     size_t queryKeyLength;
-    char separator;
     char * outValue;
     size_t outValueLength;
     JSONStatus_t ret;
@@ -59,7 +58,6 @@ void harness()
                        max,
                        queryKey,
                        queryKeyLength,
-                       separator,
                        ( nondet_bool() ? &outValue : NULL ),
                        ( nondet_bool() ? &outValueLength : NULL ) );
 

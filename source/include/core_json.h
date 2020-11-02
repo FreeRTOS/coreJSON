@@ -84,18 +84,21 @@ JSONStatus_t JSON_Validate( const char * buf,
 /* @[declare_json_validate] */
 
 /**
- * @brief Find a key in a JSON object and output the pointer @p outValue
- * to its value.
+ * @brief Find a key or array index in a JSON document and output the
+ * pointer @p outValue to its value.
  *
- * The JSON document must contain an object (e.g., <code>{"key":"value"}</code>).
- * Any value may also be an object and so forth to a maximum depth.  A search
- * may descend through nested objects when the queryKey contains matching
- * key strings joined by a separator.
+ * Any value may also be an object or an array to a maximum depth.  A search
+ * may descend through nested objects or arrays when the queryKey contains matching
+ * key strings or array indexes joined by a separator.
  *
  * For example, if buf contains <code>{"foo":"abc","bar":{"foo":"xyz"}}</code>,
  * then a search for 'foo' would output <code>abc</code>, 'bar' would output
  * <code>{"foo":"xyz"}</code>, and a search for 'bar.foo' would output
- * <code>xyz</code> (given separator is specified as '.').
+ * <code>xyz</code>.
+ *
+ * If buf contains <code>[123,456,{"foo":"abc","bar":[88,99]}]</code>,
+ * then a search for '[1]' would output <code>456</code>, '[2].foo' would output
+ * <code>abc</code>, and '[2].bar[0]' would output <code>88</code>.
  *
  * On success, the pointer @p outValue points to a location in buf.  No null
  * termination is done for the value.  For valid JSON it is safe to place
@@ -106,7 +109,6 @@ JSONStatus_t JSON_Validate( const char * buf,
  * @param[in] max  size of the buffer.
  * @param[in] queryKey  The key to search for.
  * @param[in] queryKeyLength  Length of the key.
- * @param[in] separator  A character between a key and a sub-key in queryKey.
  * @param[out] outValue  A pointer to receive the address of the value found.
  * @param[out] outValueLength  A pointer to receive the length of the value found.
  *
@@ -118,9 +120,8 @@ JSONStatus_t JSON_Validate( const char * buf,
  *
  * @return #JSONSuccess if the queryKey is found and the value output;
  * #JSONNullParameter if any pointer parameters are NULL;
- * #JSONBadParameter if the queryKey is empty, or any subpart is empty, or max is 0;
- * #JSONIllegalDocument if the buffer contents are NOT valid JSON;
- * #JSONMaxDepthExceeded if object and array nesting exceeds a threshold;
+ * #JSONBadParameter if the queryKey is empty, or any subpart is empty, or max is 0,
+ * or an index is too large to convert;
  * #JSONNotFound if the queryKey is NOT found.
  *
  * <b>Example</b>
@@ -155,15 +156,17 @@ JSONStatus_t JSON_Validate( const char * buf,
  *         value[ valueLength ] = save;
  *     }
  * @endcode
+ *
+ * @note The maximum index value is ~2 billion ( 2^31 - 9 ).
  */
 /* @[declare_json_search] */
 JSONStatus_t JSON_Search( char * buf,
                           size_t max,
                           const char * queryKey,
                           size_t queryKeyLength,
-                          char separator,
                           char ** outValue,
                           size_t * outValueLength );
 /* @[declare_json_search] */
+#define MAX_INDEX_VALUE    ( 0x7FFFFFF7 )   /* 2^31 - 9 */
 
 #endif /* ifndef CORE_JSON_H_ */

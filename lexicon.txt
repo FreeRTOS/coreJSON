@@ -55,6 +55,7 @@ outvalue
 outvaluelength
 param
 printf
+queryindex
 querykey
 querykeylength
 requirelowsurrogate

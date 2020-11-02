@@ -56,6 +56,8 @@ typedef union
 #define isCurlyPair_( x, y )          ( ( ( x ) == '{' ) && ( ( y ) == '}' ) )
 #define isSquarePair_( x, y )         ( ( ( x ) == '[' ) && ( ( y ) == ']' ) )
 #define isMatchingBracket_( x, y )    ( isCurlyPair_( x, y ) || isSquarePair_( x, y ) )
+#define isSquareOpen_( x )            ( ( x ) == '[' )
+#define isSquareClose_( x )           ( ( x ) == ']' )
 
 /**
  * @brief Advance buffer index beyond whitespace.
@@ -648,20 +650,28 @@ static bool_ skipAnyLiteral( const char * buf,
 
 /**
  * @brief Advance buffer index beyond one or more digits.
+ * Optionally, output the integer value of the digits.
  *
  * @param[in] buf  The buffer to parse.
  * @param[in,out] start  The index at which to begin.
  * @param[in] max  The size of the buffer.
+ * @param[out] outValue  The integer value of the digits.
+ *
+ * @note outValue may be NULL.  If not NULL, and the output
+ * exceeds ~2 billion, then -1 is output.
  *
  * @return true if a digit was present;
  * false otherwise.
  */
+#define MAX_FACTOR    ( MAX_INDEX_VALUE / 10 )
 static bool_ skipDigits( const char * buf,
                          size_t * start,
-                         size_t max )
+                         size_t max,
+                         int32_t * outValue )
 {
     bool_ ret = false;
     size_t i, saveStart;
+    int32_t value = 0;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
@@ -673,12 +683,31 @@ static bool_ skipDigits( const char * buf,
         {
             break;
         }
+
+        if( ( outValue != NULL ) && ( value > -1 ) )
+        {
+            int8_t n = ( int8_t ) hexToInt( buf[ i ] );
+
+            if( value <= MAX_FACTOR )
+            {
+                value = ( value * 10 ) + n;
+            }
+            else
+            {
+                value = -1;
+            }
+        }
     }
 
     if( i > saveStart )
     {
         ret = true;
         *start = i;
+
+        if( outValue != NULL )
+        {
+            *outValue = value;
+        }
     }
 
     return ret;
@@ -705,7 +734,7 @@ static void skipDecimals( const char * buf,
     {
         i++;
 
-        if( skipDigits( buf, &i, max ) == true )
+        if( skipDigits( buf, &i, max, NULL ) == true )
         {
             *start = i;
         }
@@ -738,7 +767,7 @@ static void skipExponent( const char * buf,
             i++;
         }
 
-        if( skipDigits( buf, &i, max ) == true )
+        if( skipDigits( buf, &i, max, NULL ) == true )
         {
             *start = i;
         }
@@ -787,7 +816,7 @@ static bool_ skipNumber( const char * buf,
         }
         else
         {
-            ret = skipDigits( buf, &i, max );
+            ret = skipDigits( buf, &i, max, NULL );
         }
     }
 
@@ -1139,6 +1168,55 @@ JSONStatus_t JSON_Validate( const char * buf,
 /** @cond DO_NOT_DOCUMENT */
 
 /**
+ * @brief Output index and length for the next value.
+ *
+ * Also advances the buffer index beyond the value.
+ * The value may be a scalar or a collection.
+ *
+ * @param[in] buf  The buffer to parse.
+ * @param[in,out] start  The index at which to begin.
+ * @param[in] max  The size of the buffer.
+ * @param[out] value  A pointer to receive the index of the value.
+ * @param[out] valueLength  A pointer to receive the length of the value.
+ *
+ * @return true if a value was present;
+ * false otherwise.
+ */
+static bool_ nextValue( const char * buf,
+                        size_t * start,
+                        size_t max,
+                        size_t * value,
+                        size_t * valueLength )
+{
+    bool_ ret = true;
+    size_t i, valueStart;
+
+    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert( ( value != NULL ) && ( valueLength != NULL ) );
+
+    i = *start;
+    valueStart = i;
+
+    if( ( skipAnyScalar( buf, &i, max ) == true ) ||
+        ( skipCollection( buf, &i, max ) == JSONSuccess ) )
+    {
+        *value = valueStart;
+        *valueLength = i - valueStart;
+    }
+    else
+    {
+        ret = false;
+    }
+
+    if( ret == true )
+    {
+        *start = i;
+    }
+
+    return ret;
+}
+
+/**
  * @brief Output indexes for the next key-value pair of an object.
  *
  * Also advances the buffer index beyond the key-value pair.
@@ -1164,7 +1242,7 @@ static bool_ nextKeyValuePair( const char * buf,
                                size_t * valueLength )
 {
     bool_ ret = true;
-    size_t i, keyStart, valueStart = 0U;
+    size_t i, keyStart;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
     assert( ( key != NULL ) && ( keyLength != NULL ) );
@@ -1191,7 +1269,6 @@ static bool_ nextKeyValuePair( const char * buf,
         {
             i++;
             skipSpace( buf, &i, max );
-            valueStart = i;
         }
         else
         {
@@ -1201,16 +1278,7 @@ static bool_ nextKeyValuePair( const char * buf,
 
     if( ret == true )
     {
-        if( ( skipAnyScalar( buf, &i, max ) == true ) ||
-            ( skipCollection( buf, &i, max ) == JSONSuccess ) )
-        {
-            *value = valueStart;
-            *valueLength = i - valueStart;
-        }
-        else
-        {
-            ret = false;
-        }
+        ret = nextValue( buf, &i, max, value, valueLength );
     }
 
     if( ret == true )
@@ -1233,21 +1301,19 @@ static bool_ nextKeyValuePair( const char * buf,
  *
  * Iterate over the key-value pairs of an object, looking for a matching key.
  *
- * @return #JSONSuccess if the queryKey is found and the value output;
- * #JSONIllegalDocument if the buffer contents are NOT valid JSON;
- * #JSONMaxDepthExceeded if object and array nesting exceeds a threshold;
- * #JSONNotFound if the queryKey is NOT found.
+ * @return true if the queryKey is found and the value output;
+ * false otherwise.
  *
  * @note Parsing stops upon finding a match.
  */
-static JSONStatus_t search( char * buf,
-                            size_t max,
-                            const char * queryKey,
-                            size_t queryKeyLength,
-                            char ** outValue,
-                            size_t * outValueLength )
+static bool_ objectSearch( char * buf,
+                           size_t max,
+                           const char * queryKey,
+                           size_t queryKeyLength,
+                           char ** outValue,
+                           size_t * outValueLength )
 {
-    JSONStatus_t ret = JSONPartial;
+    bool_ ret = false;
     size_t i = 0, key, keyLength, value, valueLength;
 
     assert( ( buf != NULL ) && ( queryKey != NULL ) );
@@ -1265,14 +1331,13 @@ static JSONStatus_t search( char * buf,
             if( nextKeyValuePair( buf, &i, max, &key, &keyLength,
                                   &value, &valueLength ) != true )
             {
-                ret = JSONIllegalDocument;
                 break;
             }
 
             if( ( queryKeyLength == keyLength ) &&
                 ( strnEq( queryKey, &buf[ key ], keyLength ) == true ) )
             {
-                ret = JSONSuccess;
+                ret = true;
                 break;
             }
 
@@ -1283,33 +1348,210 @@ static JSONStatus_t search( char * buf,
         }
     }
 
-    if( ret == JSONSuccess )
+    if( ret == true )
     {
-        /* String values and collections include their surrounding
-         * demarcation.  If the value is a string, strip the quotes. */
-        if( buf[ value ] == '"' )
-        {
-            value++;
-            valueLength -= 2U;
-        }
-
         *outValue = &buf[ value ];
         *outValueLength = valueLength;
     }
-    else if( ret == JSONPartial )
+
+    return ret;
+}
+
+/**
+ * @brief Find an index in a JSON array and output a pointer to its value.
+ *
+ * @param[in] buf  The buffer to search.
+ * @param[in] max  size of the buffer.
+ * @param[in] queryIndex  The index to search for.
+ * @param[out] outValue  A pointer to receive the address of the value found.
+ * @param[out] outValueLength  A pointer to receive the length of the value found.
+ *
+ * Iterate over the values of an array, looking for a matching index.
+ *
+ * @return true if the queryIndex is found and the value output;
+ * false otherwise.
+ *
+ * @note Parsing stops upon finding a match.
+ */
+static bool_ arraySearch( char * buf,
+                          size_t max,
+                          uint32_t queryIndex,
+                          char ** outValue,
+                          size_t * outValueLength )
+{
+    bool_ ret = false;
+    size_t i = 0, value, valueLength;
+    uint32_t j = 0;
+
+    assert( buf != NULL );
+    assert( ( outValue != NULL ) && ( outValueLength != NULL ) );
+
+    skipSpace( buf, &i, max );
+
+    if( ( i < max ) && ( buf[ i ] == '[' ) )
     {
-        if( ( i < max ) && ( buf[ i ] == '}' ) )
+        i++;
+        skipSpace( buf, &i, max );
+
+        while( i < max )
         {
-            ret = JSONNotFound;
+            if( nextValue( buf, &i, max, &value, &valueLength ) != true )
+            {
+                break;
+            }
+
+            if( j == queryIndex )
+            {
+                ret = true;
+                break;
+            }
+
+            if( skipSpaceAndComma( buf, &i, max ) != true )
+            {
+                break;
+            }
+
+            j++;
+        }
+    }
+
+    if( ret == true )
+    {
+        *outValue = &buf[ value ];
+        *outValueLength = valueLength;
+    }
+
+    return ret;
+}
+
+/**
+ * @brief Advance buffer index beyond a query key subpart.
+ *
+ * @param[in] buf  The buffer to parse.
+ * @param[in,out] start  The index at which to begin.
+ * @param[in] max  The size of the buffer.
+ *
+ * @return true if a valid string was present;
+ * false otherwise.
+ */
+#define JSON_QUERY_KEY_SEPARATOR    '.'
+#define isSeparator_( x )    ( ( x ) == JSON_QUERY_KEY_SEPARATOR )
+static bool_ skipQueryKey( const char * buf,
+                           size_t * start,
+                           size_t max,
+                           size_t * outLength )
+{
+    bool_ ret = false;
+    size_t i;
+
+    assert( ( buf != NULL ) && ( start != NULL ) && ( outLength != NULL ) );
+    assert( max > 0U );
+
+    i = *start;
+
+    while( ( i < max ) &&
+           !isSeparator_( buf[ i ] ) &&
+           !isSquareOpen_( buf[ i ] ) )
+    {
+        i++;
+    }
+
+    if( i > *start )
+    {
+        ret = true;
+        *outLength = i - *start;
+        *start = i;
+    }
+
+    return ret;
+}
+
+/**
+ * @brief Handle a nested search by iterating over the parts of the queryKey.
+ *
+ * @param[in] buf  The buffer to search.
+ * @param[in] max  size of the buffer.
+ * @param[in] queryKey  The key to search for.
+ * @param[in] queryKeyLength  Length of the key.
+ * @param[out] outValue  A pointer to receive the address of the value found.
+ * @param[out] outValueLength  A pointer to receive the length of the value found.
+ *
+ * @return #JSONSuccess if the queryKey is found and the value output;
+ * #JSONBadParameter if the queryKey is empty, or any subpart is empty,
+ * or an index is too large to convert;
+ * #JSONNotFound if the queryKey is NOT found.
+ *
+ * @note Parsing stops upon finding a match.
+ */
+static JSONStatus_t multiSearch( char * buf,
+                                 size_t max,
+                                 const char * queryKey,
+                                 size_t queryKeyLength,
+                                 char ** outValue,
+                                 size_t * outValueLength )
+{
+    JSONStatus_t ret = JSONSuccess;
+    size_t i = 0, start = 0, keyLength = 0;
+    char * p = buf;
+    size_t tmp = max;
+
+    assert( ( buf != NULL ) && ( queryKey != NULL ) );
+    assert( ( outValue != NULL ) && ( outValueLength != NULL ) );
+    assert( ( max > 0U ) && ( queryKeyLength > 0U ) );
+
+    while( i < queryKeyLength )
+    {
+        bool_ found = false;
+
+        if( isSquareOpen_( queryKey[ i ] ) )
+        {
+            int32_t queryIndex = -1;
+            i++;
+
+            ( void ) skipDigits( queryKey, &i, queryKeyLength, &queryIndex );
+
+            if( ( queryIndex < 0 ) ||
+                ( i >= queryKeyLength ) || !isSquareClose_( queryKey[ i ] ) )
+            {
+                ret = JSONBadParameter;
+                break;
+            }
+
+            i++;
+
+            found = arraySearch( p, tmp, ( uint32_t ) queryIndex, &p, &tmp );
         }
         else
         {
-            ret = JSONIllegalDocument;
+            start = i;
+
+            if( ( skipQueryKey( queryKey, &i, queryKeyLength, &keyLength ) != true ) ||
+                /* catch an empty key subpart or a trailing separator */
+                ( i == ( queryKeyLength - 1U ) ) )
+            {
+                ret = JSONBadParameter;
+                break;
+            }
+
+            found = objectSearch( p, tmp, &queryKey[ start ], keyLength, &p, &tmp );
+        }
+
+        if( found == false )
+        {
+            ret = JSONNotFound;
+            break;
+        }
+
+        if( ( i < queryKeyLength ) && isSeparator_( queryKey[ i ] ) )
+        {
+            i++;
         }
     }
-    else
+
+    if( ret == JSONSuccess )
     {
-        /* MISRA 15.7 */
+        *outValue = p;
+        *outValueLength = tmp;
     }
 
     return ret;
@@ -1319,21 +1561,15 @@ static JSONStatus_t search( char * buf,
 
 /**
  * See core_json.h for docs.
- *
- * Handle a nested search by iterating over the parts of the queryKey.
  */
 JSONStatus_t JSON_Search( char * buf,
                           size_t max,
                           const char * queryKey,
                           size_t queryKeyLength,
-                          char separator,
                           char ** outValue,
                           size_t * outValueLength )
 {
-    JSONStatus_t ret = JSONPartial;
-    size_t i = 0, start = 0, keyLength = 0;
-    char * p = buf;
-    size_t tmp = max;
+    JSONStatus_t ret;
 
     if( ( buf == NULL ) || ( queryKey == NULL ) ||
         ( outValue == NULL ) || ( outValueLength == NULL ) )
@@ -1346,39 +1582,18 @@ JSONStatus_t JSON_Search( char * buf,
     }
     else
     {
-        while( i < queryKeyLength )
-        {
-            start = i;
-
-            while( ( i < queryKeyLength ) && ( queryKey[ i ] != separator ) )
-            {
-                i++;
-            }
-
-            keyLength = i - start;
-
-            /* catch an empty key subpart or a trailing separator */
-            if( ( keyLength == 0U ) || ( i == ( queryKeyLength - 1U ) ) )
-            {
-                ret = JSONBadParameter;
-                break;
-            }
-
-            i++;
-
-            ret = search( p, tmp, &queryKey[ start ], keyLength, &p, &tmp );
-
-            if( ret != JSONSuccess )
-            {
-                break;
-            }
-        }
+        ret = multiSearch( buf, max, queryKey, queryKeyLength, outValue, outValueLength );
     }
 
     if( ret == JSONSuccess )
     {
-        *outValue = p;
-        *outValueLength = tmp;
+        /* String values and collections include their surrounding
+         * demarcation.  If the value is a string, strip the quotes. */
+        if( *outValue[ 0 ] == '"' )
+        {
+            ( *outValue )++;
+            *outValueLength -= 2U;
+        }
     }
 
     return ret;
