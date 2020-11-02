@@ -121,7 +121,7 @@ JSONStatus_t JSON_Validate( const char * buf,
  * @return #JSONSuccess if the query is matched and the value output;
  * #JSONNullParameter if any pointer parameters are NULL;
  * #JSONBadParameter if the query is empty, or the portion after a separator is empty,
- * or max is 0, or an index is too large to convert;
+ * or max is 0, or an index is too large to convert to a signed 32-bit integer;
  * #JSONNotFound if the query has no match.
  *
  * <b>Example</b>

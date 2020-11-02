@@ -1172,6 +1172,7 @@ JSONStatus_t JSON_Validate( const char * buf,
  *
  * Also advances the buffer index beyond the value.
  * The value may be a scalar or a collection.
+ * The start index should point to the beginning of the value.
  *
  * @param[in] buf  The buffer to parse.
  * @param[in,out] start  The index at which to begin.
