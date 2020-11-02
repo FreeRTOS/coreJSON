@@ -32,8 +32,8 @@ void harness()
 {
     char * buf = NULL;
     size_t max;
-    char * queryKey = NULL;
-    size_t queryKeyLength;
+    char * query = NULL;
+    size_t queryLength;
     char * outValue;
     size_t outValueLength;
     JSONStatus_t ret;
@@ -46,18 +46,18 @@ void harness()
         buf = malloc( max );
     }
 
-    /* queryKeyLength is the buffer length of the query which must not exceed unwindings. */
-    __CPROVER_assume( queryKeyLength < CBMC_MAX_QUERYKEYLENGTH );
+    /* queryLength is the buffer length of the query which must not exceed unwindings. */
+    __CPROVER_assume( queryLength < CBMC_MAX_QUERYKEYLENGTH );
 
     if( nondet_bool() )
     {
-        queryKey = malloc( queryKeyLength );
+        query = malloc( queryLength );
     }
 
     ret = JSON_Search( buf,
                        max,
-                       queryKey,
-                       queryKeyLength,
+                       query,
+                       queryLength,
                        ( nondet_bool() ? &outValue : NULL ),
                        ( nondet_bool() ? &outValueLength : NULL ) );
 

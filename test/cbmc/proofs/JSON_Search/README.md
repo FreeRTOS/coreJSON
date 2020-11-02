@@ -10,7 +10,7 @@ The proof runs in 15 minutes on a t3.medium.  It provides complete coverage of:
 * nextKeyValuePair()
 * nextValue()
 * objectSearch()
-* skipQueryKey()
+* skipQueryPart()
 
 For this proof, the following functions are replaced with mocks.
 These functions have separate proofs.

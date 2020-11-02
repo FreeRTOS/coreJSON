@@ -1294,29 +1294,29 @@ static bool_ nextKeyValuePair( const char * buf,
  *
  * @param[in] buf  The buffer to search.
  * @param[in] max  size of the buffer.
- * @param[in] queryKey  The key to search for.
- * @param[in] queryKeyLength  Length of the key.
+ * @param[in] query  The object keys and array indexes to search for.
+ * @param[in] queryLength  Length of the key.
  * @param[out] outValue  A pointer to receive the address of the value found.
  * @param[out] outValueLength  A pointer to receive the length of the value found.
  *
  * Iterate over the key-value pairs of an object, looking for a matching key.
  *
- * @return true if the queryKey is found and the value output;
+ * @return true if the query is matched and the value output;
  * false otherwise.
  *
  * @note Parsing stops upon finding a match.
  */
 static bool_ objectSearch( char * buf,
                            size_t max,
-                           const char * queryKey,
-                           size_t queryKeyLength,
+                           const char * query,
+                           size_t queryLength,
                            char ** outValue,
                            size_t * outValueLength )
 {
     bool_ ret = false;
     size_t i = 0, key, keyLength, value = 0, valueLength = 0;
 
-    assert( ( buf != NULL ) && ( queryKey != NULL ) );
+    assert( ( buf != NULL ) && ( query != NULL ) );
     assert( ( outValue != NULL ) && ( outValueLength != NULL ) );
 
     skipSpace( buf, &i, max );
@@ -1334,8 +1334,8 @@ static bool_ objectSearch( char * buf,
                 break;
             }
 
-            if( ( queryKeyLength == keyLength ) &&
-                ( strnEq( queryKey, &buf[ key ], keyLength ) == true ) )
+            if( ( queryLength == keyLength ) &&
+                ( strnEq( query, &buf[ key ], keyLength ) == true ) )
             {
                 ret = true;
                 break;
@@ -1381,7 +1381,7 @@ static bool_ arraySearch( char * buf,
 {
     bool_ ret = false;
     size_t i = 0, value = 0, valueLength = 0;
-    uint32_t j = 0;
+    uint32_t currentIndex = 0;
 
     assert( buf != NULL );
     assert( ( outValue != NULL ) && ( outValueLength != NULL ) );
@@ -1400,7 +1400,7 @@ static bool_ arraySearch( char * buf,
                 break;
             }
 
-            if( j == queryIndex )
+            if( currentIndex == queryIndex )
             {
                 ret = true;
                 break;
@@ -1411,7 +1411,7 @@ static bool_ arraySearch( char * buf,
                 break;
             }
 
-            j++;
+            currentIndex++;
         }
     }
 
@@ -1425,21 +1425,25 @@ static bool_ arraySearch( char * buf,
 }
 
 /**
- * @brief Advance buffer index beyond a query key subpart.
+ * @brief Advance buffer index beyond a query part.
+ *
+ * The part is the portion of the query which is not
+ * a separator or array index.
  *
  * @param[in] buf  The buffer to parse.
  * @param[in,out] start  The index at which to begin.
  * @param[in] max  The size of the buffer.
+ * @param[out] outLength  The length of the query part.
  *
  * @return true if a valid string was present;
  * false otherwise.
  */
 #define JSON_QUERY_KEY_SEPARATOR    '.'
 #define isSeparator_( x )    ( ( x ) == JSON_QUERY_KEY_SEPARATOR )
-static bool_ skipQueryKey( const char * buf,
-                           size_t * start,
-                           size_t max,
-                           size_t * outLength )
+static bool_ skipQueryPart( const char * buf,
+                            size_t * start,
+                            size_t max,
+                            size_t * outLength )
 {
     bool_ ret = false;
     size_t i;
@@ -1467,51 +1471,51 @@ static bool_ skipQueryKey( const char * buf,
 }
 
 /**
- * @brief Handle a nested search by iterating over the parts of the queryKey.
+ * @brief Handle a nested search by iterating over the parts of the query.
  *
  * @param[in] buf  The buffer to search.
  * @param[in] max  size of the buffer.
- * @param[in] queryKey  The key to search for.
- * @param[in] queryKeyLength  Length of the key.
+ * @param[in] query  The object keys and array indexes to search for.
+ * @param[in] queryLength  Length of the key.
  * @param[out] outValue  A pointer to receive the address of the value found.
  * @param[out] outValueLength  A pointer to receive the length of the value found.
  *
- * @return #JSONSuccess if the queryKey is found and the value output;
- * #JSONBadParameter if the queryKey is empty, or any subpart is empty,
+ * @return #JSONSuccess if the query is matched and the value output;
+ * #JSONBadParameter if the query is empty, or any part is empty,
  * or an index is too large to convert;
- * #JSONNotFound if the queryKey is NOT found.
+ * #JSONNotFound if the query is NOT found.
  *
  * @note Parsing stops upon finding a match.
  */
 static JSONStatus_t multiSearch( char * buf,
                                  size_t max,
-                                 const char * queryKey,
-                                 size_t queryKeyLength,
+                                 const char * query,
+                                 size_t queryLength,
                                  char ** outValue,
                                  size_t * outValueLength )
 {
     JSONStatus_t ret = JSONSuccess;
-    size_t i = 0, start = 0, keyLength = 0;
+    size_t i = 0, start = 0;
     char * p = buf;
     size_t tmp = max;
 
-    assert( ( buf != NULL ) && ( queryKey != NULL ) );
+    assert( ( buf != NULL ) && ( query != NULL ) );
     assert( ( outValue != NULL ) && ( outValueLength != NULL ) );
-    assert( ( max > 0U ) && ( queryKeyLength > 0U ) );
+    assert( ( max > 0U ) && ( queryLength > 0U ) );
 
-    while( i < queryKeyLength )
+    while( i < queryLength )
     {
         bool_ found = false;
 
-        if( isSquareOpen_( queryKey[ i ] ) )
+        if( isSquareOpen_( query[ i ] ) )
         {
             int32_t queryIndex = -1;
             i++;
 
-            ( void ) skipDigits( queryKey, &i, queryKeyLength, &queryIndex );
+            ( void ) skipDigits( query, &i, queryLength, &queryIndex );
 
             if( ( queryIndex < 0 ) ||
-                ( i >= queryKeyLength ) || !isSquareClose_( queryKey[ i ] ) )
+                ( i >= queryLength ) || !isSquareClose_( query[ i ] ) )
             {
                 ret = JSONBadParameter;
                 break;
@@ -1523,17 +1527,19 @@ static JSONStatus_t multiSearch( char * buf,
         }
         else
         {
+            size_t keyLength = 0;
+
             start = i;
 
-            if( ( skipQueryKey( queryKey, &i, queryKeyLength, &keyLength ) != true ) ||
-                /* catch an empty key subpart or a trailing separator */
-                ( i == ( queryKeyLength - 1U ) ) )
+            if( ( skipQueryPart( query, &i, queryLength, &keyLength ) != true ) ||
+                /* catch an empty key part or a trailing separator */
+                ( i == ( queryLength - 1U ) ) )
             {
                 ret = JSONBadParameter;
                 break;
             }
 
-            found = objectSearch( p, tmp, &queryKey[ start ], keyLength, &p, &tmp );
+            found = objectSearch( p, tmp, &query[ start ], keyLength, &p, &tmp );
         }
 
         if( found == false )
@@ -1542,7 +1548,7 @@ static JSONStatus_t multiSearch( char * buf,
             break;
         }
 
-        if( ( i < queryKeyLength ) && isSeparator_( queryKey[ i ] ) )
+        if( ( i < queryLength ) && isSeparator_( query[ i ] ) )
         {
             i++;
         }
@@ -1564,25 +1570,25 @@ static JSONStatus_t multiSearch( char * buf,
  */
 JSONStatus_t JSON_Search( char * buf,
                           size_t max,
-                          const char * queryKey,
-                          size_t queryKeyLength,
+                          const char * query,
+                          size_t queryLength,
                           char ** outValue,
                           size_t * outValueLength )
 {
     JSONStatus_t ret;
 
-    if( ( buf == NULL ) || ( queryKey == NULL ) ||
+    if( ( buf == NULL ) || ( query == NULL ) ||
         ( outValue == NULL ) || ( outValueLength == NULL ) )
     {
         ret = JSONNullParameter;
     }
-    else if( ( max == 0U ) || ( queryKeyLength == 0U ) )
+    else if( ( max == 0U ) || ( queryLength == 0U ) )
     {
         ret = JSONBadParameter;
     }
     else
     {
-        ret = multiSearch( buf, max, queryKey, queryKeyLength, outValue, outValueLength );
+        ret = multiSearch( buf, max, query, queryLength, outValue, outValueLength );
     }
 
     if( ret == JSONSuccess )

@@ -61,17 +61,17 @@
     COMPLETE_QUERY_KEY_ANSWER "\"}"
 #define FIRST_QUERY_KEY_ANSWER_LENGTH       ( sizeof( FIRST_QUERY_KEY_ANSWER ) - 1 )
 
-#define ARRAY_ELEMENT_0                "123"
-#define ARRAY_ELEMENT_1                "456"
-#define ARRAY_ELEMENT_2_SUB_0          "abc"
-#define ARRAY_ELEMENT_2_SUB_1          "[88,99]"
-#define ARRAY_ELEMENT_2_SUB_1_SUB_0    "88"
-#define ARRAY_ELEMENT_2_SUB_1_SUB_1    "99"
-#define JSON_DOC_LEGAL_ARRAY     \
-    "[" ARRAY_ELEMENT_0 "," ARRAY_ELEMENT_1 "," \
-        "{\"" FIRST_QUERY_KEY "\":\"" ARRAY_ELEMENT_2_SUB_0 "\",\"" \
-              SECOND_QUERY_KEY "\":" ARRAY_ELEMENT_2_SUB_1 "}]"
-#define JSON_DOC_LEGAL_ARRAY_LENGTH               ( sizeof( JSON_DOC_LEGAL_ARRAY ) - 1 )
+#define ARRAY_ELEMENT_0                     "123"
+#define ARRAY_ELEMENT_1                     "456"
+#define ARRAY_ELEMENT_2_SUB_0               "abc"
+#define ARRAY_ELEMENT_2_SUB_1               "[88,99]"
+#define ARRAY_ELEMENT_2_SUB_1_SUB_0         "88"
+#define ARRAY_ELEMENT_2_SUB_1_SUB_1         "99"
+#define JSON_DOC_LEGAL_ARRAY                                                                            \
+    "[" ARRAY_ELEMENT_0 "," ARRAY_ELEMENT_1 ","                                                         \
+                                            "{\"" FIRST_QUERY_KEY "\":\"" ARRAY_ELEMENT_2_SUB_0 "\",\"" \
+    SECOND_QUERY_KEY "\":" ARRAY_ELEMENT_2_SUB_1 "}]"
+#define JSON_DOC_LEGAL_ARRAY_LENGTH         ( sizeof( JSON_DOC_LEGAL_ARRAY ) - 1 )
 
 /* This JSON document covers all cases where scalars are exponents, literals, numbers, and decimals. */
 #define JSON_DOC_VARIED_SCALARS                                                      \
@@ -133,8 +133,8 @@
 #define ILLEGAL_SCALAR_IN_ARRAY                            "{\"hello\": [42, world]\""
 #define ILLEGAL_SCALAR_IN_ARRAY_LENGTH                     ( sizeof( ILLEGAL_SCALAR_IN_ARRAY ) - 1 )
 
-#define ILLEGAL_SCALAR_IN_ARRAY2                            "[42, world]"
-#define ILLEGAL_SCALAR_IN_ARRAY2_LENGTH                     ( sizeof( ILLEGAL_SCALAR_IN_ARRAY2 ) - 1 )
+#define ILLEGAL_SCALAR_IN_ARRAY2                           "[42, world]"
+#define ILLEGAL_SCALAR_IN_ARRAY2_LENGTH                    ( sizeof( ILLEGAL_SCALAR_IN_ARRAY2 ) - 1 )
 
 #define TRAILING_COMMA_AFTER_VALUE        \
     "{\"foo\":\"abc\",\"" FIRST_QUERY_KEY \
@@ -888,17 +888,17 @@ void test_JSON_Search_Legal_Array_Documents( void )
     char * outValue;
     size_t outValueLength;
 
-#define doSearch( query, answer )                                   \
-    jsonStatus = JSON_Search( JSON_DOC_LEGAL_ARRAY,                 \
-                              JSON_DOC_LEGAL_ARRAY_LENGTH,          \
-                              ( query ),                            \
-                              ( sizeof( query ) - 1 ),              \
-                              &outValue,                            \
-                              &outValueLength );                    \
-    TEST_ASSERT_EQUAL( JSONSuccess, jsonStatus );                   \
-    TEST_ASSERT_EQUAL( outValueLength, ( sizeof( answer ) - 1 ) );  \
-    TEST_ASSERT_EQUAL_STRING_LEN( ( answer ),                       \
-                                  outValue,                         \
+#define doSearch( query, answer )                                  \
+    jsonStatus = JSON_Search( JSON_DOC_LEGAL_ARRAY,                \
+                              JSON_DOC_LEGAL_ARRAY_LENGTH,         \
+                              ( query ),                           \
+                              ( sizeof( query ) - 1 ),             \
+                              &outValue,                           \
+                              &outValueLength );                   \
+    TEST_ASSERT_EQUAL( JSONSuccess, jsonStatus );                  \
+    TEST_ASSERT_EQUAL( outValueLength, ( sizeof( answer ) - 1 ) ); \
+    TEST_ASSERT_EQUAL_STRING_LEN( ( answer ),                      \
+                                  outValue,                        \
                                   outValueLength );
 
     doSearch( "[0]", ARRAY_ELEMENT_0 );
@@ -1629,10 +1629,10 @@ void test_JSON_asserts( void )
     catch_assert( arraySearch( buf, max, queryIndex, NULL, &valueLength ) );
     catch_assert( arraySearch( buf, max, queryIndex, &outValue, NULL ) );
 
-    catch_assert( skipQueryKey( NULL, &start, max, &valueLength ) );
-    catch_assert( skipQueryKey( buf, NULL, max, &valueLength ) );
-    catch_assert( skipQueryKey( buf, &start, 0, &valueLength ) );
-    catch_assert( skipQueryKey( buf, &start, max, NULL ) );
+    catch_assert( skipQueryPart( NULL, &start, max, &valueLength ) );
+    catch_assert( skipQueryPart( buf, NULL, max, &valueLength ) );
+    catch_assert( skipQueryPart( buf, &start, 0, &valueLength ) );
+    catch_assert( skipQueryPart( buf, &start, max, NULL ) );
 
     catch_assert( multiSearch( NULL, max, queryKey, keyLength, &outValue, &valueLength ) );
     catch_assert( multiSearch( buf, 0, queryKey, keyLength, &outValue, &valueLength ) );
@@ -1661,7 +1661,7 @@ void test_JSON_unreached( void )
 
     /* set output value to -1 when integer conversion exceeds max */
     {
-        #define TOO_BIG    "100000000000"
+#define TOO_BIG    "100000000000"
         int32_t out;
         start = 0;
         TEST_ASSERT_EQUAL( true, skipDigits( TOO_BIG, &start, ( sizeof( TOO_BIG ) - 1 ), &out ) );
