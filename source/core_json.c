@@ -1314,7 +1314,7 @@ static bool_ objectSearch( char * buf,
                            size_t * outValueLength )
 {
     bool_ ret = false;
-    size_t i = 0, key, keyLength, value, valueLength;
+    size_t i = 0, key, keyLength, value = 0, valueLength = 0;
 
     assert( ( buf != NULL ) && ( queryKey != NULL ) );
     assert( ( outValue != NULL ) && ( outValueLength != NULL ) );
@@ -1380,7 +1380,7 @@ static bool_ arraySearch( char * buf,
                           size_t * outValueLength )
 {
     bool_ ret = false;
-    size_t i = 0, value, valueLength;
+    size_t i = 0, value = 0, valueLength = 0;
     uint32_t j = 0;
 
     assert( buf != NULL );
