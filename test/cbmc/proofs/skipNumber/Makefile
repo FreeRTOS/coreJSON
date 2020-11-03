@@ -6,7 +6,7 @@ PROOF_UID=skipNumber
 
 # This value was experimentally chosen to provide 100% coverage
 # without tripping unwinding assertions and without exhausting memory.
-CBMC_MAX_BUFSIZE=8
+CBMC_MAX_BUFSIZE=12
 
 UNWINDSET += skipDecimals.0:$(CBMC_MAX_BUFSIZE)
 UNWINDSET += skipDigits.0:$(CBMC_MAX_BUFSIZE)

@@ -10,6 +10,9 @@ The proof runs in a few seconds and provides complete coverage of:
 * skipExponent()
 * skipNumber()
 
+The function hexToInt() is partially covered in this proof, but is
+fully covered in the skipEscape proof.
+
 To run the proof.
 * Add cbmc, goto-cc, goto-instrument, goto-analyzer, and cbmc-viewer
   to your path.
