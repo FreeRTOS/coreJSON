@@ -23,6 +23,8 @@
 #ifndef CORE_JSON_ANNEX_H_
 #define CORE_JSON_ANNEX_H_
 
+#include <stdint.h>
+
 #include "core_json.h"
 
 typedef enum
@@ -72,6 +74,11 @@ bool_ skipString( const char * buf,
 bool_ skipAnyLiteral( const char * buf,
                       size_t * start,
                       size_t max );
+
+bool_ skipDigits( const char * buf,
+                  size_t * start,
+                  size_t max,
+                  int32_t * outValue );
 
 bool_ skipNumber( const char * buf,
                   size_t * start,

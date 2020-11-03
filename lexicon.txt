@@ -51,12 +51,13 @@ nb
 nextkeyvaluepair
 noninfringement
 nul
+outlength
 outvalue
 outvaluelength
 param
 printf
-querykey
-querykeylength
+queryindex
+querylength
 requirelowsurrogate
 sizeof
 skipanyliteral

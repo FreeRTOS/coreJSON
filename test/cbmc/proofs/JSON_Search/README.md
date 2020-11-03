@@ -5,13 +5,18 @@ This directory contains a memory safety proof for JSON_Search.
 
 The proof runs in 15 minutes on a t3.medium.  It provides complete coverage of:
 * JSON_Search()
+* arraySearch()
+* multiSearch()
 * nextKeyValuePair()
-* search()
+* nextValue()
+* objectSearch()
+* skipQueryPart()
 
 For this proof, the following functions are replaced with mocks.
 These functions have separate proofs.
 * skipAnyScalar()
 * skipCollection()
+* skipDigits()
 * skipSpace()
 * skipSpaceAndComma()
 * skipString()

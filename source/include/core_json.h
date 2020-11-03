@@ -84,18 +84,21 @@ JSONStatus_t JSON_Validate( const char * buf,
 /* @[declare_json_validate] */
 
 /**
- * @brief Find a key in a JSON object and output the pointer @p outValue
- * to its value.
+ * @brief Find a key or array index in a JSON document and output the
+ * pointer @p outValue to its value.
  *
- * The JSON document must contain an object (e.g., <code>{"key":"value"}</code>).
- * Any value may also be an object and so forth to a maximum depth.  A search
- * may descend through nested objects when the queryKey contains matching
- * key strings joined by a separator.
+ * Any value may also be an object or an array to a maximum depth.  A search
+ * may descend through nested objects or arrays when the query contains matching
+ * key strings or array indexes joined by a separator.
  *
- * For example, if buf contains <code>{"foo":"abc","bar":{"foo":"xyz"}}</code>,
+ * For example, if the provided buffer contains <code>{"foo":"abc","bar":{"foo":"xyz"}}</code>,
  * then a search for 'foo' would output <code>abc</code>, 'bar' would output
  * <code>{"foo":"xyz"}</code>, and a search for 'bar.foo' would output
- * <code>xyz</code> (given separator is specified as '.').
+ * <code>xyz</code>.
+ *
+ * If the provided buffer contains <code>[123,456,{"foo":"abc","bar":[88,99]}]</code>,
+ * then a search for '[1]' would output <code>456</code>, '[2].foo' would output
+ * <code>abc</code>, and '[2].bar[0]' would output <code>88</code>.
  *
  * On success, the pointer @p outValue points to a location in buf.  No null
  * termination is done for the value.  For valid JSON it is safe to place
@@ -104,9 +107,8 @@ JSONStatus_t JSON_Validate( const char * buf,
  *
  * @param[in] buf  The buffer to search.
  * @param[in] max  size of the buffer.
- * @param[in] queryKey  The key to search for.
- * @param[in] queryKeyLength  Length of the key.
- * @param[in] separator  A character between a key and a sub-key in queryKey.
+ * @param[in] query  The object keys and array indexes to search for.
+ * @param[in] queryLength  Length of the key.
  * @param[out] outValue  A pointer to receive the address of the value found.
  * @param[out] outValueLength  A pointer to receive the length of the value found.
  *
@@ -116,12 +118,11 @@ JSONStatus_t JSON_Validate( const char * buf,
  * @note JSON_Search() performs validation, but stops upon finding a matching
  * key and its value. To validate the entire JSON document, use JSON_Validate().
  *
- * @return #JSONSuccess if the queryKey is found and the value output;
+ * @return #JSONSuccess if the query is matched and the value output;
  * #JSONNullParameter if any pointer parameters are NULL;
- * #JSONBadParameter if the queryKey is empty, or any subpart is empty, or max is 0;
- * #JSONIllegalDocument if the buffer contents are NOT valid JSON;
- * #JSONMaxDepthExceeded if object and array nesting exceeds a threshold;
- * #JSONNotFound if the queryKey is NOT found.
+ * #JSONBadParameter if the query is empty, or the portion after a separator is empty,
+ * or max is 0, or an index is too large to convert to a signed 32-bit integer;
+ * #JSONNotFound if the query has no match.
  *
  * <b>Example</b>
  * @code{c}
@@ -129,8 +130,8 @@ JSONStatus_t JSON_Validate( const char * buf,
  *     JSONStatus_t result;
  *     char buffer[] = "{\"foo\":\"abc\",\"bar\":{\"foo\":\"xyz\"}}";
  *     size_t bufferLength = sizeof( buffer ) - 1;
- *     char queryKey[] = "bar.foo";
- *     size_t queryKeyLength = sizeof( queryKey ) - 1;
+ *     char query[] = "bar.foo";
+ *     size_t queryLength = sizeof( query ) - 1;
  *     char * value;
  *     size_t valueLength;
  *
@@ -139,7 +140,7 @@ JSONStatus_t JSON_Validate( const char * buf,
  *
  *     if( result == JSONSuccess )
  *     {
- *         result = JSON_Search( buffer, bufferLength, queryKey, queryKeyLength, '.',
+ *         result = JSON_Search( buffer, bufferLength, query, queryLength,
  *                               &value, &valueLength );
  *     }
  *
@@ -150,20 +151,28 @@ JSONStatus_t JSON_Validate( const char * buf,
  *         // After saving the character, set it to a null byte for printing.
  *         value[ valueLength ] = '\0';
  *         // "Found: bar.foo -> xyz" will be printed.
- *         printf( "Found: %s -> %s\n", queryKey, value );
+ *         printf( "Found: %s -> %s\n", query, value );
  *         // Restore the original character.
  *         value[ valueLength ] = save;
  *     }
  * @endcode
+ *
+ * @note The maximum index value is ~2 billion ( 2^31 - 9 ).
  */
 /* @[declare_json_search] */
 JSONStatus_t JSON_Search( char * buf,
                           size_t max,
-                          const char * queryKey,
-                          size_t queryKeyLength,
-                          char separator,
+                          const char * query,
+                          size_t queryLength,
                           char ** outValue,
                           size_t * outValueLength );
 /* @[declare_json_search] */
+
+
+/**
+ * @brief The largest value usable as an array index in a query
+ * for JSON_Search(), ~2 billion.
+ */
+#define MAX_INDEX_VALUE    ( 0x7FFFFFF7 )   /* 2^31 - 9 */
 
 #endif /* ifndef CORE_JSON_H_ */
