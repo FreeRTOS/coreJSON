@@ -1,5 +1,5 @@
 /*
- * coreJSON v1.0.0
+ * coreJSON v1.0.1
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -1315,6 +1315,7 @@ static bool_ objectSearch( char * buf,
                            size_t * outValueLength )
 {
     bool_ ret = false;
+
     size_t i = 0, key, keyLength, value = 0, valueLength = 0;
 
     assert( ( buf != NULL ) && ( query != NULL ) );
