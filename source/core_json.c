@@ -1164,7 +1164,7 @@ static bool_ nextKeyValuePair( const char * buf,
                                size_t * valueLength )
 {
     bool_ ret = true;
-    size_t i, keyStart, valueStart = 0U;
+    size_t i, keyStart, valueStart = 0;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
     assert( ( key != NULL ) && ( keyLength != NULL ) );
@@ -1248,7 +1248,7 @@ static JSONStatus_t search( char * buf,
                             size_t * outValueLength )
 {
     JSONStatus_t ret = JSONPartial;
-    size_t i = 0, key, keyLength, value, valueLength;
+    size_t i = 0, key, keyLength, value = 0, valueLength = 0;
 
     assert( ( buf != NULL ) && ( queryKey != NULL ) );
     assert( ( outValue != NULL ) && ( outValueLength != NULL ) );
