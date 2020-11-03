@@ -3,7 +3,7 @@
 ## v2.0.0 (November 2020)
 
 ### Updates
- - [#53](https://github.com/FreeRTOS/coreJSON/pull/53) Add searching an array by index.
+ - [#53](https://github.com/FreeRTOS/coreJSON/pull/53) Update the `JSON_Search` function to support searching JSON arrays. This change is not backwards compatible.
 
 ### Other
  - [#35](https://github.com/FreeRTOS/coreJSON/pull/35), [#36](https://github.com/FreeRTOS/coreJSONpull/36), [#39](https://github.com/FreeRTOS/coreJSON/pull/39), [#51](https://github.com/FreeRTOS/coreJSON/pull/51), [#52](https://github.com/FreeRTOS/coreJSON/pull/52), [#54](https://github.com/FreeRTOS/coreJSON/pull/54) Minor documentation updates.
