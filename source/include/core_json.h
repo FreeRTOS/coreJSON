@@ -96,7 +96,7 @@ JSONStatus_t JSON_Validate( const char * buf,
  * <code>{"foo":"xyz"}</code>, and a search for 'bar.foo' would output
  * <code>xyz</code>.
  *
- * If buf contains <code>[123,456,{"foo":"abc","bar":[88,99]}]</code>,
+ * If the provided buffer contains <code>[123,456,{"foo":"abc","bar":[88,99]}]</code>,
  * then a search for '[1]' would output <code>456</code>, '[2].foo' would output
  * <code>abc</code>, and '[2].bar[0]' would output <code>88</code>.
  *
