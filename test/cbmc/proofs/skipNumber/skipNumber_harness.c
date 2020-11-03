@@ -33,6 +33,7 @@ void harness()
     char * buf;
     size_t start, max;
     bool_ ret;
+    int32_t * outValue;
 
     /* max is the buffer length which must be nonzero for non-API functions. */
     __CPROVER_assume( max > 0 );
@@ -52,5 +53,18 @@ void harness()
     {
         __CPROVER_assert( start <= max,
                           "The buffer start index does not exceed the buffer length." );
+    }
+
+    /* outValue may be NULL */
+    outValue = malloc( sizeof( *outValue ) );
+
+    ret = skipDigits( buf, &start, max, outValue );
+
+    __CPROVER_assert( boolEnum( ret ), "A bool_ value is returned." );
+
+    if( ( ret == true ) && ( outValue != NULL ) )
+    {
+        __CPROVER_assert( ( ( *outValue == -1 ) || ( ( *outValue >= 0 ) && ( *outValue <= MAX_INDEX_VALUE ) ) ),
+                          "The converted integer is within the permitted range or is -1." );
     }
 }
