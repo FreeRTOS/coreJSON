@@ -1,6 +1,6 @@
 # Change Log for coreJSON Library
 
-## v1.1.0 (November 2020)
+## v2.0.0 (November 2020)
 
 ### Updates
  - [#53](https://github.com/FreeRTOS/coreJSON/pull/53) Add searching an array by index.
