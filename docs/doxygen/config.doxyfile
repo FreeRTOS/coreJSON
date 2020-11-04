@@ -44,7 +44,7 @@ PROJECT_NUMBER         = "v2.0.0"
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "Parser library for the ECMA-404 JSON standard"
+PROJECT_BRIEF          = "A parser library for the ECMA-404 JSON standard"
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
