@@ -168,11 +168,31 @@ JSONStatus_t JSON_Search( char * buf,
                           size_t * outValueLength );
 /* @[declare_json_search] */
 
-
 /**
  * @brief The largest value usable as an array index in a query
  * for JSON_Search(), ~2 billion.
  */
 #define MAX_INDEX_VALUE    ( 0x7FFFFFF7 )   /* 2^31 - 9 */
+
+typedef enum
+{
+    JSONString = 0,
+    JSONNumber,
+    JSONTrue,
+    JSONFalse,
+    JSONNull,
+    JSONObject,
+    JSONArray
+} JSONTypes_t;
+
+/* @[declare_json_searcht] */
+JSONStatus_t JSON_SearchT( char * buf,
+                           size_t max,
+                           const char * query,
+                           size_t queryLength,
+                           char ** outValue,
+                           size_t * outValueLength,
+                           JSONTypes_t * outType );
+/* @[declare_json_searcht] */
 
 #endif /* ifndef CORE_JSON_H_ */
