@@ -76,7 +76,7 @@ doxygen docs/doxygen/config.doxyfile
 ## Building unit tests
 
 ### Checkout Unity Submodule
-By default, the submodules in this repository are configured with `update=none` in [.gitmodules](.gitmodules) to avoid increasing clone time and disk space usage of other repositories (like [amazon-freertos](https://github.com/aws/amazon-freertos) that submodule this repository.
+By default, the submodules in this repository are configured with `update=none` in [.gitmodules](.gitmodules), to avoid increasing clone time and disk space usage of other repositories (like [amazon-freertos](https://github.com/aws/amazon-freertos) that submodules this repository).
 
 To build unit tests, the submodule dependency of Unity is required. Use the following command to clone the submodule:
 ```
