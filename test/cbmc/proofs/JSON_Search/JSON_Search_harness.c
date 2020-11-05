@@ -72,6 +72,5 @@ void harness()
                           "The output value is a sequence of characters within buf." );
 
         __CPROVER_assert( jsonTypesEnum( ret ), "The value type is a JSONTypes_t." );
-
     }
 }
