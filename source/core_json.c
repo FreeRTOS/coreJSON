@@ -1597,6 +1597,7 @@ JSONStatus_t JSON_SearchT( char * buf,
     if( ret == JSONSuccess )
     {
         JSONTypes_t t;
+
         switch( *outValue[ 0 ] )
         {
             case '"':
@@ -1628,6 +1629,7 @@ JSONStatus_t JSON_SearchT( char * buf,
 
             default:
                 t = JSONNumber;
+                break;
         }
 
         if( outType != NULL )
@@ -1637,14 +1639,4 @@ JSONStatus_t JSON_SearchT( char * buf,
     }
 
     return ret;
-}
-
-JSONStatus_t JSON_Search( char * buf,
-                          size_t max,
-                          const char * query,
-                          size_t queryLength,
-                          char ** outValue,
-                          size_t * outValueLength )
-{
-    return JSON_SearchT( buf, max, query, queryLength, outValue, outValueLength, NULL );
 }

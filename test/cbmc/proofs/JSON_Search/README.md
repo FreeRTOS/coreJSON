@@ -1,10 +1,11 @@
 JSON_Search proof
 ==============
 
-This directory contains a memory safety proof for JSON_Search.
+This directory contains a memory safety proof for JSON_Search and JSON_SearchT.
 
 The proof runs in 15 minutes on a t3.medium.  It provides complete coverage of:
 * JSON_Search()
+* JSON_SearchT()
 * arraySearch()
 * multiSearch()
 * nextKeyValuePair()

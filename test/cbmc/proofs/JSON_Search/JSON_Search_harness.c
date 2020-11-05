@@ -37,6 +37,7 @@ void harness()
     char * outValue;
     size_t outValueLength;
     JSONStatus_t ret;
+    JSONTypes_t outType;
 
     /* max is the buffer length which must not exceed unwindings. */
     __CPROVER_assume( max < CBMC_MAX_BUFSIZE );
@@ -54,12 +55,13 @@ void harness()
         query = malloc( queryLength );
     }
 
-    ret = JSON_Search( buf,
-                       max,
-                       query,
-                       queryLength,
-                       ( nondet_bool() ? &outValue : NULL ),
-                       ( nondet_bool() ? &outValueLength : NULL ) );
+    ret = JSON_SearchT( buf,
+                        max,
+                        query,
+                        queryLength,
+                        ( nondet_bool() ? &outValue : NULL ),
+                        ( nondet_bool() ? &outValueLength : NULL ),
+                        ( nondet_bool() ? &outType : NULL ) );
 
     __CPROVER_assert( jsonSearchEnum( ret ), "The return value is a JSONStatus_t." );
 
@@ -68,5 +70,8 @@ void harness()
         __CPROVER_assert( ( outValue >= buf ) &&
                           ( ( outValue + outValueLength ) <= ( buf + max ) ),
                           "The output value is a sequence of characters within buf." );
+
+        __CPROVER_assert( jsonTypesEnum( ret ), "The value type is a JSONTypes_t." );
+
     }
 }

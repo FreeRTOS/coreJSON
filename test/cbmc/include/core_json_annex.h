@@ -50,6 +50,16 @@ typedef enum
 /* All possible return values for JSON_Search() */
 #define jsonSearchEnum( x )        ( jsonValidateEnum( x ) || ( x == JSONNotFound ) )
 
+/* All possible type values output from JSON_SearchT() */
+#define jsonTypesEnum( x )   \
+    ( ( x == JSONString ) || \
+      ( x == JSONNumber ) || \
+      ( x == JSONTrue ) ||   \
+      ( x == JSONFalse ) ||  \
+      ( x == JSONNull ) ||   \
+      ( x == JSONObject ) || \
+      ( x == JSONArray ) )
+
 /*
  * These are declarations for the (normally) static functions from core_json.c.
  * Please see core_json.c for documentation.

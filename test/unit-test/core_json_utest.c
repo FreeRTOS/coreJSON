@@ -54,11 +54,13 @@
 #define COMPLETE_QUERY_KEY_LENGTH           ( sizeof( COMPLETE_QUERY_KEY ) - 1 )
 
 #define COMPLETE_QUERY_KEY_ANSWER           "xyz"
+#define COMPLETE_QUERY_KEY_ANSWER_TYPE      JSONString
 #define COMPLETE_QUERY_KEY_ANSWER_LENGTH    ( sizeof( COMPLETE_QUERY_KEY_ANSWER ) - 1 )
 
 #define FIRST_QUERY_KEY_ANSWER     \
     "{\"" SECOND_QUERY_KEY "\":\"" \
     COMPLETE_QUERY_KEY_ANSWER "\"}"
+#define FIRST_QUERY_KEY_ANSWER_TYPE         JSONObject
 #define FIRST_QUERY_KEY_ANSWER_LENGTH       ( sizeof( FIRST_QUERY_KEY_ANSWER ) - 1 )
 
 #define ARRAY_ELEMENT_0                     "123"
@@ -67,11 +69,24 @@
 #define ARRAY_ELEMENT_2_SUB_1               "[88,99]"
 #define ARRAY_ELEMENT_2_SUB_1_SUB_0         "88"
 #define ARRAY_ELEMENT_2_SUB_1_SUB_1         "99"
-#define JSON_DOC_LEGAL_ARRAY                                                                            \
-    "[" ARRAY_ELEMENT_0 "," ARRAY_ELEMENT_1 ","                                                         \
-                                            "{\"" FIRST_QUERY_KEY "\":\"" ARRAY_ELEMENT_2_SUB_0 "\",\"" \
-    SECOND_QUERY_KEY "\":" ARRAY_ELEMENT_2_SUB_1 "}]"
+#define ARRAY_ELEMENT_3                     "true"
+#define ARRAY_ELEMENT_4                     "false"
+#define ARRAY_ELEMENT_5                     "null"
+#define JSON_DOC_LEGAL_ARRAY                                                                                \
+    "[" ARRAY_ELEMENT_0 "," ARRAY_ELEMENT_1 "," "{\"" FIRST_QUERY_KEY "\":\"" ARRAY_ELEMENT_2_SUB_0 "\",\"" \
+    SECOND_QUERY_KEY "\":" ARRAY_ELEMENT_2_SUB_1 "},"                                                       \
+    ARRAY_ELEMENT_3 "," ARRAY_ELEMENT_4 "," ARRAY_ELEMENT_5 "]"
 #define JSON_DOC_LEGAL_ARRAY_LENGTH         ( sizeof( JSON_DOC_LEGAL_ARRAY ) - 1 )
+
+#define ARRAY_ELEMENT_0_TYPE                JSONNumber
+#define ARRAY_ELEMENT_1_TYPE                JSONNumber
+#define ARRAY_ELEMENT_2_SUB_0_TYPE          JSONString
+#define ARRAY_ELEMENT_2_SUB_1_TYPE          JSONArray
+#define ARRAY_ELEMENT_2_SUB_1_SUB_0_TYPE    JSONNumber
+#define ARRAY_ELEMENT_2_SUB_1_SUB_1_TYPE    JSONNumber
+#define ARRAY_ELEMENT_3_TYPE                JSONTrue
+#define ARRAY_ELEMENT_4_TYPE                JSONFalse
+#define ARRAY_ELEMENT_5_TYPE                JSONNull
 
 /* This JSON document covers all cases where scalars are exponents, literals, numbers, and decimals. */
 #define JSON_DOC_VARIED_SCALARS                                                      \
@@ -781,14 +796,17 @@ void test_JSON_Search_Legal_Documents( void )
     JSONStatus_t jsonStatus;
     char * outValue;
     size_t outValueLength;
+    JSONTypes_t outType;
 
-    jsonStatus = JSON_Search( JSON_DOC_LEGAL_TRAILING_SPACE,
-                              JSON_DOC_LEGAL_TRAILING_SPACE_LENGTH,
-                              COMPLETE_QUERY_KEY,
-                              COMPLETE_QUERY_KEY_LENGTH,
-                              &outValue,
-                              &outValueLength );
+    jsonStatus = JSON_SearchT( JSON_DOC_LEGAL_TRAILING_SPACE,
+                               JSON_DOC_LEGAL_TRAILING_SPACE_LENGTH,
+                               COMPLETE_QUERY_KEY,
+                               COMPLETE_QUERY_KEY_LENGTH,
+                               &outValue,
+                               &outValueLength,
+                               &outType );
     TEST_ASSERT_EQUAL( JSONSuccess, jsonStatus );
+    TEST_ASSERT_EQUAL( COMPLETE_QUERY_KEY_ANSWER_TYPE, outType );
     TEST_ASSERT_EQUAL( outValueLength, COMPLETE_QUERY_KEY_ANSWER_LENGTH );
     TEST_ASSERT_EQUAL_STRING_LEN( COMPLETE_QUERY_KEY_ANSWER,
                                   outValue,
@@ -818,13 +836,15 @@ void test_JSON_Search_Legal_Documents( void )
                                   outValue,
                                   COMPLETE_QUERY_KEY_ANSWER_LENGTH );
 
-    jsonStatus = JSON_Search( JSON_DOC_VARIED_SCALARS,
-                              JSON_DOC_VARIED_SCALARS_LENGTH,
-                              FIRST_QUERY_KEY,
-                              FIRST_QUERY_KEY_LENGTH,
-                              &outValue,
-                              &outValueLength );
+    jsonStatus = JSON_SearchT( JSON_DOC_VARIED_SCALARS,
+                               JSON_DOC_VARIED_SCALARS_LENGTH,
+                               FIRST_QUERY_KEY,
+                               FIRST_QUERY_KEY_LENGTH,
+                               &outValue,
+                               &outValueLength,
+                               &outType );
     TEST_ASSERT_EQUAL( JSONSuccess, jsonStatus );
+    TEST_ASSERT_EQUAL( FIRST_QUERY_KEY_ANSWER_TYPE, outType );
     TEST_ASSERT_EQUAL( FIRST_QUERY_KEY_ANSWER_LENGTH, outValueLength );
     TEST_ASSERT_EQUAL_STRING_LEN( FIRST_QUERY_KEY_ANSWER,
                                   outValue,
@@ -887,26 +907,32 @@ void test_JSON_Search_Legal_Array_Documents( void )
     JSONStatus_t jsonStatus;
     char * outValue;
     size_t outValueLength;
+    JSONTypes_t outType;
 
-#define doSearch( query, answer )                                  \
-    jsonStatus = JSON_Search( JSON_DOC_LEGAL_ARRAY,                \
-                              JSON_DOC_LEGAL_ARRAY_LENGTH,         \
-                              ( query ),                           \
-                              ( sizeof( query ) - 1 ),             \
-                              &outValue,                           \
-                              &outValueLength );                   \
+#define doSearch( query, type, answer )                            \
+    jsonStatus = JSON_SearchT( JSON_DOC_LEGAL_ARRAY,               \
+                               JSON_DOC_LEGAL_ARRAY_LENGTH,        \
+                               ( query ),                          \
+                               ( sizeof( query ) - 1 ),            \
+                               &outValue,                          \
+                               &outValueLength,                    \
+                               &outType );                         \
     TEST_ASSERT_EQUAL( JSONSuccess, jsonStatus );                  \
+    TEST_ASSERT_EQUAL( type, outType );                            \
     TEST_ASSERT_EQUAL( outValueLength, ( sizeof( answer ) - 1 ) ); \
     TEST_ASSERT_EQUAL_STRING_LEN( ( answer ),                      \
                                   outValue,                        \
                                   outValueLength );
 
-    doSearch( "[0]", ARRAY_ELEMENT_0 );
-    doSearch( "[1]", ARRAY_ELEMENT_1 );
-    doSearch( "[2]." FIRST_QUERY_KEY, ARRAY_ELEMENT_2_SUB_0 );
-    doSearch( "[2]." SECOND_QUERY_KEY, ARRAY_ELEMENT_2_SUB_1 );
-    doSearch( "[2]." SECOND_QUERY_KEY "[0]", ARRAY_ELEMENT_2_SUB_1_SUB_0 );
-    doSearch( "[2]." SECOND_QUERY_KEY "[1]", ARRAY_ELEMENT_2_SUB_1_SUB_1 );
+    doSearch( "[0]", ARRAY_ELEMENT_0_TYPE, ARRAY_ELEMENT_0 );
+    doSearch( "[1]", ARRAY_ELEMENT_1_TYPE, ARRAY_ELEMENT_1 );
+    doSearch( "[2]." FIRST_QUERY_KEY, ARRAY_ELEMENT_2_SUB_0_TYPE, ARRAY_ELEMENT_2_SUB_0 );
+    doSearch( "[2]." SECOND_QUERY_KEY, ARRAY_ELEMENT_2_SUB_1_TYPE, ARRAY_ELEMENT_2_SUB_1 );
+    doSearch( "[2]." SECOND_QUERY_KEY "[0]", ARRAY_ELEMENT_2_SUB_1_SUB_0_TYPE, ARRAY_ELEMENT_2_SUB_1_SUB_0 );
+    doSearch( "[2]." SECOND_QUERY_KEY "[1]", ARRAY_ELEMENT_2_SUB_1_SUB_1_TYPE, ARRAY_ELEMENT_2_SUB_1_SUB_1 );
+    doSearch( "[3]", ARRAY_ELEMENT_3_TYPE, ARRAY_ELEMENT_3 );
+    doSearch( "[4]", ARRAY_ELEMENT_4_TYPE, ARRAY_ELEMENT_4 );
+    doSearch( "[5]", ARRAY_ELEMENT_5_TYPE, ARRAY_ELEMENT_5 );
 }
 
 /**
