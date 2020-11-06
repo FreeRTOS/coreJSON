@@ -1,4 +1,3 @@
-
 # MISRA Compliance
 
 The coreJSON library files conform to the [MISRA C:2012](https://www.misra.org.uk/MISRAHome/MISRAC2012/tabid/196/Default.aspx)
