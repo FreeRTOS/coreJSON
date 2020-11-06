@@ -1570,12 +1570,13 @@ static JSONStatus_t multiSearch( char * buf,
 /**
  * See core_json.h for docs.
  */
-JSONStatus_t JSON_Search( char * buf,
-                          size_t max,
-                          const char * query,
-                          size_t queryLength,
-                          char ** outValue,
-                          size_t * outValueLength )
+JSONStatus_t JSON_SearchT( char * buf,
+                           size_t max,
+                           const char * query,
+                           size_t queryLength,
+                           char ** outValue,
+                           size_t * outValueLength,
+                           JSONTypes_t * outType )
 {
     JSONStatus_t ret;
 
@@ -1595,12 +1596,45 @@ JSONStatus_t JSON_Search( char * buf,
 
     if( ret == JSONSuccess )
     {
-        /* String values and collections include their surrounding
-         * demarcation.  If the value is a string, strip the quotes. */
-        if( *outValue[ 0 ] == '"' )
+        JSONTypes_t t;
+
+        switch( *outValue[ 0 ] )
         {
-            ( *outValue )++;
-            *outValueLength -= 2U;
+            case '"':
+                /* strip the surrounding quotes */
+                ( *outValue )++;
+                *outValueLength -= 2U;
+                t = JSONString;
+                break;
+
+            case '{':
+                t = JSONObject;
+                break;
+
+            case '[':
+                t = JSONArray;
+                break;
+
+            case 't':
+                t = JSONTrue;
+                break;
+
+            case 'f':
+                t = JSONFalse;
+                break;
+
+            case 'n':
+                t = JSONNull;
+                break;
+
+            default:
+                t = JSONNumber;
+                break;
+        }
+
+        if( outType != NULL )
+        {
+            *outType = t;
         }
     }
 

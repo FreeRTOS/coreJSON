@@ -160,19 +160,52 @@ JSONStatus_t JSON_Validate( const char * buf,
  * @note The maximum index value is ~2 billion ( 2^31 - 9 ).
  */
 /* @[declare_json_search] */
-JSONStatus_t JSON_Search( char * buf,
-                          size_t max,
-                          const char * query,
-                          size_t queryLength,
-                          char ** outValue,
-                          size_t * outValueLength );
+#define JSON_Search( buf, max, query, queryLength, outValue, outValueLength ) \
+    JSON_SearchT( buf, max, query, queryLength, outValue, outValueLength, NULL )
 /* @[declare_json_search] */
-
 
 /**
  * @brief The largest value usable as an array index in a query
  * for JSON_Search(), ~2 billion.
  */
 #define MAX_INDEX_VALUE    ( 0x7FFFFFF7 )   /* 2^31 - 9 */
+
+/**
+ * @ingroup json_enum_types
+ * @brief Return codes from coreJSON library functions.
+ */
+typedef enum
+{
+    JSONString = 0, /**< @brief A quote delimited sequence of Unicode characters. */
+    JSONNumber,     /**< @brief A rational number. */
+    JSONTrue,       /**< @brief The literal value true. */
+    JSONFalse,      /**< @brief The literal value false. */
+    JSONNull,       /**< @brief The literal value null. */
+    JSONObject,     /**< @brief A collection of zero or more key-value pairs. */
+    JSONArray       /**< @brief A collection of zero or more values. */
+} JSONTypes_t;
+
+/**
+ * @brief Same as JSON_Search(), but also outputs a type for the value found
+ *
+ * See @ref JSON_Search for documentation of common behavior.
+ *
+ * @param[in] buf  The buffer to search.
+ * @param[in] max  size of the buffer.
+ * @param[in] query  The object keys and array indexes to search for.
+ * @param[in] queryLength  Length of the key.
+ * @param[out] outValue  A pointer to receive the address of the value found.
+ * @param[out] outValueLength  A pointer to receive the length of the value found.
+ * @param[out] outType  An enum indicating the JSON-specific type of the value.
+ */
+/* @[declare_json_searcht] */
+JSONStatus_t JSON_SearchT( char * buf,
+                           size_t max,
+                           const char * query,
+                           size_t queryLength,
+                           char ** outValue,
+                           size_t * outValueLength,
+                           JSONTypes_t * outType );
+/* @[declare_json_searcht] */
 
 #endif /* ifndef CORE_JSON_H_ */
