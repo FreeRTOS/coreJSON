@@ -1,4 +1,3 @@
-
 # MISRA Compliance
 
 The coreJSON library files conform to the [MISRA C:2012](https://www.misra.org.uk/MISRAHome/MISRAC2012/tabid/196/Default.aspx)
@@ -6,7 +5,6 @@ guidelines, with some noted exceptions. Compliance is checked with Coverity stat
 Deviations from the MISRA standard are listed below:
 
 ### Ignored by [Coverity Configuration](tools/coverity/misra.config)
-
 | Deviation | Category | Justification |
 | :-: | :-: | :-: |
 | Directive 4.9 | Advisory | Allow inclusion of function like macros. |
@@ -16,7 +14,9 @@ Deviations from the MISRA standard are listed below:
 | Rule 20.12 | Required | Allow use of `assert()`, which uses a parameter in both expanded and raw forms. |
 
 ### Flagged by Coverity
-*None.*
+| Deviation | Category | Justification |
+| :-: | :-: | :-: |
+| Rule 8.7 | Advisory | API functions are not used by the library; however, they must be externally visible in order to be used by an application. |
 
 ### Suppressed with Coverity Comments
 *None.*
