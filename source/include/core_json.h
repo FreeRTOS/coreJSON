@@ -208,4 +208,26 @@ JSONStatus_t JSON_SearchT( char * buf,
                            JSONTypes_t * outType );
 /* @[declare_json_searcht] */
 
+/**
+ * @brief Same as JSON_SearchT(), but with const qualified buf and outValue arguments.
+ *
+ * See @ref JSON_Search for documentation of common behavior.
+ *
+ * @param[in] buf  The buffer to search.
+ * @param[in] max  size of the buffer.
+ * @param[in] query  The object keys and array indexes to search for.
+ * @param[in] queryLength  Length of the key.
+ * @param[out] outValue  A pointer to receive the address of the value found.
+ * @param[out] outValueLength  A pointer to receive the length of the value found.
+ * @param[out] outType  An enum indicating the JSON-specific type of the value.
+ */
+/* @[declare_json_searchtc] */
+JSONStatus_t JSON_SearchTc( const char * buf,
+                            size_t max,
+                            const char * query,
+                            size_t queryLength,
+                            const char ** outValue,
+                            size_t * outValueLength,
+                            JSONTypes_t * outType );
+/* @[declare_json_searchtc] */
 #endif /* ifndef CORE_JSON_H_ */
