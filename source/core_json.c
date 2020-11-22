@@ -1497,7 +1497,7 @@ static JSONStatus_t multiSearch( const char * buf,
                                  size_t * outValueLength )
 {
     JSONStatus_t ret = JSONSuccess;
-    size_t i = 0, start = 0, offset = 0, value = 0, length = max;
+    size_t i = 0, start = 0, queryStart = 0, value = 0, length = max;
 
     assert( ( buf != NULL ) && ( query != NULL ) );
     assert( ( outValue != NULL ) && ( outValueLength != NULL ) );
@@ -1523,13 +1523,13 @@ static JSONStatus_t multiSearch( const char * buf,
 
             i++;
 
-            found = arraySearch( &buf[ offset ], length, ( uint32_t ) queryIndex, &value, &length );
+            found = arraySearch( &buf[ start ], length, ( uint32_t ) queryIndex, &value, &length );
         }
         else
         {
             size_t keyLength = 0;
 
-            start = i;
+            queryStart = i;
 
             if( ( skipQueryPart( query, &i, queryLength, &keyLength ) != true ) ||
                 /* catch an empty key part or a trailing separator */
@@ -1539,7 +1539,7 @@ static JSONStatus_t multiSearch( const char * buf,
                 break;
             }
 
-            found = objectSearch( &buf[ offset ], length, &query[ start ], keyLength, &value, &length );
+            found = objectSearch( &buf[ start ], length, &query[ queryStart ], keyLength, &value, &length );
         }
 
         if( found == false )
@@ -1548,7 +1548,7 @@ static JSONStatus_t multiSearch( const char * buf,
             break;
         }
 
-        offset += value;
+        start += value;
 
         if( ( i < queryLength ) && isSeparator_( query[ i ] ) )
         {
@@ -1558,7 +1558,7 @@ static JSONStatus_t multiSearch( const char * buf,
 
     if( ret == JSONSuccess )
     {
-        *outValue = offset;
+        *outValue = start;
         *outValueLength = length;
     }
 
@@ -1616,13 +1616,13 @@ static JSONTypes_t getType( char c )
 /**
  * See core_json.h for docs.
  */
-JSONStatus_t JSON_SearchTc( const char * buf,
-                            size_t max,
-                            const char * query,
-                            size_t queryLength,
-                            const char ** outValue,
-                            size_t * outValueLength,
-                            JSONTypes_t * outType )
+JSONStatus_t JSON_SearchConst( const char * buf,
+                               size_t max,
+                               const char * query,
+                               size_t queryLength,
+                               const char ** outValue,
+                               size_t * outValueLength,
+                               JSONTypes_t * outType )
 {
     JSONStatus_t ret;
     size_t value;
@@ -1678,6 +1678,6 @@ JSONStatus_t JSON_SearchT( char * buf,
      * This instance is a false positive, as the rule permits the
      * addition of a type qualifier. */
     /* coverity[misra_c_2012_rule_11_3_violation] */
-    return JSON_SearchTc( ( const char * ) buf, max, query, queryLength,
-                          ( const char ** ) outValue, outValueLength, outType );
+    return JSON_SearchConst( ( const char * ) buf, max, query, queryLength,
+                           ( const char ** ) outValue, outValueLength, outType );
 }

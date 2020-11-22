@@ -28,7 +28,7 @@ int main()
     
     if( result == JSONSuccess )
     {
-        result = JSON_Search( buffer, bufferLength, queryKey, queryKeyLength, '.',
+        result = JSON_Search( buffer, bufferLength, queryKey, queryKeyLength,
                               &value, &valueLength );
     }
     
@@ -47,11 +47,11 @@ int main()
     return 0;
 }
 ```
-A search may descend through nested objects when the `queryKey` contains matching key strings joined by a separator (e.g. `.`). In the example above, `bar` has the value `{"foo":"xyz"}`. Therefore, a search for query key `bar.foo` would output `xyz`.
+A search may descend through nested objects when the `queryKey` contains matching key strings joined by a separator, `.`. In the example above, `bar` has the value `{"foo":"xyz"}`. Therefore, a search for query key `bar.foo` would output `xyz`.
 
 ## Building coreJSON
 
-A compiler that supports **C89 or later** such as *gcc* is required to build the library.
+A compiler that supports **C90 or later** such as *gcc* is required to build the library.
 
 For instance, if the example above is copied to a file named `example.c`, *gcc* can be used like so:
 ```bash

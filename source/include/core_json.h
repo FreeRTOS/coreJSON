@@ -221,13 +221,13 @@ JSONStatus_t JSON_SearchT( char * buf,
  * @param[out] outValueLength  A pointer to receive the length of the value found.
  * @param[out] outType  An enum indicating the JSON-specific type of the value.
  */
-/* @[declare_json_searchtc] */
-JSONStatus_t JSON_SearchTc( const char * buf,
-                            size_t max,
-                            const char * query,
-                            size_t queryLength,
-                            const char ** outValue,
-                            size_t * outValueLength,
-                            JSONTypes_t * outType );
-/* @[declare_json_searchtc] */
+/* @[declare_json_searchconst] */
+JSONStatus_t JSON_SearchConst( const char * buf,
+                               size_t max,
+                               const char * query,
+                               size_t queryLength,
+                               const char ** outValue,
+                               size_t * outValueLength,
+                               JSONTypes_t * outType );
+/* @[declare_json_searchconst] */
 #endif /* ifndef CORE_JSON_H_ */
