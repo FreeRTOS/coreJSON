@@ -1679,5 +1679,5 @@ JSONStatus_t JSON_SearchT( char * buf,
      * addition of a type qualifier. */
     /* coverity[misra_c_2012_rule_11_3_violation] */
     return JSON_SearchConst( ( const char * ) buf, max, query, queryLength,
-                           ( const char ** ) outValue, outValueLength, outType );
+                             ( const char ** ) outValue, outValueLength, outType );
 }
