@@ -8,6 +8,7 @@ bufferlength
 cbmc
 com
 cond
+const
 corejson
 coverity
 dbff
