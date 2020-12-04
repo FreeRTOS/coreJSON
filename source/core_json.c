@@ -1297,7 +1297,7 @@ static bool_ nextKeyValuePair( const char * buf,
  * @param[in] max  size of the buffer.
  * @param[in] query  The object keys and array indexes to search for.
  * @param[in] queryLength  Length of the key.
- * @param[out] outValue  A pointer to receive the address of the value found.
+ * @param[out] outValue  A pointer to receive the index of the value found.
  * @param[out] outValueLength  A pointer to receive the length of the value found.
  *
  * Iterate over the key-value pairs of an object, looking for a matching key.
@@ -1307,11 +1307,11 @@ static bool_ nextKeyValuePair( const char * buf,
  *
  * @note Parsing stops upon finding a match.
  */
-static bool_ objectSearch( char * buf,
+static bool_ objectSearch( const char * buf,
                            size_t max,
                            const char * query,
                            size_t queryLength,
-                           char ** outValue,
+                           size_t * outValue,
                            size_t * outValueLength )
 {
     bool_ ret = false;
@@ -1352,7 +1352,7 @@ static bool_ objectSearch( char * buf,
 
     if( ret == true )
     {
-        *outValue = &buf[ value ];
+        *outValue = value;
         *outValueLength = valueLength;
     }
 
@@ -1365,7 +1365,7 @@ static bool_ objectSearch( char * buf,
  * @param[in] buf  The buffer to search.
  * @param[in] max  size of the buffer.
  * @param[in] queryIndex  The index to search for.
- * @param[out] outValue  A pointer to receive the address of the value found.
+ * @param[out] outValue  A pointer to receive the index of the value found.
  * @param[out] outValueLength  A pointer to receive the length of the value found.
  *
  * Iterate over the values of an array, looking for a matching index.
@@ -1375,10 +1375,10 @@ static bool_ objectSearch( char * buf,
  *
  * @note Parsing stops upon finding a match.
  */
-static bool_ arraySearch( char * buf,
+static bool_ arraySearch( const char * buf,
                           size_t max,
                           uint32_t queryIndex,
-                          char ** outValue,
+                          size_t * outValue,
                           size_t * outValueLength )
 {
     bool_ ret = false;
@@ -1419,7 +1419,7 @@ static bool_ arraySearch( char * buf,
 
     if( ret == true )
     {
-        *outValue = &buf[ value ];
+        *outValue = value;
         *outValueLength = valueLength;
     }
 
@@ -1479,7 +1479,7 @@ static bool_ skipQueryPart( const char * buf,
  * @param[in] max  size of the buffer.
  * @param[in] query  The object keys and array indexes to search for.
  * @param[in] queryLength  Length of the key.
- * @param[out] outValue  A pointer to receive the address of the value found.
+ * @param[out] outValue  A pointer to receive the index of the value found.
  * @param[out] outValueLength  A pointer to receive the length of the value found.
  *
  * @return #JSONSuccess if the query is matched and the value output;
@@ -1489,17 +1489,15 @@ static bool_ skipQueryPart( const char * buf,
  *
  * @note Parsing stops upon finding a match.
  */
-static JSONStatus_t multiSearch( char * buf,
+static JSONStatus_t multiSearch( const char * buf,
                                  size_t max,
                                  const char * query,
                                  size_t queryLength,
-                                 char ** outValue,
+                                 size_t * outValue,
                                  size_t * outValueLength )
 {
     JSONStatus_t ret = JSONSuccess;
-    size_t i = 0, start = 0;
-    char * p = buf;
-    size_t tmp = max;
+    size_t i = 0, start = 0, queryStart = 0, value = 0, length = max;
 
     assert( ( buf != NULL ) && ( query != NULL ) );
     assert( ( outValue != NULL ) && ( outValueLength != NULL ) );
@@ -1525,13 +1523,13 @@ static JSONStatus_t multiSearch( char * buf,
 
             i++;
 
-            found = arraySearch( p, tmp, ( uint32_t ) queryIndex, &p, &tmp );
+            found = arraySearch( &buf[ start ], length, ( uint32_t ) queryIndex, &value, &length );
         }
         else
         {
             size_t keyLength = 0;
 
-            start = i;
+            queryStart = i;
 
             if( ( skipQueryPart( query, &i, queryLength, &keyLength ) != true ) ||
                 /* catch an empty key part or a trailing separator */
@@ -1541,7 +1539,7 @@ static JSONStatus_t multiSearch( char * buf,
                 break;
             }
 
-            found = objectSearch( p, tmp, &query[ start ], keyLength, &p, &tmp );
+            found = objectSearch( &buf[ start ], length, &query[ queryStart ], keyLength, &value, &length );
         }
 
         if( found == false )
@@ -1549,6 +1547,8 @@ static JSONStatus_t multiSearch( char * buf,
             ret = JSONNotFound;
             break;
         }
+
+        start += value;
 
         if( ( i < queryLength ) && isSeparator_( query[ i ] ) )
         {
@@ -1558,11 +1558,57 @@ static JSONStatus_t multiSearch( char * buf,
 
     if( ret == JSONSuccess )
     {
-        *outValue = p;
-        *outValueLength = tmp;
+        *outValue = start;
+        *outValueLength = length;
     }
 
     return ret;
+}
+
+/**
+ * @brief Return a JSON type based on a separator character or
+ * the first character of a value.
+ *
+ * @param[in] c  The character to classify.
+ *
+ * @return an enum of JSONTypes_t
+ */
+static JSONTypes_t getType( char c )
+{
+    JSONTypes_t t;
+
+    switch( c )
+    {
+        case '"':
+            t = JSONString;
+            break;
+
+        case '{':
+            t = JSONObject;
+            break;
+
+        case '[':
+            t = JSONArray;
+            break;
+
+        case 't':
+            t = JSONTrue;
+            break;
+
+        case 'f':
+            t = JSONFalse;
+            break;
+
+        case 'n':
+            t = JSONNull;
+            break;
+
+        default:
+            t = JSONNumber;
+            break;
+    }
+
+    return t;
 }
 
 /** @endcond */
@@ -1570,15 +1616,16 @@ static JSONStatus_t multiSearch( char * buf,
 /**
  * See core_json.h for docs.
  */
-JSONStatus_t JSON_SearchT( char * buf,
-                           size_t max,
-                           const char * query,
-                           size_t queryLength,
-                           char ** outValue,
-                           size_t * outValueLength,
-                           JSONTypes_t * outType )
+JSONStatus_t JSON_SearchConst( const char * buf,
+                               size_t max,
+                               const char * query,
+                               size_t queryLength,
+                               const char ** outValue,
+                               size_t * outValueLength,
+                               JSONTypes_t * outType )
 {
     JSONStatus_t ret;
+    size_t value;
 
     if( ( buf == NULL ) || ( query == NULL ) ||
         ( outValue == NULL ) || ( outValueLength == NULL ) )
@@ -1591,46 +1638,21 @@ JSONStatus_t JSON_SearchT( char * buf,
     }
     else
     {
-        ret = multiSearch( buf, max, query, queryLength, outValue, outValueLength );
+        ret = multiSearch( buf, max, query, queryLength, &value, outValueLength );
     }
 
     if( ret == JSONSuccess )
     {
-        JSONTypes_t t;
+        JSONTypes_t t = getType( buf[ value ] );
 
-        switch( *outValue[ 0 ] )
+        if( t == JSONString )
         {
-            case '"':
-                /* strip the surrounding quotes */
-                ( *outValue )++;
-                *outValueLength -= 2U;
-                t = JSONString;
-                break;
-
-            case '{':
-                t = JSONObject;
-                break;
-
-            case '[':
-                t = JSONArray;
-                break;
-
-            case 't':
-                t = JSONTrue;
-                break;
-
-            case 'f':
-                t = JSONFalse;
-                break;
-
-            case 'n':
-                t = JSONNull;
-                break;
-
-            default:
-                t = JSONNumber;
-                break;
+            /* strip the surrounding quotes */
+            value++;
+            *outValueLength -= 2U;
         }
+
+        *outValue = &buf[ value ];
 
         if( outType != NULL )
         {
@@ -1639,4 +1661,23 @@ JSONStatus_t JSON_SearchT( char * buf,
     }
 
     return ret;
+}
+
+/**
+ * See core_json.h for docs.
+ */
+JSONStatus_t JSON_SearchT( char * buf,
+                           size_t max,
+                           const char * query,
+                           size_t queryLength,
+                           char ** outValue,
+                           size_t * outValueLength,
+                           JSONTypes_t * outType )
+{
+    /* MISRA Rule 11.3 prohibits casting a pointer to a different type.
+     * This instance is a false positive, as the rule permits the
+     * addition of a type qualifier. */
+    /* coverity[misra_c_2012_rule_11_3_violation] */
+    return JSON_SearchConst( ( const char * ) buf, max, query, queryLength,
+                             ( const char ** ) outValue, outValueLength, outType );
 }
