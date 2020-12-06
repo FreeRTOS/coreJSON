@@ -27,9 +27,9 @@
  * Please see core_json.c for documentation.
  */
 
-bool_ skipString( const char * buf,
-                  size_t * start,
-                  size_t max )
+bool skipString( const char * buf,
+                 size_t * start,
+                 size_t max )
 {
     /* min argument is 2 for an empty double-quoted string, i.e., "". */
     return skipGeneric( buf, start, max, 2 );

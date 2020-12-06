@@ -41,9 +41,9 @@
  * if true, the index in start will increment by at least min
  * but will not exceed max.
  */
-bool_ skipGeneric( const char * buf,
-                   size_t * start,
-                   size_t max,
-                   size_t min );
+bool skipGeneric( const char * buf,
+                  size_t * start,
+                  size_t max,
+                  size_t min );
 
 #endif /* ifndef SKIPGENERIC_H_ */

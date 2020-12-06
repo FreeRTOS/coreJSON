@@ -27,9 +27,9 @@
  * Please see core_json.c for documentation.
  */
 
-bool_ skipAnyScalar( const char * buf,
-                     size_t * start,
-                     size_t max )
+bool skipAnyScalar( const char * buf,
+                    size_t * start,
+                    size_t max )
 {
     /* min argument is 1 for a single character scalar like 0,
      * or 2 for an empty double-quoted string, i.e., "". */
