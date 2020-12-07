@@ -38,6 +38,7 @@ jsonarray
 jsonbadparameter
 jsonfalse
 jsonillegaldocument
+jsoninvalid
 jsonmaxdepthexceeded
 jsonnotfound
 jsonnull
