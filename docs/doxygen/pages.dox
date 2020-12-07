@@ -60,6 +60,8 @@ are written to cover every path of execution and achieve 100% branch coverage.
 @brief Primary functions of the JSON library:<br><br>
 @subpage json_validate_function <br>
 @subpage json_search_function <br>
+@subpage json_searcht_function <br>
+@subpage json_searchconst_function <br>
 
 @page json_validate_function JSON_Validate
 @snippet core_json.h declare_json_validate
@@ -68,6 +70,14 @@ are written to cover every path of execution and achieve 100% branch coverage.
 @page json_search_function JSON_Search
 @snippet core_json.h declare_json_search
 @copydoc JSON_Search
+
+@page json_searcht_function JSON_SearchT
+@snippet core_json.h declare_json_searcht
+@copydoc JSON_SearchT
+
+@page json_searchconst_function JSON_SearchConst
+@snippet core_json.h declare_json_searchconst
+@copydoc JSON_SearchConst
 */
 
 <!-- We do not use doxygen ALIASes here because there have been issues in the past versions with "^^" newlines within the alias definition. -->

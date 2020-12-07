@@ -1548,7 +1548,6 @@ void test_JSON_asserts( void )
     size_t start = 1, max = 1, length = 1;
     uint16_t u = 0;
     size_t key, keyLength, value, valueLength;
-    char * outValue;
     int32_t queryIndex = 0;
 
     catch_assert( skipSpace( NULL, &start, max ) );
@@ -1646,26 +1645,26 @@ void test_JSON_asserts( void )
     catch_assert( nextKeyValuePair( buf, &start, max, &key, &keyLength, NULL, &valueLength ) );
     catch_assert( nextKeyValuePair( buf, &start, max, &key, &keyLength, &value, NULL ) );
 
-    catch_assert( objectSearch( NULL, max, queryKey, keyLength, &outValue, &valueLength ) );
-    catch_assert( objectSearch( buf, max, NULL, keyLength, &outValue, &valueLength ) );
+    catch_assert( objectSearch( NULL, max, queryKey, keyLength, &value, &valueLength ) );
+    catch_assert( objectSearch( buf, max, NULL, keyLength, &value, &valueLength ) );
     catch_assert( objectSearch( buf, max, queryKey, keyLength, NULL, &valueLength ) );
-    catch_assert( objectSearch( buf, max, queryKey, keyLength, &outValue, NULL ) );
+    catch_assert( objectSearch( buf, max, queryKey, keyLength, &value, NULL ) );
 
-    catch_assert( arraySearch( NULL, max, queryIndex, &outValue, &valueLength ) );
+    catch_assert( arraySearch( NULL, max, queryIndex, &value, &valueLength ) );
     catch_assert( arraySearch( buf, max, queryIndex, NULL, &valueLength ) );
-    catch_assert( arraySearch( buf, max, queryIndex, &outValue, NULL ) );
+    catch_assert( arraySearch( buf, max, queryIndex, &value, NULL ) );
 
     catch_assert( skipQueryPart( NULL, &start, max, &valueLength ) );
     catch_assert( skipQueryPart( buf, NULL, max, &valueLength ) );
     catch_assert( skipQueryPart( buf, &start, 0, &valueLength ) );
     catch_assert( skipQueryPart( buf, &start, max, NULL ) );
 
-    catch_assert( multiSearch( NULL, max, queryKey, keyLength, &outValue, &valueLength ) );
-    catch_assert( multiSearch( buf, 0, queryKey, keyLength, &outValue, &valueLength ) );
-    catch_assert( multiSearch( buf, max, NULL, keyLength, &outValue, &valueLength ) );
-    catch_assert( multiSearch( buf, max, queryKey, 0, &outValue, &valueLength ) );
+    catch_assert( multiSearch( NULL, max, queryKey, keyLength, &value, &valueLength ) );
+    catch_assert( multiSearch( buf, 0, queryKey, keyLength, &value, &valueLength ) );
+    catch_assert( multiSearch( buf, max, NULL, keyLength, &value, &valueLength ) );
+    catch_assert( multiSearch( buf, max, queryKey, 0, &value, &valueLength ) );
     catch_assert( multiSearch( buf, max, queryKey, keyLength, NULL, &valueLength ) );
-    catch_assert( multiSearch( buf, max, queryKey, keyLength, &outValue, NULL ) );
+    catch_assert( multiSearch( buf, max, queryKey, keyLength, &value, NULL ) );
 }
 
 /**
