@@ -32,6 +32,7 @@ foo
 ifndef
 inc
 ingroup
+int
 json
 jsonarray
 jsonbadparameter
@@ -48,6 +49,7 @@ jsonstatus
 jsonstring
 jsonsuccess
 jsontrue
+jsontype
 keylength
 len
 longjmp
@@ -59,7 +61,10 @@ nb
 nextkeyvaluepair
 noninfringement
 nul
+outkey
+outkeylength
 outlength
+outpair
 outtype
 outvalue
 outvaluelength

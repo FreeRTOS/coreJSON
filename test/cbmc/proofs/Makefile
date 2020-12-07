@@ -1,6 +1,7 @@
 SHELL := /bin/bash
 DIRS := skipSpace skipSpaceAndComma skipEscape skipAnyLiteral skipUTF8
 DIRS += skipNumber skipString skipCollection JSON_Validate JSON_Search
+DIRS += JSON_Iterate
 
 PROOF_COMMANDS := cbmc goto-cc goto-instrument goto-analyzer cbmc-viewer
 SHELL_COMMANDS := mawk sed w3m

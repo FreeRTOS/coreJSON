@@ -45,6 +45,11 @@
 /* All possible return values for JSON_Search() */
 #define jsonSearchEnum( x )        ( jsonValidateEnum( x ) || ( x == JSONNotFound ) )
 
+/* All possible return values for JSON_Iterate() */
+#define jsonIterateEnum( x )                                \
+    ( parameterEnum( x ) || ( x == JSONIllegalDocument ) || \
+      ( x == JSONNotFound ) || ( x == JSONSuccess ) )
+
 /* All possible type values output from JSON_SearchT() */
 #define jsonTypesEnum( x )   \
     ( ( x == JSONString ) || \

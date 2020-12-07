@@ -62,6 +62,7 @@ are written to cover every path of execution and achieve 100% branch coverage.
 @subpage json_search_function <br>
 @subpage json_searcht_function <br>
 @subpage json_searchconst_function <br>
+@subpage json_iterate_function <br>
 
 @page json_validate_function JSON_Validate
 @snippet core_json.h declare_json_validate
@@ -78,10 +79,17 @@ are written to cover every path of execution and achieve 100% branch coverage.
 @page json_searchconst_function JSON_SearchConst
 @snippet core_json.h declare_json_searchconst
 @copydoc JSON_SearchConst
+
+@page json_iterate_function JSON_Iterate
+@snippet core_json.h declare_json_iterate
+@copydoc JSON_Iterate
 */
 
 <!-- We do not use doxygen ALIASes here because there have been issues in the past versions with "^^" newlines within the alias definition. -->
 /**
 @defgroup json_enum_types Enumerated Types
 @brief Enumerated types of the JSON library
+
+@defgroup json_struct_types Struct Types
+@brief Struct types of the JSON library
 */
