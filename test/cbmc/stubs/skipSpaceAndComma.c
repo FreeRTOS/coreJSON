@@ -27,9 +27,9 @@
  * Please see core_json.c for documentation.
  */
 
-bool_ skipSpaceAndComma( const char * buf,
-                         size_t * start,
-                         size_t max )
+bool skipSpaceAndComma( const char * buf,
+                        size_t * start,
+                        size_t max )
 {
     /* The original function will match 0 or more spaces, followed by a comma,
      * followed by 0 or more spaces. The spaces are still skipped if there is no comma.

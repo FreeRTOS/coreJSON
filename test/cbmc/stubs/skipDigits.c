@@ -27,13 +27,13 @@
  * Please see core_json.c for documentation.
  */
 
-bool_ skipDigits( const char * buf,
-                  size_t * start,
-                  size_t max,
-                  int32_t * outValue )
+bool skipDigits( const char * buf,
+                 size_t * start,
+                 size_t max,
+                 int32_t * outValue )
 {
     /* min argument is 1 for a single digit, e.g., 0. */
-    bool_ ret = skipGeneric( buf, start, max, 1 );
+    bool ret = skipGeneric( buf, start, max, 1 );
 
     if( ( ret == true ) && ( outValue != NULL ) )
     {

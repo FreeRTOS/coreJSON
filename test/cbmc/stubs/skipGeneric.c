@@ -27,12 +27,12 @@
  *
  * Advance buffer index beyond some minimum value.
  */
-static bool_ skipGeneric( const char * buf,
-                          size_t * start,
-                          size_t max,
-                          size_t min )
+static bool skipGeneric( const char * buf,
+                         size_t * start,
+                         size_t max,
+                         size_t min )
 {
-    bool_ ret = false;
+    bool ret = false;
 
     assert( ( buf != NULL ) && ( start != NULL ) );
     assert( min > 0 );

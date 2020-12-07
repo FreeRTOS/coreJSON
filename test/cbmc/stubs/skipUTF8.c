@@ -27,9 +27,9 @@
  * Please see core_json.c for documentation.
  */
 
-bool_ skipUTF8( const char * buf,
-                size_t * start,
-                size_t max )
+bool skipUTF8( const char * buf,
+               size_t * start,
+               size_t max )
 {
     /* min argument is 1 for a single ASCII character. */
     return skipGeneric( buf, start, max, 1 );

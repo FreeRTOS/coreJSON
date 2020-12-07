@@ -27,12 +27,7 @@
 
 #include "core_json.h"
 
-typedef enum
-{
-    true = 1, false = 0
-} bool_;
-
-#define boolEnum( x )         ( ( x == true ) || ( x == false ) )
+#define isBool( x )           ( ( x == true ) || ( x == false ) )
 
 /* parameter check fail values for JSON API functions */
 #define parameterEnum( x )    ( ( x == JSONNullParameter ) || ( x == JSONBadParameter ) )
@@ -69,38 +64,38 @@ void skipSpace( const char * buf,
                 size_t * start,
                 size_t max );
 
-bool_ skipUTF8( const char * buf,
-                size_t * start,
-                size_t max );
+bool skipUTF8( const char * buf,
+               size_t * start,
+               size_t max );
 
-bool_ skipEscape( const char * buf,
-                  size_t * start,
-                  size_t max );
+bool skipEscape( const char * buf,
+                 size_t * start,
+                 size_t max );
 
-bool_ skipString( const char * buf,
-                  size_t * start,
-                  size_t max );
+bool skipString( const char * buf,
+                 size_t * start,
+                 size_t max );
 
-bool_ skipAnyLiteral( const char * buf,
-                      size_t * start,
-                      size_t max );
-
-bool_ skipDigits( const char * buf,
-                  size_t * start,
-                  size_t max,
-                  int32_t * outValue );
-
-bool_ skipNumber( const char * buf,
-                  size_t * start,
-                  size_t max );
-
-bool_ skipSpaceAndComma( const char * buf,
-                         size_t * start,
-                         size_t max );
-
-bool_ skipAnyScalar( const char * buf,
+bool skipAnyLiteral( const char * buf,
                      size_t * start,
                      size_t max );
+
+bool skipDigits( const char * buf,
+                 size_t * start,
+                 size_t max,
+                 int32_t * outValue );
+
+bool skipNumber( const char * buf,
+                 size_t * start,
+                 size_t max );
+
+bool skipSpaceAndComma( const char * buf,
+                        size_t * start,
+                        size_t max );
+
+bool skipAnyScalar( const char * buf,
+                    size_t * start,
+                    size_t max );
 
 JSONStatus_t skipCollection( const char * buf,
                              size_t * start,

@@ -31,11 +31,6 @@
 #include "core_json.h"
 
 /** @cond DO_NOT_DOCUMENT */
-typedef enum
-{
-    true = 1,
-    false = 0
-} bool_;
 
 /* A compromise to satisfy both MISRA and CBMC */
 typedef union
@@ -124,10 +119,10 @@ static size_t countHighBits( uint8_t c )
  *
  * @note Disallow ASCII, as this is called only for multibyte sequences.
  */
-static bool_ shortestUTF8( size_t length,
-                           uint32_t value )
+static bool shortestUTF8( size_t length,
+                          uint32_t value )
 {
-    bool_ ret = false;
+    bool ret = false;
     uint32_t min, max;
 
     assert( ( length >= 2U ) && ( length <= 4U ) );
@@ -182,11 +177,11 @@ static bool_ shortestUTF8( size_t length,
  * would introduce a non-shortest sequence, and F5 or above would
  * introduce a value greater than the last code point, 0x10FFFF.
  */
-static bool_ skipUTF8MultiByte( const char * buf,
-                                size_t * start,
-                                size_t max )
+static bool skipUTF8MultiByte( const char * buf,
+                               size_t * start,
+                               size_t max )
 {
-    bool_ ret = false;
+    bool ret = false;
     size_t i, bitCount, j;
     uint32_t value = 0;
     char_ c;
@@ -246,11 +241,11 @@ static bool_ skipUTF8MultiByte( const char * buf,
  * @return true if a valid code point was present;
  * false otherwise.
  */
-static bool_ skipUTF8( const char * buf,
-                       size_t * start,
-                       size_t max )
+static bool skipUTF8( const char * buf,
+                      size_t * start,
+                      size_t max )
 {
-    bool_ ret = false;
+    bool ret = false;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
@@ -321,12 +316,12 @@ static uint8_t hexToInt( char c )
  *
  * @note For the sake of security, \u0000 is disallowed.
  */
-static bool_ skipOneHexEscape( const char * buf,
-                               size_t * start,
-                               size_t max,
-                               uint16_t * outValue )
+static bool skipOneHexEscape( const char * buf,
+                              size_t * start,
+                              size_t max,
+                              uint16_t * outValue )
 {
-    bool_ ret = false;
+    bool ret = false;
     size_t i, end;
     uint16_t value = 0;
 
@@ -382,11 +377,11 @@ static bool_ skipOneHexEscape( const char * buf,
 #define isHighSurrogate( x )    ( ( ( x ) >= 0xD800U ) && ( ( x ) <= 0xDBFFU ) )
 #define isLowSurrogate( x )     ( ( ( x ) >= 0xDC00U ) && ( ( x ) <= 0xDFFFU ) )
 
-static bool_ skipHexEscape( const char * buf,
-                            size_t * start,
-                            size_t max )
+static bool skipHexEscape( const char * buf,
+                           size_t * start,
+                           size_t max )
 {
-    bool_ ret = false;
+    bool ret = false;
     size_t i;
     uint16_t value;
 
@@ -434,11 +429,11 @@ static bool_ skipHexEscape( const char * buf,
  *
  * @note For the sake of security, \NUL is disallowed.
  */
-static bool_ skipEscape( const char * buf,
-                         size_t * start,
-                         size_t max )
+static bool skipEscape( const char * buf,
+                        size_t * start,
+                        size_t max )
 {
-    bool_ ret = false;
+    bool ret = false;
     size_t i;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
@@ -501,11 +496,11 @@ static bool_ skipEscape( const char * buf,
  * @return true if a valid string was present;
  * false otherwise.
  */
-static bool_ skipString( const char * buf,
-                         size_t * start,
-                         size_t max )
+static bool skipString( const char * buf,
+                        size_t * start,
+                        size_t max )
 {
-    bool_ ret = false;
+    bool ret = false;
     size_t i;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
@@ -566,9 +561,9 @@ static bool_ skipString( const char * buf,
  * @return true if the sequences are the same;
  * false otherwise
  */
-static bool_ strnEq( const char * a,
-                     const char * b,
-                     size_t n )
+static bool strnEq( const char * a,
+                    const char * b,
+                    size_t n )
 {
     size_t i;
 
@@ -597,13 +592,13 @@ static bool_ strnEq( const char * a,
  * @return true if the literal was present;
  * false otherwise.
  */
-static bool_ skipLiteral( const char * buf,
-                          size_t * start,
-                          size_t max,
-                          const char * literal,
-                          size_t length )
+static bool skipLiteral( const char * buf,
+                         size_t * start,
+                         size_t max,
+                         const char * literal,
+                         size_t length )
 {
-    bool_ ret = false;
+    bool ret = false;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
     assert( literal != NULL );
@@ -631,14 +626,14 @@ static bool_ skipLiteral( const char * buf,
  * @return true if a valid literal was present;
  * false otherwise.
  */
-static bool_ skipAnyLiteral( const char * buf,
-                             size_t * start,
-                             size_t max )
+static bool skipAnyLiteral( const char * buf,
+                            size_t * start,
+                            size_t max )
 {
-    bool_ ret = false;
+    bool ret = false;
 
 #define skipLit_( x ) \
-    ( skipLiteral( buf, start, max, ( x ), ( sizeof( x ) - 1U ) ) == true )
+    ( skipLiteral( buf, start, max, ( x ), ( sizeof( x ) - 1UL ) ) == true )
 
     if( skipLit_( "true" ) || skipLit_( "false" ) || skipLit_( "null" ) )
     {
@@ -664,12 +659,12 @@ static bool_ skipAnyLiteral( const char * buf,
  * false otherwise.
  */
 #define MAX_FACTOR    ( MAX_INDEX_VALUE / 10 )
-static bool_ skipDigits( const char * buf,
-                         size_t * start,
-                         size_t max,
-                         int32_t * outValue )
+static bool skipDigits( const char * buf,
+                        size_t * start,
+                        size_t max,
+                        int32_t * outValue )
 {
-    bool_ ret = false;
+    bool ret = false;
     size_t i, saveStart;
     int32_t value = 0;
 
@@ -784,11 +779,11 @@ static void skipExponent( const char * buf,
  * @return true if a valid number was present;
  * false otherwise.
  */
-static bool_ skipNumber( const char * buf,
-                         size_t * start,
-                         size_t max )
+static bool skipNumber( const char * buf,
+                        size_t * start,
+                        size_t max )
 {
-    bool_ ret = false;
+    bool ret = false;
     size_t i;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
@@ -840,11 +835,11 @@ static bool_ skipNumber( const char * buf,
  * @return true if a scalar value was present;
  * false otherwise.
  */
-static bool_ skipAnyScalar( const char * buf,
-                            size_t * start,
-                            size_t max )
+static bool skipAnyScalar( const char * buf,
+                           size_t * start,
+                           size_t max )
 {
-    bool_ ret = false;
+    bool ret = false;
 
     if( ( skipString( buf, start, max ) == true ) ||
         ( skipAnyLiteral( buf, start, max ) == true ) ||
@@ -870,11 +865,11 @@ static bool_ skipAnyScalar( const char * buf,
  * @return true if a non-terminal comma was present;
  * false otherwise.
  */
-static bool_ skipSpaceAndComma( const char * buf,
-                                size_t * start,
-                                size_t max )
+static bool skipSpaceAndComma( const char * buf,
+                               size_t * start,
+                               size_t max )
 {
-    bool_ ret = false;
+    bool ret = false;
     size_t i;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
@@ -952,7 +947,7 @@ static void skipObjectScalars( const char * buf,
                                size_t max )
 {
     size_t i;
-    bool_ comma;
+    bool comma;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
@@ -1183,13 +1178,13 @@ JSONStatus_t JSON_Validate( const char * buf,
  * @return true if a value was present;
  * false otherwise.
  */
-static bool_ nextValue( const char * buf,
-                        size_t * start,
-                        size_t max,
-                        size_t * value,
-                        size_t * valueLength )
+static bool nextValue( const char * buf,
+                       size_t * start,
+                       size_t max,
+                       size_t * value,
+                       size_t * valueLength )
 {
-    bool_ ret = true;
+    bool ret = true;
     size_t i, valueStart;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
@@ -1234,15 +1229,15 @@ static bool_ nextValue( const char * buf,
  * @return true if a key-value pair was present;
  * false otherwise.
  */
-static bool_ nextKeyValuePair( const char * buf,
-                               size_t * start,
-                               size_t max,
-                               size_t * key,
-                               size_t * keyLength,
-                               size_t * value,
-                               size_t * valueLength )
+static bool nextKeyValuePair( const char * buf,
+                              size_t * start,
+                              size_t max,
+                              size_t * key,
+                              size_t * keyLength,
+                              size_t * value,
+                              size_t * valueLength )
 {
-    bool_ ret = true;
+    bool ret = true;
     size_t i, keyStart;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
@@ -1307,14 +1302,14 @@ static bool_ nextKeyValuePair( const char * buf,
  *
  * @note Parsing stops upon finding a match.
  */
-static bool_ objectSearch( const char * buf,
-                           size_t max,
-                           const char * query,
-                           size_t queryLength,
-                           size_t * outValue,
-                           size_t * outValueLength )
+static bool objectSearch( const char * buf,
+                          size_t max,
+                          const char * query,
+                          size_t queryLength,
+                          size_t * outValue,
+                          size_t * outValueLength )
 {
-    bool_ ret = false;
+    bool ret = false;
 
     size_t i = 0, key, keyLength, value = 0, valueLength = 0;
 
@@ -1375,13 +1370,13 @@ static bool_ objectSearch( const char * buf,
  *
  * @note Parsing stops upon finding a match.
  */
-static bool_ arraySearch( const char * buf,
-                          size_t max,
-                          uint32_t queryIndex,
-                          size_t * outValue,
-                          size_t * outValueLength )
+static bool arraySearch( const char * buf,
+                         size_t max,
+                         uint32_t queryIndex,
+                         size_t * outValue,
+                         size_t * outValueLength )
 {
-    bool_ ret = false;
+    bool ret = false;
     size_t i = 0, value = 0, valueLength = 0;
     uint32_t currentIndex = 0;
 
@@ -1442,12 +1437,12 @@ static bool_ arraySearch( const char * buf,
  */
 #define JSON_QUERY_KEY_SEPARATOR    '.'
 #define isSeparator_( x )    ( ( x ) == JSON_QUERY_KEY_SEPARATOR )
-static bool_ skipQueryPart( const char * buf,
-                            size_t * start,
-                            size_t max,
-                            size_t * outLength )
+static bool skipQueryPart( const char * buf,
+                           size_t * start,
+                           size_t max,
+                           size_t * outLength )
 {
-    bool_ ret = false;
+    bool ret = false;
     size_t i;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( outLength != NULL ) );
@@ -1505,7 +1500,7 @@ static JSONStatus_t multiSearch( const char * buf,
 
     while( i < queryLength )
     {
-        bool_ found = false;
+        bool found = false;
 
         if( isSquareOpen_( query[ i ] ) )
         {
