@@ -1,5 +1,5 @@
 /*
- * coreJSON v2.0.0
+ * coreJSON v3.0.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -949,7 +949,7 @@ void test_JSON_Iterate_Legal_Array_Documents( void )
     size_t start = 0, next = 0;
     JSONPair_t pair = { 0 };
 
-#define doIterate( type, answer )                                    \
+#define iterateArray( type, answer )                                 \
     jsonStatus = JSON_Iterate( JSON_DOC_LEGAL_ARRAY,                 \
                                JSON_DOC_LEGAL_ARRAY_LENGTH,          \
                                &start,                               \
@@ -964,12 +964,12 @@ void test_JSON_Iterate_Legal_Array_Documents( void )
                                   pair.value,                        \
                                   pair.valueLength );
 
-    doIterate( ARRAY_ELEMENT_0_TYPE, ARRAY_ELEMENT_0 );
-    doIterate( ARRAY_ELEMENT_1_TYPE, ARRAY_ELEMENT_1 );
-    doIterate( ARRAY_ELEMENT_2_TYPE, ARRAY_ELEMENT_2 );
-    doIterate( ARRAY_ELEMENT_3_TYPE, ARRAY_ELEMENT_3 );
-    doIterate( ARRAY_ELEMENT_4_TYPE, ARRAY_ELEMENT_4 );
-    doIterate( ARRAY_ELEMENT_5_TYPE, ARRAY_ELEMENT_5 );
+    iterateArray( ARRAY_ELEMENT_0_TYPE, ARRAY_ELEMENT_0 );
+    iterateArray( ARRAY_ELEMENT_1_TYPE, ARRAY_ELEMENT_1 );
+    iterateArray( ARRAY_ELEMENT_2_TYPE, ARRAY_ELEMENT_2 );
+    iterateArray( ARRAY_ELEMENT_3_TYPE, ARRAY_ELEMENT_3 );
+    iterateArray( ARRAY_ELEMENT_4_TYPE, ARRAY_ELEMENT_4 );
+    iterateArray( ARRAY_ELEMENT_5_TYPE, ARRAY_ELEMENT_5 );
 
     jsonStatus = JSON_Iterate( JSON_DOC_LEGAL_ARRAY,
                                JSON_DOC_LEGAL_ARRAY_LENGTH,
@@ -988,7 +988,7 @@ void test_JSON_Iterate_Legal_Object_Documents( void )
     size_t start = 0, next = 0;
     JSONPair_t pair = { 0 };
 
-#define doIterate2( key_, type, answer )                             \
+#define iterateObject( key_, type, answer )                          \
     jsonStatus = JSON_Iterate( JSON_NESTED_OBJECT,                   \
                                JSON_NESTED_OBJECT_LENGTH,            \
                                &start,                               \
@@ -1005,8 +1005,8 @@ void test_JSON_Iterate_Legal_Object_Documents( void )
                                   pair.value,                        \
                                   pair.valueLength );
 
-    doIterate2( FIRST_QUERY_KEY, ARRAY_ELEMENT_2_SUB_0_TYPE, ARRAY_ELEMENT_2_SUB_0 );
-    doIterate2( SECOND_QUERY_KEY, ARRAY_ELEMENT_2_SUB_1_TYPE, ARRAY_ELEMENT_2_SUB_1 );
+    iterateObject( FIRST_QUERY_KEY, ARRAY_ELEMENT_2_SUB_0_TYPE, ARRAY_ELEMENT_2_SUB_0 );
+    iterateObject( SECOND_QUERY_KEY, ARRAY_ELEMENT_2_SUB_1_TYPE, ARRAY_ELEMENT_2_SUB_1 );
 
     jsonStatus = JSON_Iterate( JSON_NESTED_OBJECT,
                                JSON_NESTED_OBJECT_LENGTH,

@@ -1,5 +1,9 @@
 # Change Log for coreJSON Library
 
+## v3.0.0 (December 2020)
+ - [#74](https://github.com/FreeRTOS/coreJSON/pull/74) Add `JSON_Iterate` function to iterate over items in a JSON collection.
+ - [#74](https://github.com/FreeRTOS/coreJSON/pull/74) Add `JSONInvalid` enum with the value 0 to `JSONTypes_t`. This change is not backwards compatible.
+
 ## v2.0.0 (November 2020)
 
 ### Updates
