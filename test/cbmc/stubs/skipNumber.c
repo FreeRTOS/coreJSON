@@ -27,9 +27,9 @@
  * Please see core_json.c for documentation.
  */
 
-bool_ skipNumber( const char * buf,
-                  size_t * start,
-                  size_t max )
+bool skipNumber( const char * buf,
+                 size_t * start,
+                 size_t max )
 {
     /* min argument is 1 for a single digit, e.g., 0. */
     return skipGeneric( buf, start, max, 1 );

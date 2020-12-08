@@ -53,6 +53,8 @@ A search may descend through nested objects when the `queryKey` contains matchin
 
 A compiler that supports **C90 or later** such as *gcc* is required to build the library.
 
+The library uses a header file introduced in ISO C99, `stdbool.h`. For compilers that do not provide this header file, the [source/include](source/include) directory contains [stdbool.readme](source/include/stdbool.readme), which can be renamed to `stdbool.h`.
+
 For instance, if the example above is copied to a file named `example.c`, *gcc* can be used like so:
 ```bash
 gcc -I source/include example.c source/core_json.c -o example

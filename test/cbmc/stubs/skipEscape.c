@@ -27,9 +27,9 @@
  * Please see core_json.c for documentation.
  */
 
-bool_ skipEscape( const char * buf,
-                  size_t * start,
-                  size_t max )
+bool skipEscape( const char * buf,
+                 size_t * start,
+                 size_t max )
 {
     /* min argument is 2, since the smallest proper
     * escape sequence is 2 characters, e.g., \n. */

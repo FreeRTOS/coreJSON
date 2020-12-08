@@ -27,9 +27,9 @@
  * Please see core_json.c for documentation.
  */
 
-bool_ skipAnyLiteral( const char * buf,
-                      size_t * start,
-                      size_t max )
+bool skipAnyLiteral( const char * buf,
+                     size_t * start,
+                     size_t max )
 {
     /* min argument is 4 for the shortest literal, e.g., true or null. */
     return skipGeneric( buf, start, max, 4 );

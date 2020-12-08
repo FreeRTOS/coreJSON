@@ -32,7 +32,7 @@ void harness()
 {
     char * buf;
     size_t start, max;
-    bool_ ret;
+    bool ret;
     int32_t * outValue;
 
     /* max is the buffer length which must be nonzero for non-API functions. */
@@ -47,7 +47,7 @@ void harness()
 
     ret = skipNumber( buf, &start, max );
 
-    __CPROVER_assert( boolEnum( ret ), "A bool_ value is returned." );
+    __CPROVER_assert( isBool( ret ), "A bool value is returned." );
 
     if( ret == true )
     {
@@ -60,7 +60,7 @@ void harness()
 
     ret = skipDigits( buf, &start, max, outValue );
 
-    __CPROVER_assert( boolEnum( ret ), "A bool_ value is returned." );
+    __CPROVER_assert( isBool( ret ), "A bool value is returned." );
 
     if( ( ret == true ) && ( outValue != NULL ) )
     {
