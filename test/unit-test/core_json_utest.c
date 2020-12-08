@@ -1,5 +1,5 @@
 /*
- * coreJSON v2.0.0
+ * coreJSON v3.0.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -72,14 +72,19 @@
 #define ARRAY_ELEMENT_3                     "true"
 #define ARRAY_ELEMENT_4                     "false"
 #define ARRAY_ELEMENT_5                     "null"
-#define JSON_DOC_LEGAL_ARRAY                                                                                \
-    "[" ARRAY_ELEMENT_0 "," ARRAY_ELEMENT_1 "," "{\"" FIRST_QUERY_KEY "\":\"" ARRAY_ELEMENT_2_SUB_0 "\",\"" \
-    SECOND_QUERY_KEY "\":" ARRAY_ELEMENT_2_SUB_1 "},"                                                       \
+#define JSON_NESTED_OBJECT                                      \
+    "{\"" FIRST_QUERY_KEY "\":\"" ARRAY_ELEMENT_2_SUB_0 "\",\"" \
+    SECOND_QUERY_KEY "\":" ARRAY_ELEMENT_2_SUB_1 "}"
+#define JSON_NESTED_OBJECT_LENGTH           ( sizeof( JSON_NESTED_OBJECT ) - 1 )
+#define ARRAY_ELEMENT_2                     JSON_NESTED_OBJECT
+#define JSON_DOC_LEGAL_ARRAY                                        \
+    "[" ARRAY_ELEMENT_0 "," ARRAY_ELEMENT_1 "," ARRAY_ELEMENT_2 "," \
     ARRAY_ELEMENT_3 "," ARRAY_ELEMENT_4 "," ARRAY_ELEMENT_5 "]"
 #define JSON_DOC_LEGAL_ARRAY_LENGTH         ( sizeof( JSON_DOC_LEGAL_ARRAY ) - 1 )
 
 #define ARRAY_ELEMENT_0_TYPE                JSONNumber
 #define ARRAY_ELEMENT_1_TYPE                JSONNumber
+#define ARRAY_ELEMENT_2_TYPE                JSONObject
 #define ARRAY_ELEMENT_2_SUB_0_TYPE          JSONString
 #define ARRAY_ELEMENT_2_SUB_1_TYPE          JSONArray
 #define ARRAY_ELEMENT_2_SUB_1_SUB_0_TYPE    JSONNumber
@@ -936,6 +941,100 @@ void test_JSON_Search_Legal_Array_Documents( void )
 }
 
 /**
+ * @brief Test that JSON_Iterate returns the given values from a JSON array.
+ */
+void test_JSON_Iterate_Legal_Array_Documents( void )
+{
+    JSONStatus_t jsonStatus;
+    size_t start = 0, next = 0;
+    JSONPair_t pair = { 0 };
+
+#define iterateArray( type, answer )                                 \
+    jsonStatus = JSON_Iterate( JSON_DOC_LEGAL_ARRAY,                 \
+                               JSON_DOC_LEGAL_ARRAY_LENGTH,          \
+                               &start,                               \
+                               &next,                                \
+                               &pair );                              \
+    TEST_ASSERT_EQUAL( JSONSuccess, jsonStatus );                    \
+    TEST_ASSERT_EQUAL( NULL, pair.key );                             \
+    TEST_ASSERT_EQUAL( 0, pair.keyLength );                          \
+    TEST_ASSERT_EQUAL( type, pair.jsonType );                        \
+    TEST_ASSERT_EQUAL( ( sizeof( answer ) - 1 ), pair.valueLength ); \
+    TEST_ASSERT_EQUAL_STRING_LEN( ( answer ),                        \
+                                  pair.value,                        \
+                                  pair.valueLength );
+
+    iterateArray( ARRAY_ELEMENT_0_TYPE, ARRAY_ELEMENT_0 );
+    iterateArray( ARRAY_ELEMENT_1_TYPE, ARRAY_ELEMENT_1 );
+    iterateArray( ARRAY_ELEMENT_2_TYPE, ARRAY_ELEMENT_2 );
+    iterateArray( ARRAY_ELEMENT_3_TYPE, ARRAY_ELEMENT_3 );
+    iterateArray( ARRAY_ELEMENT_4_TYPE, ARRAY_ELEMENT_4 );
+    iterateArray( ARRAY_ELEMENT_5_TYPE, ARRAY_ELEMENT_5 );
+
+    jsonStatus = JSON_Iterate( JSON_DOC_LEGAL_ARRAY,
+                               JSON_DOC_LEGAL_ARRAY_LENGTH,
+                               &start,
+                               &next,
+                               &pair );
+    TEST_ASSERT_EQUAL( JSONNotFound, jsonStatus );
+}
+
+/**
+ * @brief Test that JSON_Iterate returns the given keys and values from a JSON object.
+ */
+void test_JSON_Iterate_Legal_Object_Documents( void )
+{
+    JSONStatus_t jsonStatus;
+    size_t start = 0, next = 0;
+    JSONPair_t pair = { 0 };
+
+#define iterateObject( key_, type, answer )                          \
+    jsonStatus = JSON_Iterate( JSON_NESTED_OBJECT,                   \
+                               JSON_NESTED_OBJECT_LENGTH,            \
+                               &start,                               \
+                               &next,                                \
+                               &pair );                              \
+    TEST_ASSERT_EQUAL( JSONSuccess, jsonStatus );                    \
+    TEST_ASSERT_EQUAL( ( sizeof( key_ ) - 1 ), pair.keyLength );     \
+    TEST_ASSERT_EQUAL_STRING_LEN( ( key_ ),                          \
+                                  pair.key,                          \
+                                  pair.keyLength );                  \
+    TEST_ASSERT_EQUAL( type, pair.jsonType );                        \
+    TEST_ASSERT_EQUAL( ( sizeof( answer ) - 1 ), pair.valueLength ); \
+    TEST_ASSERT_EQUAL_STRING_LEN( ( answer ),                        \
+                                  pair.value,                        \
+                                  pair.valueLength );
+
+    iterateObject( FIRST_QUERY_KEY, ARRAY_ELEMENT_2_SUB_0_TYPE, ARRAY_ELEMENT_2_SUB_0 );
+    iterateObject( SECOND_QUERY_KEY, ARRAY_ELEMENT_2_SUB_1_TYPE, ARRAY_ELEMENT_2_SUB_1 );
+
+    jsonStatus = JSON_Iterate( JSON_NESTED_OBJECT,
+                               JSON_NESTED_OBJECT_LENGTH,
+                               &start,
+                               &next,
+                               &pair );
+    TEST_ASSERT_EQUAL( JSONNotFound, jsonStatus );
+}
+
+/**
+ * @brief Test that JSON_Iterate returns an error for an invalid collection.
+ */
+void test_JSON_Iterate_Illegal_Documents( void )
+{
+    JSONStatus_t jsonStatus;
+    size_t start = 0, next = 0;
+    JSONPair_t pair = { 0 };
+
+    jsonStatus = JSON_Iterate( FIRST_QUERY_KEY,
+                               FIRST_QUERY_KEY_LENGTH,
+                               &start,
+                               &next,
+                               &pair );
+
+    TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
+}
+
+/**
  * @brief Test that JSON_Search can returns JSONNotFound when a query key does
  * not apply to a JSON document.
  */
@@ -1473,6 +1572,68 @@ void test_JSON_Search_Invalid_Params( void )
 }
 
 /**
+ * @brief Test that JSON_Iterate is able to classify any null or bad parameters.
+ */
+void test_JSON_Iterate_Invalid_Params( void )
+{
+    JSONStatus_t jsonStatus;
+    size_t start = 0, next = 0;
+    JSONPair_t pair = { 0 };
+
+    jsonStatus = JSON_Iterate( NULL,
+                               JSON_DOC_LEGAL_ARRAY_LENGTH,
+                               &start,
+                               &next,
+                               &pair );
+    TEST_ASSERT_EQUAL( JSONNullParameter, jsonStatus );
+
+    jsonStatus = JSON_Iterate( JSON_DOC_LEGAL_ARRAY,
+                               0,
+                               &start,
+                               &next,
+                               &pair );
+    TEST_ASSERT_EQUAL( JSONBadParameter, jsonStatus );
+
+    jsonStatus = JSON_Iterate( JSON_DOC_LEGAL_ARRAY,
+                               JSON_DOC_LEGAL_ARRAY_LENGTH,
+                               NULL,
+                               &next,
+                               &pair );
+    TEST_ASSERT_EQUAL( JSONNullParameter, jsonStatus );
+
+    jsonStatus = JSON_Iterate( JSON_DOC_LEGAL_ARRAY,
+                               JSON_DOC_LEGAL_ARRAY_LENGTH,
+                               &start,
+                               NULL,
+                               &pair );
+    TEST_ASSERT_EQUAL( JSONNullParameter, jsonStatus );
+
+    jsonStatus = JSON_Iterate( JSON_DOC_LEGAL_ARRAY,
+                               JSON_DOC_LEGAL_ARRAY_LENGTH,
+                               &start,
+                               &next,
+                               NULL );
+    TEST_ASSERT_EQUAL( JSONNullParameter, jsonStatus );
+
+    start = JSON_DOC_LEGAL_ARRAY_LENGTH + 1;
+    jsonStatus = JSON_Iterate( JSON_DOC_LEGAL_ARRAY,
+                               JSON_DOC_LEGAL_ARRAY_LENGTH,
+                               &start,
+                               &next,
+                               &pair );
+    TEST_ASSERT_EQUAL( JSONBadParameter, jsonStatus );
+
+    start = 0;
+    next = JSON_DOC_LEGAL_ARRAY_LENGTH + 1;
+    jsonStatus = JSON_Iterate( JSON_DOC_LEGAL_ARRAY,
+                               JSON_DOC_LEGAL_ARRAY_LENGTH,
+                               &start,
+                               &next,
+                               &pair );
+    TEST_ASSERT_EQUAL( JSONBadParameter, jsonStatus );
+}
+
+/**
  * @brief Test that JSON_Search is able to classify a partial JSON document correctly.
  *
  * @note JSON_Search returns JSONIllegalDocument when it finds a partial document.
@@ -1545,7 +1706,7 @@ void test_JSON_Max_Depth( void )
 void test_JSON_asserts( void )
 {
     char buf[] = "x", queryKey[] = "y";
-    size_t start = 1, max = 1, length = 1;
+    size_t start = 1, max = 1, length = 1, next = 0;
     uint16_t u = 0;
     size_t key, keyLength, value, valueLength;
     int32_t queryIndex = 0;
@@ -1665,6 +1826,15 @@ void test_JSON_asserts( void )
     catch_assert( multiSearch( buf, max, queryKey, 0, &value, &valueLength ) );
     catch_assert( multiSearch( buf, max, queryKey, keyLength, NULL, &valueLength ) );
     catch_assert( multiSearch( buf, max, queryKey, keyLength, &value, NULL ) );
+
+    catch_assert( iterate( NULL, max, &start, &next, &key, &keyLength, &value, &valueLength ) );
+    catch_assert( iterate( buf, 0, &start, &next, &key, &keyLength, &value, &valueLength ) );
+    catch_assert( iterate( buf, max, NULL, &next, &key, &keyLength, &value, &valueLength ) );
+    catch_assert( iterate( buf, max, &start, NULL, &key, &keyLength, &value, &valueLength ) );
+    catch_assert( iterate( buf, max, &start, &next, NULL, &keyLength, &value, &valueLength ) );
+    catch_assert( iterate( buf, max, &start, &next, &key, NULL, &value, &valueLength ) );
+    catch_assert( iterate( buf, max, &start, &next, &key, &keyLength, NULL, &valueLength ) );
+    catch_assert( iterate( buf, max, &start, &next, &key, &keyLength, &value, NULL ) );
 }
 
 /**
@@ -1691,5 +1861,13 @@ void test_JSON_unreached( void )
         start = 0;
         TEST_ASSERT_EQUAL( true, skipDigits( TOO_BIG, &start, ( sizeof( TOO_BIG ) - 1 ), &out ) );
         TEST_ASSERT_EQUAL( -1, out );
+    }
+
+    /* return JSONNotFound when start >= max */
+    {
+        size_t next, key, keyLength, value, valueLength;
+        start = max = 1;
+        TEST_ASSERT_EQUAL( JSONNotFound,
+                           iterate( buf, max, &start, &next, &key, &keyLength, &value, &valueLength ) );
     }
 }

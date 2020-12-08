@@ -1,5 +1,5 @@
 /*
- * coreJSON v2.0.0
+ * coreJSON v3.0.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -173,17 +173,18 @@ JSONStatus_t JSON_Validate( const char * buf,
 
 /**
  * @ingroup json_enum_types
- * @brief Return codes from coreJSON library functions.
+ * @brief Value types from the JSON standard.
  */
 typedef enum
 {
-    JSONString = 0, /**< @brief A quote delimited sequence of Unicode characters. */
-    JSONNumber,     /**< @brief A rational number. */
-    JSONTrue,       /**< @brief The literal value true. */
-    JSONFalse,      /**< @brief The literal value false. */
-    JSONNull,       /**< @brief The literal value null. */
-    JSONObject,     /**< @brief A collection of zero or more key-value pairs. */
-    JSONArray       /**< @brief A collection of zero or more values. */
+    JSONInvalid = 0, /**< @brief Not a valid JSON type. */
+    JSONString,      /**< @brief A quote delimited sequence of Unicode characters. */
+    JSONNumber,      /**< @brief A rational number. */
+    JSONTrue,        /**< @brief The literal value true. */
+    JSONFalse,       /**< @brief The literal value false. */
+    JSONNull,        /**< @brief The literal value null. */
+    JSONObject,      /**< @brief A collection of zero or more key-value pairs. */
+    JSONArray        /**< @brief A collection of zero or more values. */
 } JSONTypes_t;
 
 /**
@@ -231,4 +232,93 @@ JSONStatus_t JSON_SearchConst( const char * buf,
                                size_t * outValueLength,
                                JSONTypes_t * outType );
 /* @[declare_json_searchconst] */
+
+/**
+ * @ingroup json_struct_types
+ * @brief Structure to represent a key-value pair.
+ */
+typedef struct
+{
+    const char * key;     /**< @brief Pointer to the code point sequence for key. */
+    size_t keyLength;     /**< @brief Length of the code point sequence for key. */
+    const char * value;   /**< @brief Pointer to the code point sequence for value. */
+    size_t valueLength;   /**< @brief Length of the code point sequence for value. */
+    JSONTypes_t jsonType; /**< @brief JSON-specific type of the value. */
+} JSONPair_t;
+
+/**
+ * @brief Output the next key-value pair or value from a collection.
+ *
+ * This function may be used in a loop to output each key-value pair from an object,
+ * or each value from an array.  For the first invocation, the integers pointed to by
+ * start and next should be initialized to 0.  These will be updated by the function.
+ * If another key-value pair or value is present, the output structure is populated
+ * and #JSONSuccess is returned; otherwise the structure is unchanged and #JSONNotFound
+ * is returned.
+ *
+ * @param[in] buf  The buffer to search.
+ * @param[in] max  size of the buffer.
+ * @param[in,out] start  The index at which the collection begins.
+ * @param[in,out] next  The index at which to seek the next value.
+ * @param[out] outPair  A pointer to receive the next key-value pair.
+ *
+ * @note This function expects a valid JSON document; run JSON_Validate() first.
+ *
+ * @note For an object, the outPair structure will reference a key and its value.
+ * For an array, only the value will be referenced (i.e., outPair.key will be NULL).
+ *
+ * @return #JSONSuccess if a value is output;
+ * #JSONIllegalDocument if the buffer does not contain a collection;
+ * #JSONNotFound if there are no further values in the collection.
+ *
+ * <b>Example</b>
+ * @code{c}
+ *     // Variables used in this example.
+ *     static char * json_types[] =
+ *     {
+ *         "invalid",
+ *         "string",
+ *         "number",
+ *         "true",
+ *         "false",
+ *         "null",
+ *         "object",
+ *         "array"
+ *     };
+ *
+ *     void show( const char * json,
+ *                size_t length )
+ *     {
+ *         size_t start = 0, next = 0;
+ *         JSONPair_t pair = { 0 };
+ *         JSONStatus_t result;
+ *
+ *         result = JSON_Validate( json, length );
+ *         if( result == JSONSuccess )
+ *         {
+ *             result = JSON_Iterate( json, length, &start, &next, &pair );
+ *         }
+ *
+ *         while( result == JSONSuccess )
+ *         {
+ *             if( pair.key != NULL )
+ *             {
+ *                 printf( "key: %.*s\t", ( int ) pair.keyLength, pair.key );
+ *             }
+ *
+ *             printf( "value: (%s) %.*s\n", json_types[ pair.jsonType ],
+ *                     ( int ) pair.valueLength, pair.value );
+ *
+ *             result = JSON_Iterate( json, length, &start, &next, &pair );
+ *         }
+ *     }
+ * @endcode
+ */
+/* @[declare_json_iterate] */
+JSONStatus_t JSON_Iterate( const char * buf,
+                           size_t max,
+                           size_t * start,
+                           size_t * next,
+                           JSONPair_t * outPair );
+/* @[declare_json_iterate] */
 #endif /* ifndef CORE_JSON_H_ */

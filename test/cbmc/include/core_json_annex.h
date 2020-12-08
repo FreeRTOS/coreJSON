@@ -1,5 +1,5 @@
 /*
- * coreJSON v2.0.0
+ * coreJSON v3.0.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -44,6 +44,11 @@
 
 /* All possible return values for JSON_Search() */
 #define jsonSearchEnum( x )        ( jsonValidateEnum( x ) || ( x == JSONNotFound ) )
+
+/* All possible return values for JSON_Iterate() */
+#define jsonIterateEnum( x )                                \
+    ( parameterEnum( x ) || ( x == JSONIllegalDocument ) || \
+      ( x == JSONNotFound ) || ( x == JSONSuccess ) )
 
 /* All possible type values output from JSON_SearchT() */
 #define jsonTypesEnum( x )   \

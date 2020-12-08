@@ -21,8 +21,8 @@
  */
 
 /**
- * @file skipNumber_harness.c
- * @brief Implements the proof harness for the skipNumber function.
+ * @file JSON_Iterate_harness.c
+ * @brief Implements the proof harness for the JSON_Iterate function.
  */
 
 #include <stdlib.h>
@@ -31,40 +31,49 @@
 void harness()
 {
     char * buf;
-    size_t start, max;
-    bool ret;
-    int32_t * outValue;
-
-    /* max is the buffer length which must be nonzero for non-API functions. */
-    __CPROVER_assume( max > 0 );
+    size_t max;
+    size_t * start, * next;
+    JSONPair_t * pair;
+    JSONStatus_t ret;
 
     /* max is the buffer length which must not exceed unwindings. */
     __CPROVER_assume( max < CBMC_MAX_BUFSIZE );
 
-    /* buf must not be NULL */
     buf = malloc( max );
-    __CPROVER_assume( buf != NULL );
+    start = malloc( sizeof( *start ) );
+    next = malloc( sizeof( *next ) );
+    pair = malloc( sizeof( *pair ) );
 
-    ret = skipNumber( buf, &start, max );
-
-    __CPROVER_assert( isBool( ret ), "A bool value is returned." );
-
-    if( ret == true )
+    if( pair != NULL )
     {
-        __CPROVER_assert( start <= max,
-                          "The buffer start index does not exceed the buffer length." );
+        JSONPair_t tmp = { 0 };
+        *pair = tmp;
     }
 
-    /* outValue may be NULL */
-    outValue = malloc( sizeof( *outValue ) );
+    ret = JSON_Iterate( buf,
+                        max,
+                        start,
+                        next,
+                        pair );
 
-    ret = skipDigits( buf, &start, max, outValue );
+    __CPROVER_assert( jsonIterateEnum( ret ), "The return value is a JSONStatus_t." );
 
-    __CPROVER_assert( isBool( ret ), "A bool value is returned." );
-
-    if( ( ret == true ) && ( outValue != NULL ) )
+    if( ret == JSONSuccess )
     {
-        __CPROVER_assert( ( ( *outValue == -1 ) || ( ( *outValue >= 0 ) && ( *outValue <= MAX_INDEX_VALUE ) ) ),
-                          "The converted integer is within the permitted range or is -1." );
+        if( pair->key != NULL )
+        {
+            __CPROVER_assert( ( pair->key > buf ) &&
+                              ( ( pair->key + pair->keyLength ) < ( buf + max ) ),
+                              "The output key is a sequence of characters within buf." );
+
+            __CPROVER_assert( ( pair->key + pair->keyLength ) < pair->value,
+                              "The output value occurs after the key." );
+        }
+
+        __CPROVER_assert( ( pair->value > buf ) &&
+                          ( ( pair->value + pair->valueLength ) <= ( buf + max ) ),
+                          "The output value is a sequence of characters within buf." );
+
+        __CPROVER_assert( jsonTypesEnum( pair->jsonType ), "The value type is a JSONTypes_t." );
     }
 }

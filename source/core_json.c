@@ -1,5 +1,5 @@
 /*
- * coreJSON v2.0.0
+ * coreJSON v3.0.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -1675,4 +1675,132 @@ JSONStatus_t JSON_SearchT( char * buf,
     /* coverity[misra_c_2012_rule_11_3_violation] */
     return JSON_SearchConst( ( const char * ) buf, max, query, queryLength,
                              ( const char ** ) outValue, outValueLength, outType );
+}
+
+/** @cond DO_NOT_DOCUMENT */
+
+/**
+ * @brief Output the next key-value pair or value from a collection.
+ *
+ * @param[in] buf  The buffer to search.
+ * @param[in] max  size of the buffer.
+ * @param[in] start  The index at which the collection begins.
+ * @param[in,out] next  The index at which to seek the next value.
+ * @param[out] outKey  A pointer to receive the index of the value found.
+ * @param[out] outKeyLength  A pointer to receive the length of the value found.
+ * @param[out] outValue  A pointer to receive the index of the value found.
+ * @param[out] outValueLength  A pointer to receive the length of the value found.
+ *
+ * @return #JSONSuccess if a value is output;
+ * #JSONIllegalDocument if the buffer does not begin with '[' or '{';
+ * #JSONNotFound if there are no further values in the collection.
+ */
+static JSONStatus_t iterate( const char * buf,
+                             size_t max,
+                             size_t * start,
+                             size_t * next,
+                             size_t * outKey,
+                             size_t * outKeyLength,
+                             size_t * outValue,
+                             size_t * outValueLength )
+{
+    JSONStatus_t ret = JSONNotFound;
+    bool found = false;
+
+    assert( ( buf != NULL ) && ( max > 0U ) );
+    assert( ( start != NULL ) && ( next != NULL ) );
+    assert( ( outKey != NULL ) && ( outKeyLength != NULL ) );
+    assert( ( outValue != NULL ) && ( outValueLength != NULL ) );
+
+    if( *start < max )
+    {
+        switch( buf[ *start ] )
+        {
+            case '[':
+                found = nextValue( buf, next, max, outValue, outValueLength );
+
+                if( found == true )
+                {
+                    *outKey = 0;
+                    *outKeyLength = 0;
+                }
+
+                break;
+
+            case '{':
+                found = nextKeyValuePair( buf, next, max, outKey, outKeyLength,
+                                          outValue, outValueLength );
+                break;
+
+            default:
+                ret = JSONIllegalDocument;
+                break;
+        }
+    }
+
+    if( found == true )
+    {
+        ret = JSONSuccess;
+        ( void ) skipSpaceAndComma( buf, next, max );
+    }
+
+    return ret;
+}
+
+/** @endcond */
+
+/**
+ * See core_json.h for docs.
+ */
+JSONStatus_t JSON_Iterate( const char * buf,
+                           size_t max,
+                           size_t * start,
+                           size_t * next,
+                           JSONPair_t * outPair )
+{
+    JSONStatus_t ret;
+    size_t key, keyLength, value, valueLength;
+
+    if( ( buf == NULL ) || ( start == NULL ) || ( next == NULL ) ||
+        ( outPair == NULL ) )
+    {
+        ret = JSONNullParameter;
+    }
+    else if( ( max == 0U ) || ( *start >= max ) || ( *next > max ) )
+    {
+        ret = JSONBadParameter;
+    }
+    else
+    {
+        skipSpace( buf, start, max );
+
+        if( *next <= *start )
+        {
+            *next = *start + 1U;
+            skipSpace( buf, next, max );
+        }
+
+        ret = iterate( buf, max, start, next, &key, &keyLength,
+                       &value, &valueLength );
+    }
+
+    if( ret == JSONSuccess )
+    {
+        JSONTypes_t t = getType( buf[ value ] );
+
+        if( t == JSONString )
+        {
+            /* strip the surrounding quotes */
+            value++;
+            valueLength -= 2U;
+        }
+
+        outPair->key = ( key == 0U ) ? NULL : &buf[ key ];
+        outPair->keyLength = keyLength;
+        outPair->value = &buf[ value ];
+        outPair->valueLength = valueLength;
+        outPair->jsonType = t;
+    }
+
+    return ret;
 }
