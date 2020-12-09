@@ -155,6 +155,7 @@ jobs:
         run: |
           mkdir -p override-include
           cp source/include/stdbool.readme override-include/stdbool.h
+          cp source/include/stdint.readme override-include/stdint.h
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
           -DBUILD_CLONE_SUBMODULES=ON \
