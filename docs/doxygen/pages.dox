@@ -14,19 +14,22 @@ and no heap allocation, making it suitable for IoT microcontrollers, but also fu
 
 <table>
     <tr>
-        <td colspan="4"><center><b>Code size of coreJSON library files (sizes generated with [GCC for ARM Cortex-M toolchain](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads/9-2020-q2-update))</b></center></td>
+        <td colspan="3"><center><b>Code size of coreJSON (example generated with GCC for ARM Cortex-M)</b></center></td>
     </tr>
     <tr>
         <td><b>File</b></td>
-        <td><b>No Optimization (asserts enabled)</b></td>
-        <td><b>With -O1 Optimization (asserts disabled)</b></td>
-        <td><b>With -Os Optimization (asserts disabled)</b></td>
+        <td><center><b>With -O1 Optimization</b></center></td>
+        <td><center><b>With -Os Optimization</b></center></td>
     </tr>
     <tr>
         <td>core_json.c</td>
-        <td>9.5K</td>
-        <td>4.7K</td>
-        <td>3.8K</td>
+        <td><center>2.7K</center></td>
+        <td><center>2.2K</center></td>
+    </tr>
+    <tr>
+        <td><b>Total estimate</b></td>
+        <td><center><b>2.7K</b></center></td>
+        <td><center><b>2.2K</b></center></td>
     </tr>
 </table>
 
