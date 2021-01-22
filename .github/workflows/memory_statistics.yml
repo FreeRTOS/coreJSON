@@ -14,11 +14,7 @@ jobs:
       - name: Measure sizes
         uses: FreeRTOS/CI-CD-Github-Actions/memory_statistics@main
         with:
-          lib_name: coreJSON
-          src: |
-            source/core_json.c
-          include: |
-            source/include
+            config: .github/memory_statistics_config.json
       - name: Upload table
         uses: actions/upload-artifact@v2
         with:
