@@ -12,26 +12,7 @@ and no heap allocation, making it suitable for IoT microcontrollers, but also fu
 @section json_memory_requirements Memory Requirements
 @brief Memory requirements of the JSON library.
 
-<table>
-    <tr>
-        <td colspan="3"><center><b>Code size of coreJSON (example generated with GCC for ARM Cortex-M)</b></center></td>
-    </tr>
-    <tr>
-        <td><b>File</b></td>
-        <td><center><b>With -O1 Optimization</b></center></td>
-        <td><center><b>With -Os Optimization</b></center></td>
-    </tr>
-    <tr>
-        <td>core_json.c</td>
-        <td><center>2.7K</center></td>
-        <td><center>2.2K</center></td>
-    </tr>
-    <tr>
-        <td><b>Total estimate</b></td>
-        <td><center><b>2.7K</b></center></td>
-        <td><center><b>2.2K</b></center></td>
-    </tr>
-</table>
+@include{doc} size_table.html
 
 @section json_design Design
 @brief JSON Library Design
