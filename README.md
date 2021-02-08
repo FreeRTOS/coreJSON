@@ -84,7 +84,7 @@ By default, the submodules in this repository are configured with `update=none` 
 
 To build unit tests, the submodule dependency of Unity is required. Use the following command to clone the submodule:
 ```
-git submodule update --checkout --init --recursive --test/unit-test/Unity
+git submodule update --checkout --init --recursive test/unit-test/Unity
 ```
 
 ### Platform Prerequisites
