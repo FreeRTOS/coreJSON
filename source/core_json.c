@@ -1620,7 +1620,7 @@ JSONStatus_t JSON_SearchConst( const char * buf,
                                JSONTypes_t * outType )
 {
     JSONStatus_t ret;
-    size_t value;
+    size_t value = 0U;
 
     if( ( buf == NULL ) || ( query == NULL ) ||
         ( outValue == NULL ) || ( outValueLength == NULL ) )
