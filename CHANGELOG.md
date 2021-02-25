@@ -1,6 +1,6 @@
 # Change Log for coreJSON Library
 
-## v3.0.1 (March 2021)
+## v3.0.1 (February 2021)
  - [#86]([#84](https://github.com/FreeRTOS/coreJSON/pull/86) Fix MISRA 9.1 violation.
  - [#84](https://github.com/FreeRTOS/coreJSON/pull/84), [#82](https://github.com/FreeRTOS/coreJSON/pull/82) and [#80](https://github.com/FreeRTOS/coreJSON/pull/80) Documentation updates and fixes.
 
