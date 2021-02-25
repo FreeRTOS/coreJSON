@@ -1,5 +1,5 @@
 /*
- * coreJSON v3.0.0
+ * coreJSON v3.0.1
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -1620,7 +1620,7 @@ JSONStatus_t JSON_SearchConst( const char * buf,
                                JSONTypes_t * outType )
 {
     JSONStatus_t ret;
-    size_t value;
+    size_t value = 0U;
 
     if( ( buf == NULL ) || ( query == NULL ) ||
         ( outValue == NULL ) || ( outValueLength == NULL ) )
