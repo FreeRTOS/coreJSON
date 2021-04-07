@@ -17,7 +17,7 @@ execute_process( COMMAND sed "s/^static //"
         )
 
 # Generate a header file for internal functions
-execute_process( COMMAND sed -n "1s/.*/typedef int bool_;/p; /^static.*(/,/^{\$/{s/^static //; s/)\$/&;/; /{/d; p;}"
+execute_process( COMMAND sed -n "/^static.*(/,/^{\$/{s/^static //; s/)\$/&;/; /{/d; p;}"
                  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                  INPUT_FILE ${JSON_SOURCES}
                  OUTPUT_FILE ${TEMP_BASE}_annex.h
