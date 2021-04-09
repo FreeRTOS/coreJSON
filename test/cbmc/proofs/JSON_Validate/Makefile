@@ -21,4 +21,4 @@ include ../Makefile-json.common
 
 # Substitution command to pass to sed for patching core_json.c. The
 # characters " and # must be escaped with backslash.
-CORE_JSON_SED_EXPR = 1s/^/\#include \"core_json_annex.h\" /; s/^static //; s/(bool_|JSONStatus_t|void) skip(AnyLiteral|Collection|Number|Space|String)\b/&_/
+CORE_JSON_SED_EXPR = 1s/^/\#include \"core_json_annex.h\" /; s/^static //; s/(bool|JSONStatus_t|void) skip(AnyLiteral|Collection|Number|Space|String)\b/&_/
