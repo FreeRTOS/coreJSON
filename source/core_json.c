@@ -1435,7 +1435,9 @@ static bool arraySearch( const char * buf,
  * @return true if a valid string was present;
  * false otherwise.
  */
-#define JSON_QUERY_KEY_SEPARATOR    '.'
+#ifndef JSON_QUERY_KEY_SEPARATOR
+    #define JSON_QUERY_KEY_SEPARATOR    '.'
+#endif
 #define isSeparator_( x )    ( ( x ) == JSON_QUERY_KEY_SEPARATOR )
 static bool skipQueryPart( const char * buf,
                            size_t * start,
