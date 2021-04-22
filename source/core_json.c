@@ -26,6 +26,7 @@
  */
 
 #include <assert.h>
+#include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
 #include "core_json.h"
@@ -39,8 +40,13 @@ typedef union
     uint8_t u;
 } char_;
 
-#define isdigit_( x )    ( ( ( x ) >= '0' ) && ( ( x ) <= '9' ) )
-#define iscntrl_( x )    ( ( ( x ) >= '\0' ) && ( ( x ) < ' ' ) )
+#if ( CHAR_MIN == 0 )
+    #define isascii_( x )    ( ( x ) <= '\x7F' )
+#else
+    #define isascii_( x )    ( ( x ) >= '\0' )
+#endif
+#define iscntrl_( x )        ( isascii_( x ) && ( ( x ) < ' ' ) )
+#define isdigit_( x )        ( ( ( x ) >= '0' ) && ( ( x ) <= '9' ) )
 /* NB. This is whitespace as defined by the JSON standard (ECMA-404). */
 #define isspace_( x )                          \
     ( ( ( x ) == ' ' ) || ( ( x ) == '\t' ) || \
@@ -190,7 +196,7 @@ static bool skipUTF8MultiByte( const char * buf,
 
     i = *start;
     assert( i < max );
-    assert( buf[ i ] < '\0' );
+    assert( !isascii_( buf[ i ] ) );
 
     c.c = buf[ i ];
 
@@ -251,8 +257,7 @@ static bool skipUTF8( const char * buf,
 
     if( *start < max )
     {
-        /* an ASCII byte */
-        if( buf[ *start ] >= '\0' )
+        if( isascii_( buf[ *start ] ) )
         {
             *start += 1U;
             ret = true;
