@@ -333,8 +333,13 @@ static bool skipOneHexEscape( const char * buf,
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
     assert( outValue != NULL );
 
-    i = *start;
 #define HEX_ESCAPE_LENGTH    ( 6U )   /* e.g., \u1234 */
+    if (*start > SIZE_MAX - HEX_ESCAPE_LENGTH)
+    {
+        return false;
+    }
+
+    i = *start;
     end = i + HEX_ESCAPE_LENGTH;
 
     if( ( end < max ) && ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
