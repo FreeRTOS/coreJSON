@@ -1871,3 +1871,16 @@ void test_JSON_unreached( void )
                            iterate( buf, max, &start, &next, &key, &keyLength, &value, &valueLength ) );
     }
 }
+
+/**
+ * @brief Test overflows.
+ */
+void test_JSON_overflows( void )
+{
+    char buf[] = UNICODE_ESCAPE_SEQUENCES_BMP;
+    size_t start;
+    uint16_t u;
+
+    start = SIZE_MAX;
+    TEST_ASSERT_EQUAL( false, skipOneHexEscape( buf, &start, SIZE_MAX, &u ) );
+}
