@@ -335,7 +335,7 @@ static bool skipOneHexEscape( const char * buf,
 
     i = *start;
 #define HEX_ESCAPE_LENGTH    ( 6U )   /* e.g., \u1234 */
-    end = i + HEX_ESCAPE_LENGTH;
+    end = ( i <= ( SIZE_MAX - HEX_ESCAPE_LENGTH ) ) ? ( i + HEX_ESCAPE_LENGTH ) : SIZE_MAX;
 
     if( ( end < max ) && ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
     {
