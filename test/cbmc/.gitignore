@@ -4,6 +4,7 @@ proofs/**/gotos
 proofs/**/report
 proofs/**/html
 proofs/**/core_json.c
+proofs/output
 
 # Emitted by CBMC Viewer
 TAGS-*
