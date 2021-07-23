@@ -1,5 +1,10 @@
 # Change Log for coreJSON Library
 
+## v3.0.2 (July 2021)
+- [#100](https://github.com/FreeRTOS/coreJSON/pull/100) Fix overflow in skipOneHexEscape().
+- [#95](https://github.com/FreeRTOS/coreJSON/pull/95) Eliminate warnings when base char type is unsigned.
+- [#93](https://github.com/FreeRTOS/coreJSON/pull/93) Wrap query key separator macro with ifndef.
+
 ## v3.0.1 (February 2021)
  - [#86](https://github.com/FreeRTOS/coreJSON/pull/86) Fix MISRA 9.1 violation.
  - [#84](https://github.com/FreeRTOS/coreJSON/pull/84), [#82](https://github.com/FreeRTOS/coreJSON/pull/82) and [#80](https://github.com/FreeRTOS/coreJSON/pull/80) Documentation updates and fixes.
