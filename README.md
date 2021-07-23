@@ -78,7 +78,7 @@ For pre-generated documentation, please see the documentation linked in the loca
 | [AWS IoT Device SDK for Embedded C](https://github.com/aws/aws-iot-device-sdk-embedded-C#releases-and-documentation) |
 | [FreeRTOS.org](https://freertos.org/Documentation/api-ref/coreJSON/docs/doxygen/output/html/index.html) |
 
-Note that the latest included version of the AWS IoT Device Defender library may differ across repositories.
+Note that the latest included version of the coreJSON library may differ across repositories.
 
 ### Generating documentation
 
