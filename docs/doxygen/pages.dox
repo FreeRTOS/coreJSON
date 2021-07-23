@@ -12,7 +12,7 @@ and no heap allocation, making it suitable for IoT microcontrollers, but also fu
 @section json_memory_requirements Memory Requirements
 @brief Memory requirements of the JSON library.
 
-@include{doc} size_table.html
+@include{doc} size_table.md
 
 @section json_design Design
 @brief JSON Library Design

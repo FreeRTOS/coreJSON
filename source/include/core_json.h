@@ -1,5 +1,5 @@
 /*
- * coreJSON v3.0.1
+ * coreJSON v3.0.2
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -30,6 +30,12 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+
+/* *INDENT-OFF* */
+#ifdef __cplusplus
+    extern "C" {
+#endif
+/* *INDENT-ON* */
 
 /**
  * @ingroup json_enum_types
@@ -321,4 +327,11 @@ JSONStatus_t JSON_Iterate( const char * buf,
                            size_t * next,
                            JSONPair_t * outPair );
 /* @[declare_json_iterate] */
+
+/* *INDENT-OFF* */
+#ifdef __cplusplus
+    }
+#endif
+/* *INDENT-ON* */
+
 #endif /* ifndef CORE_JSON_H_ */
