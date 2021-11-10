@@ -1,5 +1,8 @@
 # Change Log for coreJSON Library
 
+## v3.1.0 (November 2021)
+- [#106](https://github.com/FreeRTOS/coreJSON/pull/106) Update doxygen version for documentation.
+
 ## v3.0.2 (July 2021)
 - [#100](https://github.com/FreeRTOS/coreJSON/pull/100) Fix overflow in skipOneHexEscape().
 - [#95](https://github.com/FreeRTOS/coreJSON/pull/95) Eliminate warnings when base char type is unsigned.
