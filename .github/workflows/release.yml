@@ -82,8 +82,20 @@ jobs:
         with:
           name: coreJSON-${{ github.event.inputs.version_number }}.zip
           path: zip-check/coreJSON-${{ github.event.inputs.version_number }}.zip
+  deploy-doxygen:
+    needs: tag-commit
+    name: Deploy doxygen documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Doxygen generation
+        uses: FreeRTOS/CI-CD-Github-Actions/doxygen-generation@main
+        with:
+          ref: ${{ github.event.inputs.version_number }}
+          add_release: "true"
   create-release:
-    needs: create-zip
+    needs:
+      - create-zip
+      - deploy-doxygen
     name: Create Release and Upload Release Asset
     runs-on: ubuntu-latest
     steps:
