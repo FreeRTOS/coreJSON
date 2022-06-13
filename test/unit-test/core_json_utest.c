@@ -171,7 +171,10 @@
 #define MISMATCHED_BRACKETS_LENGTH                         ( sizeof( MISMATCHED_BRACKETS ) - 1 )
 
 #define MISMATCHED_BRACKETS2                               "{\"foo\":[\"bar\",\"xyz\"}}"
-#define MISMATCHED_BRACKETS2_LENGTH                        ( sizeof( MISMATCHED_BRACKETS ) - 1 )
+#define MISMATCHED_BRACKETS2_LENGTH                        ( sizeof( MISMATCHED_BRACKETS2 ) - 1 )
+
+#define MISMATCHED_BRACKETS3                               "{\"foo\":[\"bar\",\"xyz\"]]"
+#define MISMATCHED_BRACKETS3_LENGTH                        ( sizeof( MISMATCHED_BRACKETS3 ) - 1 )
 
 #define INCORRECT_OBJECT_SEPARATOR                         "{\"foo\": \"bar\"; \"bar\": \"foo\"}"
 #define INCORRECT_OBJECT_SEPARATOR_LENGTH                  ( sizeof( INCORRECT_OBJECT_SEPARATOR ) - 1 )
@@ -618,6 +621,10 @@ void test_JSON_Validate_Illegal_Documents( void )
 
     jsonStatus = JSON_Validate( MISMATCHED_BRACKETS2,
                                 MISMATCHED_BRACKETS2_LENGTH );
+    TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
+
+    jsonStatus = JSON_Validate( MISMATCHED_BRACKETS3,
+                                MISMATCHED_BRACKETS3_LENGTH );
     TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
 
     jsonStatus = JSON_Validate( NUL_ESCAPE, NUL_ESCAPE_LENGTH );
