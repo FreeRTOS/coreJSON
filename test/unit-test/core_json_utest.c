@@ -1252,7 +1252,7 @@ void test_JSON_Search_Illegal_Documents( void )
                               COMPLETE_QUERY_KEY_LENGTH,
                               &outValue,
                               &outValueLength );
-    TEST_ASSERT_EQUAL( JSONSuccess, jsonStatus );
+    TEST_ASSERT_EQUAL( JSONNotFound, jsonStatus );
 
     jsonStatus = JSON_Search( LETTER_AS_EXPONENT,
                               LETTER_AS_EXPONENT_LENGTH,
