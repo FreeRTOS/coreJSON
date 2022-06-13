@@ -1090,7 +1090,9 @@ static JSONStatus_t skipCollection( const char * buf,
                     break;
                 }
 
-                ret = ( depth == 0 ) ? JSONSuccess : JSONIllegalDocument;
+                /* If the below condition is true, then the depth is 0 and we
+                 * have reached the end of the collection. */
+                ret = isMatchingBracket_( stack[ depth ], c ) ? JSONSuccess : JSONIllegalDocument;
                 break;
 
             default:
