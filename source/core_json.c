@@ -1090,7 +1090,8 @@ static JSONStatus_t skipCollection( const char * buf,
                     break;
                 }
 
-                ret = ( depth == 0 ) ? JSONSuccess : JSONIllegalDocument;
+                ret = ( ( depth == 0 ) && isMatchingBracket_( stack[ depth ], c ) ) ?
+                      JSONSuccess : JSONIllegalDocument;
                 break;
 
             default:

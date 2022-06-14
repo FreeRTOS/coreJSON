@@ -171,7 +171,13 @@
 #define MISMATCHED_BRACKETS_LENGTH                         ( sizeof( MISMATCHED_BRACKETS ) - 1 )
 
 #define MISMATCHED_BRACKETS2                               "{\"foo\":[\"bar\",\"xyz\"}}"
-#define MISMATCHED_BRACKETS2_LENGTH                        ( sizeof( MISMATCHED_BRACKETS ) - 1 )
+#define MISMATCHED_BRACKETS2_LENGTH                        ( sizeof( MISMATCHED_BRACKETS2 ) - 1 )
+
+#define MISMATCHED_BRACKETS3                               "{\"foo\":[\"bar\",\"xyz\"]]"
+#define MISMATCHED_BRACKETS3_LENGTH                        ( sizeof( MISMATCHED_BRACKETS3 ) - 1 )
+
+#define MISMATCHED_BRACKETS4                               "[\"foo\",\"bar\",\"xyz\"}"
+#define MISMATCHED_BRACKETS4_LENGTH                        ( sizeof( MISMATCHED_BRACKETS4 ) - 1 )
 
 #define INCORRECT_OBJECT_SEPARATOR                         "{\"foo\": \"bar\"; \"bar\": \"foo\"}"
 #define INCORRECT_OBJECT_SEPARATOR_LENGTH                  ( sizeof( INCORRECT_OBJECT_SEPARATOR ) - 1 )
@@ -618,6 +624,14 @@ void test_JSON_Validate_Illegal_Documents( void )
 
     jsonStatus = JSON_Validate( MISMATCHED_BRACKETS2,
                                 MISMATCHED_BRACKETS2_LENGTH );
+    TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
+
+    jsonStatus = JSON_Validate( MISMATCHED_BRACKETS3,
+                                MISMATCHED_BRACKETS3_LENGTH );
+    TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
+
+    jsonStatus = JSON_Validate( MISMATCHED_BRACKETS4,
+                                MISMATCHED_BRACKETS4_LENGTH );
     TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
 
     jsonStatus = JSON_Validate( NUL_ESCAPE, NUL_ESCAPE_LENGTH );
@@ -1245,7 +1259,7 @@ void test_JSON_Search_Illegal_Documents( void )
                               COMPLETE_QUERY_KEY_LENGTH,
                               &outValue,
                               &outValueLength );
-    TEST_ASSERT_EQUAL( JSONSuccess, jsonStatus );
+    TEST_ASSERT_EQUAL( JSONNotFound, jsonStatus );
 
     jsonStatus = JSON_Search( LETTER_AS_EXPONENT,
                               LETTER_AS_EXPONENT_LENGTH,
