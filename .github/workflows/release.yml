@@ -11,7 +11,7 @@ on:
         required: true
 
 jobs:
-  tag-commit:
+  generate-sbom-and-tag-commit:
     name: Tag commit
     runs-on: ubuntu-latest
     steps:
@@ -21,7 +21,20 @@ jobs:
           ref: ${{ github.event.inputs.commit_id }}
       - name: Configure git identity
         run: |
-            git config --global user.name "Release Workflow"
+          git config --global user.name ${{ github.actor }}
+          git config --global user.email ${{ github.actor }}@users.noreply.github.com
+      - name: create a new branch that references commit id
+        run: git checkout -b ${{ github.event.inputs.version_number }} ${{ github.event.inputs.commit_id }}
+      - name: Generate SBOM
+        uses: FreeRTOS/CI-CD-Github-Actions/sbom-generator@main
+        with:
+          repo_path: ./
+          source_path: ./source
+      - name: commit SBOM file
+        run: |
+          git add .
+          git commit -m 'Update SBOM'
+          git push -u origin ${{ github.event.inputs.version_number }}
       - name: Tag Commit and Push to remote
         run: |
           git tag ${{ github.event.inputs.version_number }} -a -m "coreJSON Library ${{ github.event.inputs.version_number }}"
