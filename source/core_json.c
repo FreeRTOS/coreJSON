@@ -336,7 +336,7 @@ static bool skipOneHexEscape( const char * buf,
     i = *start;
 #define HEX_ESCAPE_LENGTH    ( 6U )   /* e.g., \u1234 */
     /* MISRA Ref 14.3.1 [Configuration dependent invariant] */
-    /* More details at: https://github.com/FreeRTOS/FreeRTOS-Plus-TCP/blob/main/MISRA.md#rule-143 */
+    /* More details at: https://github.com/FreeRTOS/coreJSON/blob/main/MISRA.md#rule-143 */
     /* coverity[misra_c_2012_rule_14_3_violation] */
     end = ( i <= ( SIZE_MAX - HEX_ESCAPE_LENGTH ) ) ? ( i + HEX_ESCAPE_LENGTH ) : SIZE_MAX;
 
@@ -1681,7 +1681,7 @@ JSONStatus_t JSON_SearchT( char * buf,
                            JSONTypes_t * outType )
 {
     /* MISRA Ref 11.3.1 [[Misaligned access]] */
-    /* More details at: https://github.com/FreeRTOS/FreeRTOS-Plus-TCP/blob/main/MISRA.md#rule-143 */
+    /* More details at: https://github.com/FreeRTOS/coreJSON/blob/main/MISRA.md#rule-113 */
     /* coverity[misra_c_2012_rule_11_3_violation] */
     return JSON_SearchConst( ( const char * ) buf, max, query, queryLength,
                              ( const char ** ) outValue, outValueLength, outType );
