@@ -8,9 +8,9 @@ Additionally, [MISRA configuration file](https://github.com/FreeRTOS/coreJSON/bl
 
 ### Suppressed with Coverity Comments
 To find the violation references in the source files run grep on the source code
-with ( Assuming rule 14.3 violation; with justification in point 1 ):
+with ( Assuming rule 11.3 violation; with justification in point 1 ):
 ```
-grep 'MISRA Ref 14.3.1' . -rI
+grep 'MISRA Ref 11.3.1' . -rI
 ```
 
 #### Rule 11.3
@@ -19,9 +19,3 @@ _Ref 11.3.1_
 - MISRA C-2012 Rule 11.3 prohibits casting a pointer to a different type.
         This instance is a false positive, as the rule permits the
         addition of a const type qualifier.
-
-#### Rule 14.3
-_Ref 14.3.1_
-
-- MISRA C-2012 Rule 14.3 False positive as the value might be changed
-        depending on the conditionally compiled code
