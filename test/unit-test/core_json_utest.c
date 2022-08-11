@@ -1898,6 +1898,5 @@ void test_JSON_overflows( void )
     start = SIZE_MAX;
     TEST_ASSERT_EQUAL( false, skipOneHexEscape( buf, &start, SIZE_MAX, &u ) );
     TEST_ASSERT_EQUAL( false, skipOneHexEscape( buf, &start, -1, &u ) );
-    start = 5;
-    TEST_ASSERT_EQUAL( false, skipOneHexEscape( buf, &start, 15u, &u ) );
+    TEST_ASSERT_EQUAL( false, skipOneHexEscape( buf, &start, 5u, &u ) );
 }
