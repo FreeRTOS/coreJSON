@@ -344,7 +344,7 @@ static bool skipOneHexEscape( const char * buf,
         end  = max;
     }
 
-    if( ( end < max ) && ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
+    if( ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
     {
         for( i += 2U; i < end; i++ )
         {
