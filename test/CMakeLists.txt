@@ -41,6 +41,9 @@ add_library( coverity_analysis
 # JSON public include path.
 target_include_directories( coverity_analysis PUBLIC ${JSON_INCLUDE_PUBLIC_DIRS} )
 
+# When building the coverity analysis target we disable debug
+target_compile_options(coverity_analysis PUBLIC -DNDEBUG )
+
 #  ====================================  Test Configuration ========================================
 
 # Include Unity build configuration.

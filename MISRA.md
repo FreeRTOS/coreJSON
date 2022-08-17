@@ -2,25 +2,30 @@
 
 The coreJSON library files conform to the [MISRA C:2012](https://www.misra.org.uk)
 guidelines, with some noted exceptions. Compliance is checked with Coverity static analysis.
-Deviations from the MISRA standard are listed below:
+The specific deviations, suppressed inline, are listed below.
 
-### Ignored by [Coverity Configuration](tools/coverity/misra.config)
-| Deviation | Category | Justification |
-| :-: | :-: | :-: |
-| Directive 4.9 | Advisory | Allow inclusion of function like macros. |
-| Rule 3.1 | Required | Allow nested comments. C++ style `//` comments are used in example code within Doxygen documentation blocks. |
-| Rule 8.13 | Advisory | Allow one function to have a char * argument without const qualifier. |
-| Rule 15.4 | Advisory | Allow more then one `break` statement to terminate a loop. |
-| Rule 19.2 | Advisory | Allow a `union` of a signed and unsigned type of identical sizes. |
-| Rule 20.12 | Required | Allow use of `assert()`, which uses a parameter in both expanded and raw forms. |
-
-### Flagged by Coverity
-| Deviation | Category | Justification |
-| :-: | :-: | :-: |
-| Rule 2.5 | Advisory | A macro is not used by the library; however, it exists to be used by an application. |
-| Rule 8.7 | Advisory | API functions are not used by the library; however, they must be externally visible in order to be used by an application. |
+Additionally, [MISRA configuration file](https://github.com/FreeRTOS/coreJSON/blob/main/tools/coverity/misra.config) contains the project wide deviations.
 
 ### Suppressed with Coverity Comments
-| Deviation | Category | Justification |
-| :-: | :-: | :-: |
-| Rule 11.3 | Required | False positive - the rule permits type qualifiers to be added. |
+To find the violation references in the source files run grep on the source code
+with ( Assuming rule 11.3 violation; with justification in point 1 ):
+```
+grep 'MISRA Ref 11.3.1' . -rI
+```
+
+#### Rule 11.3
+_Ref 11.3.1_
+
+- MISRA C-2012 Rule 11.3 prohibits casting a pointer to a different type.
+        This instance is a false positive, as the rule permits the
+        addition of a const type qualifier.
+
+#### Rule 14.3
+_Ref 14.3.1_
+
+- MISRA C-2012 Rule 14.3 False positive as the static analysis tool believes
+        i can never be larger than SIZE_MAX - HEX_ESCAPE_LENGTH. This can be proven as
+        a bug by setting i to be 18446744073709551615UL at initial assignment, then require
+        start != NULL before assigning the vaue of i to start. This creates a case
+        where i should be large enough to hit the else statement, but the tool still flags
+        this as invariant.

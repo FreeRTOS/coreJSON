@@ -32,8 +32,10 @@ fd
 fe
 ff
 ffff
+freertos
 foo
 gcc
+github
 html
 https
 ifndef
