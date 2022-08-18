@@ -1,7 +1,7 @@
 # Change Log for coreJSON Library
 
 ## v3.1.1 (August 2022)
-- [#121](https://github.com/FreeRTOS/coreJSON/pull/121) MISRA compliance updates.
+- [#121](https://github.com/FreeRTOS/coreJSON/pull/121) MISRA C:2012 compliance updates.
 - [#119](https://github.com/FreeRTOS/coreJSON/pull/119) Update CBMC Starter Kit.
 - [#115](https://github.com/FreeRTOS/coreJSON/pull/115) Fix JSON validation for mismatched brackets.
 - [#109](https://github.com/FreeRTOS/coreJSON/pull/109) Remove non-ASCII characters
