@@ -1,4 +1,4 @@
-# Static code analysis for backoffAlgorithm library
+# Static code analysis for coreJSON library
 This directory is made for the purpose of statically testing the MISRA C:2012 compliance of coreJSON using
 [Synopsys Coverity](https://www.synopsys.com/software-integrity/security-testing/static-analysis-sast.html) static analysis tool.
 To that end, this directory provides a [configuration file](https://github.com/FreeRTOS/coreJSON/blob/main/tools/coverity/misra.config) to use when
