@@ -48,12 +48,12 @@ Go to the root directory of the library and run the following commands in termin
   ~~~
 6. Format the errors in HTML format so that it is more readable while removing the test and build directory from the report
   ~~~
-  cov-format-errors --dir . --file "*/source" --exclude-files '(/build/|/test/)' --html-output html-out;
+  cov-format-errors --dir . --file "source" --exclude-files '(/build/|/test/)' --html-output html-out;
   ~~~
 7. Format the errors in JSON format to perform a jq query to get a simplified list of any exceptions.
   NOTE: A blank output means there are no defects that aren't being suppressed by the config or inline comments.
   ~~~
-  cov-format-errors --dir . --file "*/source" --exclude-files '(/build/|/test/)' --json-output-v2 defects.json;
+  cov-format-errors --dir . --file "source" --exclude-files '(/build/|/test/)' --json-output-v2 defects.json;
   echo -e "\n-------------------------Non-Suppresed Deviations, if any, Listed Below-------------------------\n";
   jq '.issues[] | .events[] | .eventTag ' defects.json | sort | uniq -c | sort -nr;
    echo -e "\n-------------------------Non-Suppresed Deviations, if any, Listed Above-------------------------\n";
@@ -67,8 +67,8 @@ For your convenience the commands above are below to be copy/pasted into a UNIX 
  cov-build --emit-complementary-info --dir cov-out make coverity_analysis;
  cd cov-out/
  cov-analyze --dir . --coding-standard-config ../../tools/coverity/misra.config;
- cov-format-errors --dir . --file "*/source" --exclude-files '(/build/|/test/)' --html-output html-out;
- cov-format-errors --dir . --file "*/source" --exclude-files '(/build/|/test/)' --json-output-v2 defects.json;
+ cov-format-errors --dir . --file "source" --exclude-files '(/build/|/test/)' --html-output html-out;
+ cov-format-errors --dir . --file "source" --exclude-files '(/build/|/test/)' --json-output-v2 defects.json;
  echo -e "\n-------------------------Non-Suppresed Deviations, if any, Listed Below-------------------------\n";
  jq '.issues[] | .events[] | .eventTag ' defects.json | sort | uniq -c | sort -nr;
  echo -e "\n-------------------------Non-Suppresed Deviations, if any, Listed Above-------------------------\n";
