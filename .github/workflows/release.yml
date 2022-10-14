@@ -11,7 +11,7 @@ on:
         required: true
 
 jobs:
-  generate-sbom-and-tag-commit:
+  tag-commit:
     name: Tag commit
     runs-on: ubuntu-latest
     steps:
