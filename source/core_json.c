@@ -73,7 +73,7 @@ static void skipSpace( const char * buf,
                        size_t * start,
                        size_t max )
 {
-    size_t i;
+    size_t i = 0;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
@@ -956,7 +956,7 @@ static void skipObjectScalars( const char * buf,
                                size_t * start,
                                size_t max )
 {
-    size_t i;
+    size_t i = 0;
     bool comma;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
@@ -1053,7 +1053,7 @@ static JSONStatus_t skipCollection( const char * buf,
     JSONStatus_t ret = JSONPartial;
     char c, stack[ JSON_MAX_DEPTH ];
     int16_t depth = -1;
-    size_t i;
+    size_t i = 0;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 

@@ -23,8 +23,8 @@
  */
 
 /**
- * @file skipSpace_harness.c
- * @brief Implements the proof harness for the skipSpace function.
+ * @file skipAnyLiteral_harness.c
+ * @brief Implements the proof harness for the skipAnyLiteral function.
  */
 
 #include "core_json_annex.h"
@@ -34,6 +34,7 @@ void harness()
     char * buf;
     size_t * start;
     size_t max;
+    char mode;
 
-    skipSpace( buf, start, max );
+    skipScalars( buf, start, max, mode );
 }

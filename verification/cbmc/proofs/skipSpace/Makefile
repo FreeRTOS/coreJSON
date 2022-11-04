@@ -1,14 +1,16 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
-HARNESS_FILE=skipSpace_harness
 PROOF_UID=skipSpace
+CHECK_FUNCTION_CONTRACTS = $(PROOF_UID)
+HARNESS_FILE= $(PROOF_UID)_harness
 
 # This value was experimentally chosen to provide 100% coverage
 # without tripping unwinding assertions and without exhausting memory.
 CBMC_MAX_BUFSIZE=10
 
 UNWINDSET += skipSpace.0:$(CBMC_MAX_BUFSIZE)
+UNWINDSET += skipSpace_wrapped_for_contract_checking.0:$(CBMC_MAX_BUFSIZE)
 
 include ../Makefile-json.common
 

@@ -257,7 +257,7 @@ CBMC_FLAG_FLUSH ?= --flush
 
 # CBMC flags used for property checking and coverage checking
 
-CBMCFLAGS += $(CBMC_FLAG_UNWIND) $(CBMC_UNWINDSET) $(CBMC_FLAG_FLUSH)
+CBMCFLAGS += $(CBMC_UNWINDSET) $(CBMC_FLAG_FLUSH)
 
 # CBMC flags used for property checking
 
@@ -662,19 +662,17 @@ $(HARNESS_GOTO)5.goto: $(HARNESS_GOTO)4.goto
 	  --ci-stage build \
 	  --description "$(PROOF_UID): slicing global initializations"
 
-# Replace function calls with function contracts
-# This must be done before enforcing function contracts,
-# since contract enforcement inlines all function calls.
+# Replace function contracts, check function contracts, instrument for loop contracts
 $(HARNESS_GOTO)6.goto: $(HARNESS_GOTO)5.goto
 	$(LITANI) add-job \
 	  --command \
-	    '$(GOTO_INSTRUMENT) $(CBMC_VERBOSITY) $(CBMC_USE_FUNCTION_CONTRACTS) $^ $@' \
+	    '$(GOTO_INSTRUMENT) --dfcc $(HARNESS_ENTRY) $(CBMC_VERBOSITY) $(CBMC_CHECK_FUNCTION_CONTRACTS) $(CBMC_USE_FUNCTION_CONTRACTS) $(CBMC_APPLY_LOOP_CONTRACTS) $^ $@' \
 	  --inputs $^ \
 	  --outputs $@ \
-	  --stdout-file $(LOGDIR)/use_function_contracts-log.txt \
+	  --stdout-file $(LOGDIR)/check_function_contracts-log.txt \
 	  --pipeline-name "$(PROOF_UID)" \
 	  --ci-stage build \
-	  --description "$(PROOF_UID): replacing function calls with function contracts"
+	  --description "$(PROOF_UID): checking function contracts"
 
 # Unwind loops for loop and function contracts
 $(HARNESS_GOTO)7.goto: $(HARNESS_GOTO)6.goto
@@ -688,32 +686,8 @@ $(HARNESS_GOTO)7.goto: $(HARNESS_GOTO)6.goto
 	  --ci-stage build \
 	  --description "$(PROOF_UID): unwinding loops"
 
-# Apply loop contracts
-$(HARNESS_GOTO)8.goto: $(HARNESS_GOTO)7.goto
-	$(LITANI) add-job \
-	  --command \
-	    '$(GOTO_INSTRUMENT) $(CBMC_VERBOSITY) $(CBMC_APPLY_LOOP_CONTRACTS) $^ $@' \
-	  --inputs $^ \
-	  --outputs $@ \
-	  --stdout-file $(LOGDIR)/apply_loop_contracts-log.txt \
-	  --pipeline-name "$(PROOF_UID)" \
-	  --ci-stage build \
-	  --description "$(PROOF_UID): applying loop contracts"
-
-# Check function contracts
-$(HARNESS_GOTO)9.goto: $(HARNESS_GOTO)8.goto
-	$(LITANI) add-job \
-	  --command \
-	    '$(GOTO_INSTRUMENT) $(CBMC_VERBOSITY) $(CBMC_CHECK_FUNCTION_CONTRACTS) $^ $@' \
-	  --inputs $^ \
-	  --outputs $@ \
-	  --stdout-file $(LOGDIR)/check_function_contracts-log.txt \
-	  --pipeline-name "$(PROOF_UID)" \
-	  --ci-stage build \
-	  --description "$(PROOF_UID): checking function contracts"
-
 # Final name for proof harness
-$(HARNESS_GOTO).goto: $(HARNESS_GOTO)9.goto
+$(HARNESS_GOTO).goto: $(HARNESS_GOTO)7.goto
 	$(LITANI) add-job \
 	  --command 'cp $< $@' \
 	  --inputs $^ \

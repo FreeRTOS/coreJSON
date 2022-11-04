@@ -1,7 +1,7 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
-PROOF_UID=skipString
+PROOF_UID=skipAnyScalar
 CHECK_FUNCTION_CONTRACTS = $(PROOF_UID)
 HARNESS_FILE= $(PROOF_UID)_harness
 
@@ -9,12 +9,10 @@ HARNESS_FILE= $(PROOF_UID)_harness
 # without tripping unwinding assertions and without exhausting memory.
 CBMC_MAX_BUFSIZE=10
 
-UNWINDSET += skipString.0:$(CBMC_MAX_BUFSIZE)
-UNWINDSET += skipString_wrapped_for_contract_checking.0:$(CBMC_MAX_BUFSIZE)
+UNWINDSET += skipDigits.0:$(CBMC_MAX_BUFSIZE)
+UNWINDSET += strnEq.0:$(CBMC_MAX_BUFSIZE)
 
-UNWINDSET += countHighBits.0:$(CBMC_MAX_BUFSIZE)
-UNWINDSET += skipUTF8MultiByte.0:$(CBMC_MAX_BUFSIZE)
-UNWINDSET += skipOneHexEscape.0:$(CBMC_MAX_BUFSIZE)
+USE_FUNCTION_CONTRACTS += skipString
 
 include ../Makefile-json.common
 

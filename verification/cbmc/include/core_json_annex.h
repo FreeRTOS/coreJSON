@@ -31,7 +31,7 @@
 
 #define isBool( x )           ( ( x == true ) || ( x == false ) )
 
-/* parameter check fail values for JSON API functions */
+/* Parameter check fail values for JSON API functions. */
 #define parameterEnum( x )    ( ( x == JSONNullParameter ) || ( x == JSONBadParameter ) )
 
 /* These 3 enums represent all the ways skipCollection() can fail. */
@@ -67,45 +67,69 @@
  * Please see core_json.c for documentation.
  */
 
-void skipSpace( const char * buf,
-                size_t * start,
-                size_t max );
-
-bool skipUTF8( const char * buf,
-               size_t * start,
-               size_t max );
-
-bool skipEscape( const char * buf,
-                 size_t * start,
-                 size_t max );
-
-bool skipString( const char * buf,
-                 size_t * start,
-                 size_t max );
-
-bool skipAnyLiteral( const char * buf,
-                     size_t * start,
-                     size_t max );
-
-bool skipDigits( const char * buf,
-                 size_t * start,
-                 size_t max,
-                 int32_t * outValue );
-
-bool skipNumber( const char * buf,
-                 size_t * start,
-                 size_t max );
-
-bool skipSpaceAndComma( const char * buf,
-                        size_t * start,
-                        size_t max );
-
-bool skipAnyScalar( const char * buf,
-                    size_t * start,
-                    size_t max );
+JSONStatus_t JSON_Validate( const char * buf,
+                            size_t max )
+__CPROVER_requires( max < CBMC_MAX_BUFSIZE )
+__CPROVER_requires( buf == NULL || __CPROVER_is_fresh( buf, max ) )
+__CPROVER_ensures( jsonValidateEnum( __CPROVER_return_value ) );
 
 JSONStatus_t skipCollection( const char * buf,
                              size_t * start,
-                             size_t max );
+                             size_t max )
+__CPROVER_requires( max > 0 && max < CBMC_MAX_BUFSIZE )
+__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
+__CPROVER_requires( __CPROVER_is_fresh( start, sizeof( *start ) ) )
+__CPROVER_assigns( *start )
+__CPROVER_ensures( skipCollectionEnum( __CPROVER_return_value ) )
+__CPROVER_ensures( __CPROVER_return_value == JSONSuccess == > *start <= max );
+
+void skipScalars( const char * buf,
+                  size_t * start,
+                  size_t max,
+                  char mode )
+__CPROVER_requires( max > 0 && max < CBMC_MAX_BUFSIZE )
+__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
+__CPROVER_requires( __CPROVER_is_fresh( start, sizeof( *start ) ) )
+__CPROVER_requires( ( mode == '{' ) || ( mode == '[' ) )
+/* __CPROVER_requires(isOpenBracket_( mode )) */
+__CPROVER_assigns( *start )
+__CPROVER_ensures( *start >= __CPROVER_old( *start ) )
+/* __CPROVER_ensures(__CPROVER_old(*start) <= max ==> *start <= max) */
+__CPROVER_ensures( __CPROVER_old( *start ) > max == > *start == __CPROVER_old( *start ) );
+
+bool skipAnyScalar( const char * buf,
+                    size_t * start,
+                    size_t max )
+__CPROVER_requires( max > 0 && max < CBMC_MAX_BUFSIZE )
+__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
+__CPROVER_requires( __CPROVER_is_fresh( start, sizeof( *start ) ) )
+__CPROVER_assigns( *start )
+__CPROVER_ensures( isBool( __CPROVER_return_value ) )
+__CPROVER_ensures( *start >= __CPROVER_old( *start ) )
+__CPROVER_ensures( __CPROVER_old( *start ) <= max == > *start <= max )
+__CPROVER_ensures( __CPROVER_old( *start ) > max == > *start == __CPROVER_old( *start ) );
+
+void skipSpace( const char * buf,
+                size_t * start,
+                size_t max )
+__CPROVER_requires( max > 0 && max < CBMC_MAX_BUFSIZE )
+__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
+__CPROVER_requires( __CPROVER_is_fresh( start, sizeof( *start ) ) )
+__CPROVER_assigns( *start )
+__CPROVER_ensures( *start >= __CPROVER_old( *start ) )
+__CPROVER_ensures( __CPROVER_old( *start ) <= max == > *start <= max )
+__CPROVER_ensures( __CPROVER_old( *start ) > max == > *start == __CPROVER_old( *start ) );
+
+bool skipString( const char * buf,
+                 size_t * start,
+                 size_t max )
+__CPROVER_requires( max > 0 && max < CBMC_MAX_BUFSIZE )
+__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
+__CPROVER_requires( __CPROVER_is_fresh( start, sizeof( *start ) ) )
+__CPROVER_assigns( *start )
+__CPROVER_ensures( isBool( __CPROVER_return_value ) )
+__CPROVER_ensures( *start >= __CPROVER_old( *start ) )
+__CPROVER_ensures( __CPROVER_old( *start ) <= max == > *start <= max )
+__CPROVER_ensures( __CPROVER_old( *start ) > max == > *start == __CPROVER_old( *start ) );
 
 #endif /* ifndef CORE_JSON_ANNEX_H_ */
