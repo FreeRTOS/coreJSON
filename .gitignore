@@ -11,3 +11,7 @@ build/
 *.gcda
 *.gcno
 *.gcov
+
+# Ignore IDE artifacts
+.vscode/
+.DS_Store
