@@ -41,7 +41,8 @@ static bool skipGeneric( const char * buf,
 
     if( *start < max )
     {
-        assert( __CPROVER_r_ok( ( buf + *start ), ( max - *start ) ) );
+        size_t readable_length = max - *start;
+        assert( __CPROVER_r_ok( ( buf + *start ), readable_length ) );
 
         if( nondet_bool() && ( min <= max ) )
         {
