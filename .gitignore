@@ -14,3 +14,6 @@ build/
 
 # Ignore macOS artifacts
 .DS_Store
+
+# Ignore IDE artifacts
+.vscode/
