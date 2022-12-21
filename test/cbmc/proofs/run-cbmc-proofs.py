@@ -15,6 +15,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import uuid
 
 from lib.summarize import print_proof_results
 
@@ -153,7 +154,7 @@ def get_args():
     }, {
             "flags": ["--version"],
             "action": "version",
-            "version": "CBMC starter kit 2.7",
+            "version": "CBMC starter kit 2.8",
             "help": "display version and exit"
     }, {
             "flags": ["--no-coverage"],
@@ -333,6 +334,22 @@ async def configure_proof_dirs( # pylint: disable=too-many-arguments
         queue.task_done()
 
 
+def add_tool_version_job():
+    cmd = [
+        "litani", "add-job",
+        "--command", "cbmc-starter-kit-print-tool-versions .",
+        "--description", "printing out tool versions",
+        "--phony-outputs", str(uuid.uuid4()),
+        "--pipeline-name", "print_tool_versions",
+        "--ci-stage", "report",
+        "--tags", "front-page-text",
+    ]
+    proc = subprocess.run(cmd)
+    if proc.returncode:
+        logging.critical("Could not add tool version printing job")
+        sys.exit(1)
+
+
 async def main(): # pylint: disable=too-many-locals
     args = get_args()
     set_up_logging(args.verbose)
@@ -401,6 +418,8 @@ async def main(): # pylint: disable=too-many-locals
         tasks.append(task)
 
     await proof_queue.join()
+
+    add_tool_version_job()
 
     print_counter(counter)
     print("", file=sys.stderr)
