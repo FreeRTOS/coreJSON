@@ -39,7 +39,6 @@
 #include "core_json.h"
 #include "core_json_annex.h"
 
-
 /* Sample test from the docs. */
 #define JSON_QUERY_SEPARATOR                "."
 
