@@ -1,13 +1,13 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
-PROOF_UID=skipEscape
+PROOF_UID=skipDigits
 CHECK_FUNCTION_CONTRACTS = $(PROOF_UID)
 HARNESS_FILE= $(PROOF_UID)_harness
 
 USE_DYNAMIC_FRAMES = 1
 
-UNWINDSET += skipOneHexEscape.0:$(CBMC_MAX_BUFSIZE)
+UNWINDSET += skipDigits.0:$(CBMC_MAX_BUFSIZE)
 
 include ../Makefile-json.common
 

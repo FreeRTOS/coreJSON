@@ -1,15 +1,13 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
-HARNESS_FILE=skipUTF8_harness
 PROOF_UID=skipUTF8
+CHECK_FUNCTION_CONTRACTS = $(PROOF_UID)
+HARNESS_FILE= $(PROOF_UID)_harness
 
-# This value was experimentally chosen to provide 100% coverage
-# without tripping unwinding assertions and without exhausting memory.
-CBMC_MAX_BUFSIZE=10
+USE_DYNAMIC_FRAMES = 1
 
-UNWINDSET += countHighBits.0:9
-UNWINDSET += skipUTF8.0:$(CBMC_MAX_BUFSIZE)
+UNWINDSET += countHighBits.0:$(CBMC_MAX_BUFSIZE)
 UNWINDSET += skipUTF8MultiByte.0:$(CBMC_MAX_BUFSIZE)
 
 include ../Makefile-json.common

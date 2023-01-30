@@ -23,8 +23,8 @@
  */
 
 /**
- * @file JSON_Iterate_harness.c
- * @brief Implements the proof harness for the JSON_Iterate function.
+ * @file skipAnyLiteral_harness.c
+ * @brief Implements the proof harness for the skipAnyLiteral function.
  */
 
 #include "core_json_contracts.h"
@@ -32,10 +32,8 @@
 void harness()
 {
     char * buf;
-    size_t max;
     size_t * start;
-    size_t * next;
-    JSONPair_t * outPair;
+    size_t max;
 
-    JSON_Iterate( buf, max, start, next, outPair );
+    skipAnyScalar( buf, start, max );
 }
