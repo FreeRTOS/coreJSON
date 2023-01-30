@@ -1,7 +1,0 @@
-{ "expected-missing-functions":
-  [
-
-  ],
-  "proof-name": "skipNumber",
-  "proof-root": "test/cbmc/proofs"
-}

@@ -1,20 +1,24 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
-PROOF_UID=skipCollection
+PROOF_UID=JSON_SearchConst
 CHECK_FUNCTION_CONTRACTS = $(PROOF_UID)
 HARNESS_FILE= $(PROOF_UID)_harness
 
 USE_DYNAMIC_FRAMES = 1
 
-CBMC_OBJECT_BITS = 10
+CBMC_OBJECT_BITS = 12
 
-DEFINES += -DJSON_MAX_DEPTH="( $(CBMC_MAX_BUFSIZE) - 2 )"
+UNWINDSET += multiSearch.0:$(CBMC_MAX_QUERYKEYLENGTH)
+UNWINDSET += skipQueryPart.0:$(CBMC_MAX_QUERYKEYLENGTH)
 
-USE_FUNCTION_CONTRACTS += skipScalars
+USE_FUNCTION_CONTRACTS += arraySearch
+USE_FUNCTION_CONTRACTS += objectSearch
+USE_FUNCTION_CONTRACTS += skipAnyScalar
+USE_FUNCTION_CONTRACTS += skipCollection
+USE_FUNCTION_CONTRACTS += skipDigits
 USE_FUNCTION_CONTRACTS += skipSpace
-
-UNWINDSET += skipCollection.0:$(CBMC_MAX_BUFSIZE)
+USE_FUNCTION_CONTRACTS += skipString
 
 include ../Makefile-json.common
 

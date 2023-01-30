@@ -29,39 +29,6 @@
 
 #include "core_json.h"
 
-#define isBool( x )           ( ( x == true ) || ( x == false ) )
-
-/* parameter check fail values for JSON API functions */
-#define parameterEnum( x )    ( ( x == JSONNullParameter ) || ( x == JSONBadParameter ) )
-
-/* These 3 enums represent all the ways skipCollection() can fail. */
-#define skipCollectionFailEnum( x ) \
-    ( ( x == JSONPartial ) || ( x == JSONIllegalDocument ) || ( x == JSONMaxDepthExceeded ) )
-
-/* All possible return values for skipCollection() */
-#define skipCollectionEnum( x )    ( skipCollectionFailEnum( x ) || ( x == JSONSuccess ) )
-
-/* All possible return values for JSON_Validate() */
-#define jsonValidateEnum( x )      ( skipCollectionEnum( x ) || parameterEnum( x ) )
-
-/* All possible return values for JSON_Search() */
-#define jsonSearchEnum( x )        ( jsonValidateEnum( x ) || ( x == JSONNotFound ) )
-
-/* All possible return values for JSON_Iterate() */
-#define jsonIterateEnum( x )                                \
-    ( parameterEnum( x ) || ( x == JSONIllegalDocument ) || \
-      ( x == JSONNotFound ) || ( x == JSONSuccess ) )
-
-/* All possible type values output from JSON_SearchT() */
-#define jsonTypesEnum( x )   \
-    ( ( x == JSONString ) || \
-      ( x == JSONNumber ) || \
-      ( x == JSONTrue ) ||   \
-      ( x == JSONFalse ) ||  \
-      ( x == JSONNull ) ||   \
-      ( x == JSONObject ) || \
-      ( x == JSONArray ) )
-
 /*
  * These are declarations for the (normally) static functions from core_json.c.
  * Please see core_json.c for documentation.

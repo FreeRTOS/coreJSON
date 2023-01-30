@@ -1,6 +1,6 @@
 abc
 api
-arraySearch
+arraysearch
 ascii
 bf
 bmp
@@ -78,7 +78,7 @@ nb
 nextkeyvaluepair
 noninfringement
 nul
-objectSearch
+objectsearch
 os
 outkey
 outkeylength
