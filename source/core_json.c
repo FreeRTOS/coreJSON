@@ -27,6 +27,8 @@
  * @brief The source file that implements the user-facing functions in core_json.h.
  */
 
+/* DO NOT MERGE THIS CHANGE. */
+
 #include <assert.h>
 #include <limits.h>
 #include <stddef.h>
