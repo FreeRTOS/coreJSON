@@ -62,12 +62,23 @@
       ( x == JSONObject ) || \
       ( x == JSONArray ) )
 
-/*
+/**
+ * Renaming all contract functions from CBMC for readability.
+ * For more information about contracts in CBMC, see
+ * https://diffblue.github.io/cbmc/contracts-user.html
+ */
+#define requires            __CPROVER_requires
+#define ensures             __CPROVER_ensures
+#define assigns             __CPROVER_assigns
+#define allocates           __CPROVER_is_fresh
+#define old                 __CPROVER_old
+#define result              __CPROVER_return_value
+#define pointer_in_range    __CPROVER_pointer_in_range_dfcc
+
+/**
  * These are declarations for the (normally) static functions from core_json.c.
  * Please see core_json.c for documentation.
  */
-
-/* *INDENT-OFF* */
 
 JSONStatus_t JSON_SearchConst( const char * buf,
                                size_t max,
@@ -76,62 +87,37 @@ JSONStatus_t JSON_SearchConst( const char * buf,
                                const char ** outValue,
                                size_t * outValueLength,
                                JSONTypes_t * outType )
-__CPROVER_requires( max < CBMC_MAX_BUFSIZE )
-__CPROVER_requires( queryLength < CBMC_MAX_QUERYKEYLENGTH )
-__CPROVER_requires( buf == NULL || __CPROVER_is_fresh( buf, max ) )
-__CPROVER_requires( query == NULL || __CPROVER_is_fresh( query, queryLength ) )
-__CPROVER_requires( outValue == NULL || __CPROVER_is_fresh( outValue, sizeof( *outValue ) ) )
-__CPROVER_requires( outValueLength == NULL || __CPROVER_is_fresh( outValueLength, sizeof( *outValueLength ) ) )
-__CPROVER_requires( outType == NULL || __CPROVER_is_fresh( outType, sizeof( *outType ) ) )
-__CPROVER_assigns( *outValue )
-__CPROVER_assigns( *outValueLength )
-__CPROVER_assigns( *outType )
-__CPROVER_ensures( isJSONSearchEnum( __CPROVER_return_value ) )
-__CPROVER_ensures( __CPROVER_return_value == JSONSuccess ==> ( ( *outValue >= buf ) && ( ( *outValue + *outValueLength ) <= ( buf + max ) ) ) );
+requires( JSON_SearchConst_requires( buf, max, query, queryLength, outValue, outValueLength, outType ) )
+assigns( *outValue, *outValueLength, *outType )
+ensures( JSON_SearchConst_ensures( result, buf, outValue, outValueLength, max ) )
+;
 
 JSONStatus_t JSON_Iterate( const char * buf,
                            size_t max,
                            size_t * start,
                            size_t * next,
                            JSONPair_t * outPair )
-__CPROVER_requires( 0 < max && max < CBMC_MAX_BUFSIZE )
-__CPROVER_requires( buf == NULL || __CPROVER_is_fresh( buf, max ) )
-__CPROVER_requires( start == NULL || __CPROVER_is_fresh( start, sizeof( *start ) ) )
-__CPROVER_requires( next == NULL || __CPROVER_is_fresh( next, sizeof( *next ) ) )
-__CPROVER_requires( outPair == NULL || __CPROVER_is_fresh( outPair, sizeof( *outPair ) ) )
-__CPROVER_requires( outPair != NULL ==> ( ( outPair->keyLength == 0 && outPair->key == NULL ) || __CPROVER_is_fresh( outPair->key, outPair->keyLength ) ) )
-__CPROVER_requires( outPair != NULL ==> ( ( outPair->keyLength == 0 && outPair->key == NULL ) || __CPROVER_is_fresh( outPair->value, outPair->valueLength ) ) )
-__CPROVER_assigns( *start )
-__CPROVER_assigns( *next )
-__CPROVER_assigns( *outPair )
-__CPROVER_ensures( isJSONIterateEnum( __CPROVER_return_value ) )
-__CPROVER_ensures( ( __CPROVER_return_value == JSONSuccess && outPair->key != NULL ) ==> ( ( outPair->key > buf ) && ( ( outPair->key + outPair->keyLength ) < ( buf + max ) ) ) )
-__CPROVER_ensures( ( __CPROVER_return_value == JSONSuccess && outPair->key != NULL ) ==> ( ( outPair->key + outPair->keyLength ) < outPair->value ) )
-__CPROVER_ensures( __CPROVER_return_value == JSONSuccess ==> ( ( outPair->value > buf ) && ( ( outPair->value + outPair->valueLength ) <= ( buf + max ) ) ) )
-__CPROVER_ensures( __CPROVER_return_value == JSONSuccess ==> isJSONTypesEnum( outPair->jsonType ) );
+requires( JSON_Iterate_requires( buf, max, start, next, outPair ) )
+assigns( *start, *next, *outPair )
+ensures( JSON_Iterate_ensures( result, buf, max, outPair ) )
+;
 
 JSONStatus_t JSON_Validate( const char * buf,
                             size_t max )
-__CPROVER_requires( max < CBMC_MAX_BUFSIZE )
-__CPROVER_requires( buf == NULL || __CPROVER_is_fresh( buf, max ) )
-__CPROVER_ensures( isJSONValidateEnum( __CPROVER_return_value ) );
+requires( max < CBMC_MAX_BUFSIZE )
+requires( buf == NULL || allocates( buf, max ) )
+ensures( isJSONValidateEnum( result ) )
+;
 
 bool arraySearch( const char * buf,
                   size_t max,
                   uint32_t queryIndex,
                   size_t * outValue,
                   size_t * outValueLength )
-__CPROVER_requires( 0 < max && max < CBMC_MAX_BUFSIZE )
-__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
-__CPROVER_requires( __CPROVER_is_fresh( outValue, sizeof( *outValue ) ) )
-__CPROVER_requires( __CPROVER_is_fresh( outValueLength, sizeof( *outValueLength ) ) )
-__CPROVER_requires( *outValueLength <= max )
-__CPROVER_assigns( *outValue )
-__CPROVER_assigns( *outValueLength )
-__CPROVER_ensures( isBool( __CPROVER_return_value ) )
-__CPROVER_ensures( __CPROVER_return_value ? ( 0 <= *outValue && *outValue < max ) : ( *outValue == __CPROVER_old( *outValue ) ) )
-__CPROVER_ensures( __CPROVER_return_value ? ( 0 < *outValueLength && *outValueLength <= max - *outValue ) : ( *outValueLength == __CPROVER_old( *outValueLength ) ) )
-__CPROVER_ensures( __CPROVER_return_value && buf[ *outValue ] == '"' ==> ( 2 <= *outValueLength && *outValueLength <= max - *outValue ) );
+requires( arraySearch_requires( buf, max, outValue, outValueLength ) )
+assigns( *outValue, *outValueLength )
+ensures( arraySearch_ensures( result, buf, max, outValue, outValueLength, old( *outValue ), old( *outValueLength ) ) )
+;
 
 bool objectSearch( const char * buf,
                    size_t max,
@@ -139,126 +125,84 @@ bool objectSearch( const char * buf,
                    size_t queryLength,
                    size_t * outValue,
                    size_t * outValueLength )
-__CPROVER_requires( 0 < max && max < CBMC_MAX_BUFSIZE )
-__CPROVER_requires( queryLength < CBMC_MAX_QUERYKEYLENGTH )
-__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
-__CPROVER_requires( __CPROVER_is_fresh( query, queryLength ) )
-__CPROVER_requires( __CPROVER_is_fresh( outValue, sizeof( *outValue ) ) )
-__CPROVER_requires( __CPROVER_is_fresh( outValueLength, sizeof( *outValueLength ) ) )
-__CPROVER_assigns( *outValue )
-__CPROVER_assigns( *outValueLength )
-__CPROVER_ensures( isBool( __CPROVER_return_value ) )
-__CPROVER_ensures( __CPROVER_return_value ? ( 0 <= *outValue && *outValue < max ) : ( *outValue == __CPROVER_old( *outValue ) ) )
-__CPROVER_ensures( __CPROVER_return_value ? ( 0 < *outValueLength && *outValueLength <= max - *outValue ) : ( *outValueLength == __CPROVER_old( *outValueLength ) ) )
-__CPROVER_ensures( __CPROVER_return_value && buf[ *outValue ] == '"' ==> ( 2 <= *outValueLength && *outValueLength <= max - *outValue ) );
+requires( objectSearch_requires( buf, max, query, queryLength, outValue, outValueLength ) )
+assigns( *outValue, *outValueLength )
+ensures( objectSearch_ensures( result, buf, max, outValue, outValueLength, old( *outValue ), old( *outValueLength ) ) )
+;
 
 JSONStatus_t skipCollection( const char * buf,
                              size_t * start,
                              size_t max )
-__CPROVER_requires( 0 < max && max < CBMC_MAX_BUFSIZE )
-__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
-__CPROVER_requires( __CPROVER_is_fresh( start, sizeof( *start ) ) )
-__CPROVER_assigns( *start )
-__CPROVER_ensures( isSkipCollectionEnum( __CPROVER_return_value ) )
-__CPROVER_ensures( *start >= __CPROVER_old( *start ) )
-__CPROVER_ensures( ( __CPROVER_old( *start ) < max ) ? ( ( *start <= max ) ) : ( *start == __CPROVER_old( *start ) ) )
-__CPROVER_ensures( ( __CPROVER_return_value == JSONSuccess ) ==> ( __CPROVER_old( *start ) < max ) && ( *start >= __CPROVER_old( *start ) + 2 ) );
+requires( skipCollection_requires( buf, start, max ) )
+assigns( *start )
+ensures( skipCollection_ensures( result, buf, start, old( *start ), max ) )
+;
 
 void skipScalars( const char * buf,
                   size_t * start,
                   size_t max,
                   char mode )
-__CPROVER_requires( 0 < max && max < CBMC_MAX_BUFSIZE )
-__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
-__CPROVER_requires( __CPROVER_is_fresh( start, sizeof( *start ) ) )
-__CPROVER_requires( ( mode == '{' ) || ( mode == '[' ) )
-__CPROVER_assigns( *start )
-__CPROVER_ensures( *start >= __CPROVER_old( *start ) )
-__CPROVER_ensures( ( __CPROVER_old( *start ) < max ) ? ( ( *start <= max ) ) : ( *start == __CPROVER_old( *start ) ) );
+requires( skipScalars_requires( buf, start, max, mode ) )
+assigns( *start )
+ensures( skipScalars_ensures( start, old( *start ), max ) )
+;
 
 void skipObjectScalars( const char * buf,
                         size_t * start,
                         size_t max )
-__CPROVER_requires( 0 < max && max < CBMC_MAX_BUFSIZE )
-__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
-__CPROVER_requires( __CPROVER_is_fresh( start, sizeof( *start ) ) )
-__CPROVER_assigns( *start )
-__CPROVER_ensures( *start >= __CPROVER_old( *start ) )
-__CPROVER_ensures( ( __CPROVER_old( *start ) < max ) ? ( ( *start <= max ) ) : ( *start == __CPROVER_old( *start ) ) );
+requires( skipObjectScalars_requires( buf, start, max ) )
+assigns( *start )
+ensures( skipObjectScalars_ensures( start, old( *start ), max ) )
+;
 
 bool skipAnyScalar( const char * buf,
                     size_t * start,
                     size_t max )
-__CPROVER_requires( 0 < max && max < CBMC_MAX_BUFSIZE )
-__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
-__CPROVER_requires( __CPROVER_is_fresh( start, sizeof( *start ) ) )
-__CPROVER_assigns( *start )
-__CPROVER_ensures( isBool( __CPROVER_return_value ) )
-__CPROVER_ensures( *start >= __CPROVER_old( *start ) )
-__CPROVER_ensures( ( __CPROVER_old( *start ) < max ) ? ( ( *start <= max ) ) : ( *start == __CPROVER_old( *start ) ) )
-__CPROVER_ensures( __CPROVER_return_value ==> __CPROVER_old( *start ) < max && *start > __CPROVER_old( *start ) )
-__CPROVER_ensures( __CPROVER_return_value && buf[ __CPROVER_old( *start ) ] == '"' ==> *start >= __CPROVER_old( *start ) + 2 );
+requires( skipAnyScalar_requires( buf, start, max ) )
+assigns( *start )
+ensures( skipAnyScalar_ensures( result, buf, start, old( *start ), max ) )
+;
 
 void skipSpace( const char * buf,
                 size_t * start,
                 size_t max )
-__CPROVER_requires( 0 < max && max < CBMC_MAX_BUFSIZE )
-__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
-__CPROVER_requires( __CPROVER_is_fresh( start, sizeof( *start ) ) )
-__CPROVER_assigns( *start )
-__CPROVER_ensures( ( __CPROVER_old( *start ) < max ) ? ( ( *start <= max ) && ( *start >= __CPROVER_old( *start ) ) ) : ( *start == __CPROVER_old( *start ) ) );
+requires( skipSpace_requires( buf, start, max ) )
+assigns( *start )
+ensures( skipSpace_ensures( start, old( *start ), max ) )
+;
 
 bool skipString( const char * buf,
                  size_t * start,
                  size_t max )
-__CPROVER_requires( 0 < max && max < CBMC_MAX_BUFSIZE )
-__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
-__CPROVER_requires( __CPROVER_is_fresh( start, sizeof( *start ) ) )
-__CPROVER_assigns( *start )
-__CPROVER_ensures( isBool( __CPROVER_return_value ) )
-__CPROVER_ensures( *start >= __CPROVER_old( *start ) )
-__CPROVER_ensures( ( __CPROVER_old( *start ) < max ) ? ( ( *start <= max ) ) : ( *start == __CPROVER_old( *start ) ) )
-__CPROVER_ensures( __CPROVER_return_value ==> ( __CPROVER_old( *start ) < max ) && ( *start >= __CPROVER_old( *start ) + 2 ) );
+requires( skipString_requires( buf, start, max ) )
+assigns( *start )
+ensures( skipString_ensures( result, start, old( *start ), max ) )
+;
 
 bool skipEscape( const char * buf,
                  size_t * start,
                  size_t max )
-__CPROVER_requires( 0 < max && max < CBMC_MAX_BUFSIZE )
-__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
-__CPROVER_requires( __CPROVER_is_fresh( start, sizeof( *start ) ) )
-__CPROVER_assigns( *start )
-__CPROVER_ensures( isBool( __CPROVER_return_value ) )
-__CPROVER_ensures( *start >= __CPROVER_old( *start ) )
-__CPROVER_ensures( ( __CPROVER_old( *start ) < max ) ? ( ( *start <= max ) ) : ( *start == __CPROVER_old( *start ) ) )
-__CPROVER_ensures( __CPROVER_return_value ==> ( __CPROVER_old( *start ) < max ) && ( *start >= __CPROVER_old( *start ) + 1 ) );
+requires( skipEscape_requires( buf, start, max ) )
+assigns( *start )
+ensures( skipEscape_ensures( result, start, old( *start ), max ) )
+;
 
 bool skipUTF8( const char * buf,
                size_t * start,
                size_t max )
-__CPROVER_requires( 0 < max && max < CBMC_MAX_BUFSIZE )
-__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
-__CPROVER_requires( __CPROVER_is_fresh( start, sizeof( *start ) ) )
-__CPROVER_assigns( *start )
-__CPROVER_ensures( isBool( __CPROVER_return_value ) )
-__CPROVER_ensures( *start >= __CPROVER_old( *start ) )
-__CPROVER_ensures( ( __CPROVER_old( *start ) < max ) ? ( ( *start <= max ) ) : ( *start == __CPROVER_old( *start ) ) )
-__CPROVER_ensures( __CPROVER_return_value ==> ( __CPROVER_old( *start ) < max ) && ( *start >= __CPROVER_old( *start ) + 1 ) );
+requires( skipEscape_requires( buf, start, max ) )
+assigns( *start )
+ensures( skipEscape_ensures( result, start, old( *start ), max ) )
+;
 
 bool skipDigits( const char * buf,
                  size_t * start,
                  size_t max,
                  int32_t * outValue )
-__CPROVER_requires( 0 < max && max < CBMC_MAX_BUFSIZE )
-__CPROVER_requires( __CPROVER_is_fresh( buf, max ) )
-__CPROVER_requires( __CPROVER_is_fresh( start, sizeof( *start ) ) )
-__CPROVER_requires( outValue == NULL || __CPROVER_is_fresh( outValue, sizeof( *outValue ) ) )
-__CPROVER_assigns( *start )
-__CPROVER_assigns( outValue != NULL: *outValue )
-__CPROVER_ensures( isBool( __CPROVER_return_value ) )
-__CPROVER_ensures( __CPROVER_old( *start ) <= *start )
-__CPROVER_ensures( __CPROVER_old( *start ) < max ? *start <= max : *start == __CPROVER_old( *start ) )
-__CPROVER_ensures( __CPROVER_return_value ==> ( __CPROVER_old( *start ) < max ) && ( *start > __CPROVER_old( *start ) ) && ( ( ( buf[ __CPROVER_old( *start ) ] ) >= '0' ) && ( ( buf[ __CPROVER_old( *start ) ] ) <= '9' ) ) );
-
-/* *INDENT-ON* */
+requires( skipDigits_requires( buf, start, max, outValue ) )
+assigns( *start )
+assigns( outValue != NULL: *outValue )
+ensures( skipDigits_ensures( result, buf, start, old( *start ), max ) )
+;
 
 #endif /* ifndef CORE_JSON_CONTRACTS_H_ */
