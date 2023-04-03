@@ -75,6 +75,8 @@
 #define result              __CPROVER_return_value
 #define pointer_in_range    __CPROVER_pointer_in_range_dfcc
 
+#define CHECK( cond )    do { if( !( cond ) ) { return false; } } while( 0 )
+
 /**
  * These are declarations for the (normally) static functions from core_json.c.
  * Please see core_json.c for documentation.
@@ -87,7 +89,13 @@ JSONStatus_t JSON_SearchConst( const char * buf,
                                const char ** outValue,
                                size_t * outValueLength,
                                JSONTypes_t * outType )
-requires( JSON_SearchConst_requires( buf, max, query, queryLength, outValue, outValueLength, outType ) )
+requires( max < CBMC_MAX_BUFSIZE )
+requires( queryLength < CBMC_MAX_QUERYKEYLENGTH )
+requires( buf == NULL || allocates( buf, max ) )
+requires( query == NULL || allocates( query, queryLength ) )
+requires( outValue == NULL || allocates( outValue, sizeof( *outValue ) ) )
+requires( outValueLength == NULL || allocates( outValueLength, sizeof( *outValueLength ) ) )
+requires( outType == NULL || allocates( outType, sizeof( *outType ) ) )
 assigns( *outValue, *outValueLength, *outType )
 ensures( JSON_SearchConst_ensures( result, buf, outValue, outValueLength, max ) )
 ;
@@ -97,7 +105,15 @@ JSONStatus_t JSON_Iterate( const char * buf,
                            size_t * start,
                            size_t * next,
                            JSONPair_t * outPair )
-requires( JSON_Iterate_requires( buf, max, start, next, outPair ) )
+requires( 0 < max && max < CBMC_MAX_BUFSIZE )
+requires( buf == NULL || allocates( buf, max ) )
+requires( start == NULL || allocates( start, sizeof( *start ) ) )
+requires( next == NULL || allocates( next, sizeof( *next ) ) )
+requires( outPair == NULL || allocates( outPair, sizeof( *outPair ) ) )
+/* *INDENT-OFF* */
+requires( outPair != NULL ==> ( ( outPair->keyLength == 0 && outPair->key == NULL ) || allocates( outPair->key, outPair->keyLength ) ) )
+requires( outPair != NULL ==> ( ( outPair->valueLength == 0 && outPair->value == NULL ) || allocates( outPair->value, outPair->valueLength ) ) )
+/* *INDENT-ON* */
 assigns( *start, *next, *outPair )
 ensures( JSON_Iterate_ensures( result, buf, max, outPair ) )
 ;
@@ -114,7 +130,10 @@ bool arraySearch( const char * buf,
                   uint32_t queryIndex,
                   size_t * outValue,
                   size_t * outValueLength )
-requires( arraySearch_requires( buf, max, outValue, outValueLength ) )
+requires( 0 < max && max < CBMC_MAX_BUFSIZE )
+requires( allocates( buf, max ) )
+requires( allocates( outValue, sizeof( *outValue ) ) )
+requires( allocates( outValueLength, sizeof( *outValueLength ) ) && *outValueLength <= max )
 assigns( *outValue, *outValueLength )
 ensures( arraySearch_ensures( result, buf, max, outValue, outValueLength, old( *outValue ), old( *outValueLength ) ) )
 ;
@@ -125,15 +144,22 @@ bool objectSearch( const char * buf,
                    size_t queryLength,
                    size_t * outValue,
                    size_t * outValueLength )
-requires( objectSearch_requires( buf, max, query, queryLength, outValue, outValueLength ) )
+requires( 0 < max && max < CBMC_MAX_BUFSIZE )
+requires( queryLength < CBMC_MAX_QUERYKEYLENGTH )
+requires( allocates( buf, max ) )
+requires( allocates( query, queryLength ) )
+requires( allocates( outValue, sizeof( *outValue ) ) )
+requires( allocates( outValueLength, sizeof( *outValueLength ) ) )
 assigns( *outValue, *outValueLength )
-ensures( objectSearch_ensures( result, buf, max, outValue, outValueLength, old( *outValue ), old( *outValueLength ) ) )
+ensures( arraySearch_ensures( result, buf, max, outValue, outValueLength, old( *outValue ), old( *outValueLength ) ) )
 ;
 
 JSONStatus_t skipCollection( const char * buf,
                              size_t * start,
                              size_t max )
-requires( skipCollection_requires( buf, start, max ) )
+requires( 0 < max && max < CBMC_MAX_BUFSIZE )
+requires( allocates( buf, max ) )
+requires( allocates( start, sizeof( *start ) ) )
 assigns( *start )
 ensures( skipCollection_ensures( result, buf, start, old( *start ), max ) )
 ;
@@ -142,7 +168,10 @@ void skipScalars( const char * buf,
                   size_t * start,
                   size_t max,
                   char mode )
-requires( skipScalars_requires( buf, start, max, mode ) )
+requires( ( mode == '{' ) || ( mode == '[' ) )
+requires( 0 < max && max < CBMC_MAX_BUFSIZE )
+requires( allocates( buf, max ) )
+requires( allocates( start, sizeof( *start ) ) )
 assigns( *start )
 ensures( skipScalars_ensures( start, old( *start ), max ) )
 ;
@@ -150,7 +179,9 @@ ensures( skipScalars_ensures( start, old( *start ), max ) )
 void skipObjectScalars( const char * buf,
                         size_t * start,
                         size_t max )
-requires( skipObjectScalars_requires( buf, start, max ) )
+requires( 0 < max && max < CBMC_MAX_BUFSIZE )
+requires( allocates( buf, max ) )
+requires( allocates( start, sizeof( *start ) ) )
 assigns( *start )
 ensures( skipObjectScalars_ensures( start, old( *start ), max ) )
 ;
@@ -158,7 +189,9 @@ ensures( skipObjectScalars_ensures( start, old( *start ), max ) )
 bool skipAnyScalar( const char * buf,
                     size_t * start,
                     size_t max )
-requires( skipAnyScalar_requires( buf, start, max ) )
+requires( 0 < max && max < CBMC_MAX_BUFSIZE )
+requires( allocates( buf, max ) )
+requires( allocates( start, sizeof( *start ) ) )
 assigns( *start )
 ensures( skipAnyScalar_ensures( result, buf, start, old( *start ), max ) )
 ;
@@ -166,7 +199,9 @@ ensures( skipAnyScalar_ensures( result, buf, start, old( *start ), max ) )
 void skipSpace( const char * buf,
                 size_t * start,
                 size_t max )
-requires( skipSpace_requires( buf, start, max ) )
+requires( 0 < max && max < CBMC_MAX_BUFSIZE )
+requires( allocates( buf, max ) )
+requires( allocates( start, sizeof( *start ) ) )
 assigns( *start )
 ensures( skipSpace_ensures( start, old( *start ), max ) )
 ;
@@ -174,7 +209,9 @@ ensures( skipSpace_ensures( start, old( *start ), max ) )
 bool skipString( const char * buf,
                  size_t * start,
                  size_t max )
-requires( skipString_requires( buf, start, max ) )
+requires( 0 < max && max < CBMC_MAX_BUFSIZE )
+requires( allocates( buf, max ) )
+requires( allocates( start, sizeof( *start ) ) )
 assigns( *start )
 ensures( skipString_ensures( result, start, old( *start ), max ) )
 ;
@@ -182,7 +219,9 @@ ensures( skipString_ensures( result, start, old( *start ), max ) )
 bool skipEscape( const char * buf,
                  size_t * start,
                  size_t max )
-requires( skipEscape_requires( buf, start, max ) )
+requires( 0 < max && max < CBMC_MAX_BUFSIZE )
+requires( allocates( buf, max ) )
+requires( allocates( start, sizeof( *start ) ) )
 assigns( *start )
 ensures( skipEscape_ensures( result, start, old( *start ), max ) )
 ;
@@ -190,7 +229,9 @@ ensures( skipEscape_ensures( result, start, old( *start ), max ) )
 bool skipUTF8( const char * buf,
                size_t * start,
                size_t max )
-requires( skipEscape_requires( buf, start, max ) )
+requires( 0 < max && max < CBMC_MAX_BUFSIZE )
+requires( allocates( buf, max ) )
+requires( allocates( start, sizeof( *start ) ) )
 assigns( *start )
 ensures( skipEscape_ensures( result, start, old( *start ), max ) )
 ;

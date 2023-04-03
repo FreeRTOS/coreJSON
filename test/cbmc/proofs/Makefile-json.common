@@ -22,6 +22,8 @@ PROJECT_SOURCES += $(PROOFDIR)/core_json.c
 
 CHECKFLAGS += --pointer-primitive-check
 
+CBMCFLAGS += --slice-formula
+
 include ../Makefile.common
 
 cleanclean: veryclean
