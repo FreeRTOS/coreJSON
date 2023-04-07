@@ -27,339 +27,229 @@
 
 #include "core_json_contracts.h"
 
-bool JSON_SearchConst_requires( char * buf,
-                                size_t max,
-                                char * query,
-                                size_t queryLength,
-                                char ** outValue,
-                                size_t * outValueLength,
-                                JSONTypes_t * outType )
-{
-    CHECK( max < CBMC_MAX_BUFSIZE );
-    CHECK( queryLength < CBMC_MAX_QUERYKEYLENGTH );
-    CHECK( buf == NULL || allocates( buf, max ) );
-    CHECK( query == NULL || allocates( query, queryLength ) );
-    CHECK( outValue == NULL || allocates( outValue, sizeof( *outValue ) ) );
-    CHECK( outValueLength == NULL || allocates( outValueLength, sizeof( *outValueLength ) ) );
-    CHECK( outType == NULL || allocates( outType, sizeof( *outType ) ) );
+/**
+ * When to use `&` vs `&&`:
+ * Prefer `cond1 & cond2` when `cond2` can be evaluated without errors without knowing that `cond1` holds: e.g.  `( 0 < i ) & ( i < j )`.
+ *
+ * Use `cond1 && cond2` when `cond1` must be established first to ensure that `cond2` can be evaluated without error: e.g.
+ * `( allocated( p, size ) & ( 0 < i & i < size ) ) && p[i] > 0`.
+ */
 
-    return true;
+/* Valid allocated buffer up to size max. */
+bool isValidBoundedBuffer( char * buf,
+                           size_t max )
+{
+    return ( 0 < max && max < CBMC_MAX_BUFSIZE )
+           & ( allocated( buf, max ) );
 }
 
-bool JSON_SearchConst_ensures( JSONStatus_t result,
-                               char * buf,
-                               char ** outValue,
-                               size_t * outValueLength,
-                               size_t max )
+/* Valid allocated buffer up to size max and allocated start index. */
+bool isValidBoundedBufferWithStartIndex( char * buf,
+                                         size_t max,
+                                         size_t * start )
 {
-    if( result == JSONSuccess )
+    return isValidBoundedBuffer( buf, max )
+           & ( allocated( start, sizeof( *start ) ) );
+}
+
+/* Invariant for index in the buffer. */
+bool isValidStart( size_t start,
+                   size_t old_start,
+                   size_t max )
+{
+    return ( start >= old_start ) &&
+           ( ( old_start < max ) ? ( start <= max ) : ( start == old_start ) );
+}
+
+bool JSON_SearchConstPreconditions( char * buf,
+                                    size_t max,
+                                    char * query,
+                                    size_t queryLength,
+                                    char ** outValue,
+                                    size_t * outValueLength,
+                                    JSONTypes_t * outType )
+{
+    return ( max < CBMC_MAX_BUFSIZE )
+           & ( queryLength < CBMC_MAX_QUERYKEYLENGTH )
+           & ( buf == NULL || allocated( buf, max ) )
+           & ( query == NULL || allocated( query, queryLength ) )
+           & ( outValue == NULL || allocated( outValue, sizeof( *outValue ) ) )
+           & ( outValueLength == NULL || allocated( outValueLength, sizeof( *outValueLength ) ) )
+           & ( outType == NULL || allocated( outType, sizeof( *outType ) ) );
+}
+
+bool JSON_SearchConstPostconditions( JSONStatus_t result,
+                                     char * buf,
+                                     char ** outValue,
+                                     size_t * outValueLength,
+                                     size_t max )
+{
+    bool validity = isJSONSearchEnum( result );
+
+    if( validity && ( result == JSONSuccess ) )
     {
-        /*pointer_in_range( buf,  *outValue , buf + max)*/
         char * endOfValue = *outValue + *outValueLength;
         char * endOfBuf = buf + max;
-        return pointer_in_range( buf, endOfValue, endOfBuf );
+        validity = pointer_in_range( buf, endOfValue, endOfBuf );
     }
 
-    return true;
+    return validity;
 }
 
-bool JSON_Iterate_requires( char * buf,
-                            size_t max,
-                            size_t * start,
-                            size_t * next,
-                            JSONPair_t * outPair )
+bool JSON_IteratePreconditions( char * buf,
+                                size_t max,
+                                size_t * start,
+                                size_t * next,
+                                JSONPair_t * outPair )
 {
-    CHECK( 0 < max && max < CBMC_MAX_BUFSIZE );
-    CHECK( buf == NULL || allocates( buf, max ) );
-    CHECK( start == NULL || allocates( start, sizeof( *start ) ) );
-    CHECK( next == NULL || allocates( next, sizeof( *next ) ) );
-    CHECK( outPair == NULL || allocates( outPair, sizeof( *outPair ) ) );
-/* *INDENT-OFF* */
-    CHECK( outPair != NULL ==> ( ( outPair->keyLength == 0 && outPair->key == NULL ) || allocates( outPair->key, outPair->keyLength ) ) );
-    CHECK( outPair != NULL ==> ( ( outPair->valueLength == 0 && outPair->value == NULL ) || allocates( outPair->value, outPair->valueLength ) ) );
-/* *INDENT-ON* */
-
-    return true;
+    return ( 0 < max && max < CBMC_MAX_BUFSIZE )
+           & ( buf == NULL || allocated( buf, max ) )
+           & ( start == NULL || allocated( start, sizeof( *start ) ) )
+           & ( next == NULL || allocated( next, sizeof( *next ) ) )
+           & ( outPair == NULL || allocated( outPair, sizeof( *outPair ) ) )
+           & IMPLIES( outPair != NULL, ( ( outPair->keyLength == 0 && outPair->key == NULL ) || allocated( outPair->key, outPair->keyLength ) ) )
+           & IMPLIES( outPair != NULL, ( ( outPair->valueLength == 0 && outPair->value == NULL ) || allocated( outPair->value, outPair->valueLength ) ) );
 }
 
-bool JSON_Iterate_ensures( JSONStatus_t result,
-                           char * buf,
-                           size_t max,
-                           JSONPair_t * outPair )
+bool JSON_IteratePostconditions( JSONStatus_t result,
+                                 char * buf,
+                                 size_t max,
+                                 JSONPair_t * outPair )
 {
-    CHECK( isJSONIterateEnum( result ) );
+    bool validity = isJSONIterateEnum( result );
 
-    if( result == JSONSuccess )
+    if( validity && ( result == JSONSuccess ) )
     {
-/* *INDENT-OFF* */
-        CHECK( ( outPair->key != NULL ) ==> ( ( outPair->key > buf ) && ( ( outPair->key + outPair->keyLength ) < ( buf + max ) ) ) );
-        CHECK( ( outPair->key != NULL ) ==> ( ( outPair->key + outPair->keyLength ) < outPair->value ) );
-/* *INDENT-ON* */
-        CHECK( ( outPair->value > buf ) && ( ( outPair->value + outPair->valueLength ) <= ( buf + max ) ) );
-        CHECK( isJSONTypesEnum( outPair->jsonType ) );
+        validity = IMPLIES( ( outPair->key != NULL ), ( ( outPair->key > buf ) && ( ( outPair->key + outPair->keyLength ) < ( buf + max ) ) ) )
+                   & IMPLIES( ( outPair->key != NULL ), ( ( outPair->key + outPair->keyLength ) < outPair->value ) )
+                   & ( ( outPair->value > buf ) && ( ( outPair->value + outPair->valueLength ) <= ( buf + max ) ) )
+                   & ( isJSONTypesEnum( outPair->jsonType ) );
     }
 
-    return true;
+    return validity;
 }
 
-bool arraySearch_requires( char * buf,
-                           size_t max,
-                           size_t * outValue,
-                           size_t * outValueLength )
+JSONStatus_t JSON_ValidatePreconditions( char * buf,
+                                         size_t max )
 {
-    CHECK( 0 < max && max < CBMC_MAX_BUFSIZE );
-    CHECK( allocates( buf, max ) );
-    CHECK( allocates( outValue, sizeof( *outValue ) ) );
-    CHECK( allocates( outValueLength, sizeof( *outValueLength ) ) && *outValueLength <= max );
-
-    return true;
+    return ( max < CBMC_MAX_BUFSIZE )
+           & ( buf == NULL || allocated( buf, max ) );
 }
 
-bool arraySearch_ensures( bool result,
-                          char * buf,
-                          size_t max,
-                          size_t * outValue,
-                          size_t * outValueLength,
-                          size_t old_outValue,
-                          size_t old_outValueLength )
+bool arraySearchPreconditions( char * buf,
+                               size_t max,
+                               size_t * outValue,
+                               size_t * outValueLength )
 {
+    return ( isValidBoundedBuffer( buf, max ) )
+           & ( allocated( outValue, sizeof( *outValue ) ) )
+           & ( allocated( outValueLength, sizeof( *outValueLength ) ) )
+           & ( *outValueLength <= max );
+}
+
+bool arraySearchPostconditions( bool result,
+                                char * buf,
+                                size_t max,
+                                size_t * outValue,
+                                size_t * outValueLength,
+                                size_t old_outValue,
+                                size_t old_outValueLength )
+{
+    bool validity = true;
+
     if( result )
     {
-        CHECK( 0 <= *outValue && *outValue < max );
-        CHECK( 0 < *outValueLength && *outValueLength <= max - *outValue );
-/* *INDENT-OFF* */
-        CHECK( buf[ *outValue ] == '"' ==> ( 2 <= *outValueLength && *outValueLength <= max - *outValue ) );
-/* *INDENT-ON* */
+        validity = ( 0 <= *outValue && *outValue < max ) &&
+                   ( 0 < *outValueLength && *outValueLength <= max - *outValue ) &&
+                   IMPLIES( buf[ *outValue ] == '"', ( 2 <= *outValueLength && *outValueLength <= max - *outValue ) );
     }
     else
     {
-        CHECK( *outValue == old_outValue );
-        CHECK( *outValueLength == old_outValueLength );
+        validity = ( *outValue == old_outValue ) &&
+                   ( *outValueLength == old_outValueLength );
     }
 
-    return true;
+    return validity;
 }
 
-bool skipCollection_requires( char * buf,
-                              size_t * start,
-                              size_t max )
+bool objectSearchPreconditions( char * buf,
+                                size_t max,
+                                const char * query,
+                                size_t queryLength,
+                                size_t * outValue,
+                                size_t * outValueLength )
 {
-    CHECK( 0 < max && max < CBMC_MAX_BUFSIZE );
-    CHECK( allocates( buf, max ) );
-    CHECK( allocates( start, sizeof( *start ) ) );
-
-    return true;
+    return arraySearchPreconditions( buf, max, outValue, outValueLength )
+           & ( queryLength < CBMC_MAX_QUERYKEYLENGTH )
+           & ( allocated( query, queryLength ) );
 }
 
-bool skipCollection_ensures( JSONStatus_t result,
-                             char * buf,
-                             size_t * start,
-                             size_t old_start,
-                             size_t max )
-{
-    CHECK( isSkipCollectionEnum( result ) );
-    CHECK( *start >= old_start );
-
-    if( old_start < max )
-    {
-        CHECK( *start <= max );
-    }
-    else
-    {
-        CHECK( *start == old_start );
-    }
-
-/* *INDENT-OFF* */
-    CHECK( ( result == JSONSuccess ) ==> ( old_start < max ) && ( *start >= old_start + 2 ) );
-/* *INDENT-ON* */
-
-    return true;
-}
-
-bool skipScalars_requires( char * buf,
-                           size_t * start,
-                           size_t max,
-                           char mode )
-{
-    CHECK( ( mode == '{' ) || ( mode == '[' ) );
-
-    return skipCollection_requires( buf, start, max );
-}
-
-bool skipScalars_ensures( size_t * start,
-                          size_t old_start,
-                          size_t max )
-{
-    CHECK( *start >= old_start );
-
-    if( old_start < max )
-    {
-        CHECK( *start <= max );
-    }
-    else
-    {
-        CHECK( *start == old_start );
-    }
-
-    return true;
-}
-
-bool skipObjectScalars_requires( char * buf,
-                                 size_t * start,
-                                 size_t max )
-{
-    return skipCollection_requires( buf, start, max );
-}
-
-bool skipObjectScalars_ensures( size_t * start,
-                                size_t old_start,
-                                size_t max )
-{
-    return skipScalars_ensures( start, old_start, max );
-}
-
-bool skipAnyScalar_requires( char * buf,
-                             size_t * start,
-                             size_t max )
-{
-    return skipCollection_requires( buf, start, max );
-}
-
-bool skipAnyScalar_ensures( bool result,
-                            char * buf,
-                            size_t * start,
-                            size_t old_start,
-                            size_t max )
-{
-    CHECK( isBool( result ) );
-    CHECK( *start >= old_start );
-
-    if( old_start < max )
-    {
-        CHECK( *start <= max );
-    }
-    else
-    {
-        CHECK( *start == old_start );
-    }
-
-/* *INDENT-OFF* */
-    CHECK( result ==> old_start < max && *start > old_start );
-    CHECK( ( result && ( buf[ old_start ] == '"' ) ) ==> *start >= old_start + 2 );
-/* *INDENT-ON* */
-
-    return true;
-}
-
-bool skipSpace_requires( char * buf,
-                         size_t * start,
-                         size_t max )
-{
-    return skipCollection_requires( buf, start, max );
-}
-
-bool skipSpace_ensures( size_t * start,
-                        size_t old_start,
-                        size_t max )
-{
-    return skipScalars_ensures( start, old_start, max );
-}
-
-bool skipString_requires( char * buf,
-                          size_t * start,
-                          size_t max )
-{
-    return skipCollection_requires( buf, start, max );
-}
-
-bool skipString_ensures( bool result,
-                         size_t * start,
-                         size_t old_start,
-                         size_t max )
-{
-    CHECK( isBool( result ) );
-    CHECK( *start >= old_start );
-
-    if( old_start < max )
-    {
-        CHECK( *start <= max );
-    }
-    else
-    {
-        CHECK( *start == old_start );
-    }
-
-/* *INDENT-OFF* */
-    CHECK( result ==> ( old_start < max ) && ( *start >= old_start + 2 ) );
-/* *INDENT-ON* */
-
-    return true;
-}
-
-bool skipEscape_requires( char * buf,
-                          size_t * start,
-                          size_t max )
-{
-    return skipCollection_requires( buf, start, max );
-}
-
-bool skipEscape_ensures( bool result,
-                         size_t * start,
-                         size_t old_start,
-                         size_t max )
-{
-    CHECK( isBool( result ) );
-    CHECK( *start >= old_start );
-
-    if( old_start < max )
-    {
-        CHECK( *start <= max );
-    }
-    else
-    {
-        CHECK( *start == old_start );
-    }
-
-/* *INDENT-OFF* */
-    CHECK( result ==> ( old_start < max ) && ( *start >= old_start + 1 ) );
-/* *INDENT-ON* */
-
-    return true;
-}
-
-bool skipDigits_requires( char * buf,
-                          size_t * start,
-                          size_t max,
-                          int32_t * outValue )
-{
-    CHECK( outValue == NULL || allocates( outValue, sizeof( *outValue ) ) );
-
-    return skipCollection_requires( buf, start, max );
-}
-
-bool skipDigits_ensures( bool result,
+bool skipPostconditions( bool result,
                          char * buf,
                          size_t * start,
                          size_t old_start,
-                         size_t max )
+                         size_t max,
+                         size_t gap )
 {
-    CHECK( isBool( result ) );
-    CHECK( *start >= old_start );
+    bool validity = isValidStart( *start, old_start, max ) &&
+                    IMPLIES( result, ( old_start < max ) && ( *start > old_start + gap ) );
 
-    if( old_start < max )
-    {
-        CHECK( *start <= max );
-    }
-    else
-    {
-        CHECK( *start == old_start );
-    }
+    return validity;
+}
 
-/* *INDENT-OFF* */
-    CHECK( result ==> ( old_start < max ) && ( *start > old_start ) && ( ( ( buf[ old_start ] ) >= '0' ) && ( ( buf[ old_start ] ) <= '9' ) ) );
-/* *INDENT-ON* */
+bool skipCollectionPostconditions( JSONStatus_t result,
+                                   char * buf,
+                                   size_t * start,
+                                   size_t old_start,
+                                   size_t max )
+{
+    bool validity = isSkipCollectionEnum( result ) &&
+                    skipPostconditions( ( result == JSONSuccess ), buf, start, old_start, max, 1 );
 
-    return true;
+    return validity;
+}
+
+bool skipScalarsPreconditions( char * buf,
+                               size_t * start,
+                               size_t max,
+                               char mode )
+{
+    return ( ( mode == '{' ) || ( mode == '[' ) )
+           & isValidBoundedBufferWithStartIndex( buf, max, start );
+}
+
+bool skipAnyScalarPostconditions( bool result,
+                                  char * buf,
+                                  size_t * start,
+                                  size_t old_start,
+                                  size_t max )
+{
+    bool validity = skipPostconditions( result, buf, start, old_start, max, 0 ) &&
+                    IMPLIES( ( result && ( buf[ old_start ] == '"' ) ), *start >= old_start + 2 );
+
+    return validity;
+}
+
+bool skipDigitsPreconditions( char * buf,
+                              size_t * start,
+                              size_t max,
+                              int32_t * outValue )
+{
+    return ( outValue == NULL || allocated( outValue, sizeof( *outValue ) ) )
+           & isValidBoundedBufferWithStartIndex( buf, max, start );
+}
+
+bool skipDigitsPostconditions( bool result,
+                               char * buf,
+                               size_t * start,
+                               size_t old_start,
+                               size_t max,
+                               size_t gap )
+{
+    bool validity = skipPostconditions( result, buf, start, old_start, max, 0 ) &&
+                    IMPLIES( result, ( ( ( buf[ old_start ] ) >= '0' ) && ( ( buf[ old_start ] ) <= '9' ) ) );
+
+    return validity;
 }
 
 #endif /* ifndef CORE_JSON_CONTRACTS_C_ */
