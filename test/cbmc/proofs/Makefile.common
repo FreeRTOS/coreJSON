@@ -4,7 +4,7 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
-CBMC_STARTER_KIT_VERSION = CBMC starter kit 2.8
+CBMC_STARTER_KIT_VERSION = CBMC starter kit 2.10
 
 ################################################################
 # The CBMC Starter Kit depends on the files Makefile.common and
@@ -450,6 +450,24 @@ ifdef APPLY_LOOP_CONTRACTS
   endif
 endif
 
+# The default unwind should only be used in DFCC mode without loop contracts.
+# When loop contracts are applied, we only unwind specified loops.
+# If any loops remain after loop contracts have been applied, CBMC might try
+# to unwind the program indefinetly, because we do not pass default unwind
+# (i.e., --unwind 1) to CBMC when in DFCC mode.
+# We must not use a default unwind command in DFCC mode, because contract instrumentation
+# introduces loops encoding write set inclusion checks that must be dynamically unwound during
+# symex.
+ifneq ($(strip $(USE_DYNAMIC_FRAMES)),)
+ifneq ($(strip $(APPLY_LOOP_CONTRACTS)),)
+  UNWIND_0500_FLAGS=$(CBMC_UNWINDSET) $(CBMC_CPROVER_LIBRARY_UNWINDSET) $(CBMC_FLAG_UNWINDING_ASSERTIONS)
+  UNWIND_0500_DESC="$(PROOF_UID): unwinding specified subset of loops"
+else
+  UNWIND_0500_FLAGS=$(CBMC_UNWINDSET) $(CBMC_CPROVER_LIBRARY_UNWINDSET) $(CBMC_DEFAULT_UNWIND) $(CBMC_FLAG_UNWINDING_ASSERTIONS)
+  UNWIND_0500_DESC="$(PROOF_UID): unwinding all loops"
+endif
+endif
+
 # Silence makefile output (eg, long litani commands) unless VERBOSE is set.
 ifndef VERBOSE
     MAKEFLAGS := $(MAKEFLAGS) -s
@@ -604,7 +622,7 @@ $(REWRITTEN_SOURCES):
 # Build targets that make the relevant .goto files
 
 # Compile project sources
-$(PROJECT_GOTO)1.goto: $(PROJECT_SOURCES) $(REWRITTEN_SOURCES)
+$(PROJECT_GOTO)0100.goto: $(PROJECT_SOURCES) $(REWRITTEN_SOURCES)
 	$(LITANI) add-job \
 	  --command \
 	    '$(GOTO_CC) $(CBMC_VERBOSITY) $(COMPILE_FLAGS) $(EXPORT_FILE_LOCAL_SYMBOLS) $(INCLUDES) $(DEFINES) $^ -o $@' \
@@ -616,7 +634,7 @@ $(PROJECT_GOTO)1.goto: $(PROJECT_SOURCES) $(REWRITTEN_SOURCES)
 	  --description "$(PROOF_UID): building project binary"
 
 # Compile proof sources
-$(PROOF_GOTO)1.goto: $(PROOF_SOURCES)
+$(PROOF_GOTO)0100.goto: $(PROOF_SOURCES)
 	$(LITANI) add-job \
 	  --command \
 	    '$(GOTO_CC) $(CBMC_VERBOSITY) $(COMPILE_FLAGS) $(EXPORT_FILE_LOCAL_SYMBOLS) $(INCLUDES) $(DEFINES) $^ -o $@' \
@@ -628,7 +646,7 @@ $(PROOF_GOTO)1.goto: $(PROOF_SOURCES)
 	  --description "$(PROOF_UID): building proof binary"
 
 # Remove function bodies from project sources
-$(PROJECT_GOTO)2.goto: $(PROJECT_GOTO)1.goto
+$(PROJECT_GOTO)0200.goto: $(PROJECT_GOTO)0100.goto
 	$(LITANI) add-job \
 	  --command \
 	    '$(GOTO_INSTRUMENT) $(CBMC_VERBOSITY) $(CBMC_REMOVE_FUNCTION_BODY) $^ $@' \
@@ -640,7 +658,7 @@ $(PROJECT_GOTO)2.goto: $(PROJECT_GOTO)1.goto
 	  --description "$(PROOF_UID): removing function bodies from project sources"
 
 # Link project and proof sources into the proof harness
-$(HARNESS_GOTO)1.goto: $(PROOF_GOTO)1.goto $(PROJECT_GOTO)2.goto
+$(HARNESS_GOTO)0100.goto: $(PROOF_GOTO)0100.goto $(PROJECT_GOTO)0200.goto
 	$(LITANI) add-job \
 	  --command '$(GOTO_CC) $(CBMC_VERBOSITY) --function $(HARNESS_ENTRY) $^ $(LINK_FLAGS) -o $@' \
 	  --inputs $^ \
@@ -651,7 +669,7 @@ $(HARNESS_GOTO)1.goto: $(PROOF_GOTO)1.goto $(PROJECT_GOTO)2.goto
 	  --description "$(PROOF_UID): linking project to proof"
 
 # Restrict function pointers
-$(HARNESS_GOTO)2.goto: $(HARNESS_GOTO)1.goto
+$(HARNESS_GOTO)0200.goto: $(HARNESS_GOTO)0100.goto
 	$(LITANI) add-job \
 	  --command \
 	    '$(GOTO_INSTRUMENT) $(CBMC_VERBOSITY) $(CBMC_RESTRICT_FUNCTION_POINTER) --remove-function-pointers $^ $@' \
@@ -663,7 +681,7 @@ $(HARNESS_GOTO)2.goto: $(HARNESS_GOTO)1.goto
 	  --description "$(PROOF_UID): restricting function pointers in project sources"
 
 # Fill static variable with unconstrained values
-$(HARNESS_GOTO)3.goto: $(HARNESS_GOTO)2.goto
+$(HARNESS_GOTO)0300.goto: $(HARNESS_GOTO)0200.goto
 ifneq ($(strip $(CODE_CONTRACTS)),)
 	$(LITANI) add-job \
 	  --command 'cp $^ $@' \
@@ -686,7 +704,7 @@ else
 endif
 
 # Link CPROVER library if DFCC mode is on
-$(HARNESS_GOTO)4.goto: $(HARNESS_GOTO)3.goto
+$(HARNESS_GOTO)0400.goto: $(HARNESS_GOTO)0300.goto
 ifneq ($(strip $(USE_DYNAMIC_FRAMES)),)
 	$(LITANI) add-job \
 	  --command \
@@ -709,17 +727,17 @@ else
 endif
 
 # Early unwind all loops on DFCC mode; otherwise, only unwind loops in proof and project code
-$(HARNESS_GOTO)5.goto: $(HARNESS_GOTO)4.goto
+$(HARNESS_GOTO)0500.goto: $(HARNESS_GOTO)0400.goto
 ifneq ($(strip $(USE_DYNAMIC_FRAMES)),)
 	$(LITANI) add-job \
 	  --command \
-	    '$(GOTO_INSTRUMENT) $(CBMC_VERBOSITY) $(CBMC_UNWINDSET) $(CBMC_CPROVER_LIBRARY_UNWINDSET) $(CBMC_DEFAULT_UNWIND) $(CBMC_FLAG_UNWINDING_ASSERTIONS) $^ $@' \
+	    '$(GOTO_INSTRUMENT) $(CBMC_VERBOSITY) $(UNWIND_0500_FLAGS) $^ $@' \
 	  --inputs $^ \
 	  --outputs $@ \
 	  --stdout-file $(LOGDIR)/unwind_loops-log.txt \
 	  --pipeline-name "$(PROOF_UID)" \
 	  --ci-stage build \
-	  --description "$(PROOF_UID): unwinding all loops"
+	  --description $(UNWIND_0500_DESC)
 else ifneq ($(strip $(CODE_CONTRACTS)),)
 	$(LITANI) add-job \
 	  --command \
@@ -735,14 +753,14 @@ else
 	  --command 'cp $^ $@' \
 	  --inputs $^ \
 	  --outputs $@ \
-	  --stdout-file $(LOGDIR)/linking-library-models-log.txt \
+	  --stdout-file $(LOGDIR)/unwind_loops-log.txt \
 	  --pipeline-name "$(PROOF_UID)" \
 	  --ci-stage build \
 	  --description "$(PROOF_UID): not unwinding loops"
 endif
 
 # Replace function contracts, check function contracts, instrument for loop contracts
-$(HARNESS_GOTO)6.goto: $(HARNESS_GOTO)5.goto
+$(HARNESS_GOTO)0600.goto: $(HARNESS_GOTO)0500.goto
 	$(LITANI) add-job \
 	  --command \
 	    '$(GOTO_INSTRUMENT) $(CBMC_USE_DYNAMIC_FRAMES) $(NONDET_STATIC) $(CBMC_VERBOSITY) $(CBMC_CHECK_FUNCTION_CONTRACTS) $(CBMC_USE_FUNCTION_CONTRACTS) $(CBMC_APPLY_LOOP_CONTRACTS) $^ $@' \
@@ -754,7 +772,7 @@ $(HARNESS_GOTO)6.goto: $(HARNESS_GOTO)5.goto
 	  --description "$(PROOF_UID): checking function contracts"
 
 # Omit initialization of unused global variables (reduces problem size)
-$(HARNESS_GOTO)7.goto: $(HARNESS_GOTO)6.goto
+$(HARNESS_GOTO)0700.goto: $(HARNESS_GOTO)0600.goto
 	$(LITANI) add-job \
 	  --command \
 	    '$(GOTO_INSTRUMENT) $(CBMC_VERBOSITY) --slice-global-inits $^ $@' \
@@ -766,7 +784,7 @@ $(HARNESS_GOTO)7.goto: $(HARNESS_GOTO)6.goto
 	  --description "$(PROOF_UID): slicing global initializations"
 
 # Omit unused functions (sharpens coverage calculations)
-$(HARNESS_GOTO)8.goto: $(HARNESS_GOTO)7.goto
+$(HARNESS_GOTO)0800.goto: $(HARNESS_GOTO)0700.goto
 	$(LITANI) add-job \
 	  --command \
 	    '$(GOTO_INSTRUMENT) $(CBMC_VERBOSITY) --drop-unused-functions $^ $@' \
@@ -778,7 +796,7 @@ $(HARNESS_GOTO)8.goto: $(HARNESS_GOTO)7.goto
 	  --description "$(PROOF_UID): dropping unused functions"
 
 # Final name for proof harness
-$(HARNESS_GOTO).goto: $(HARNESS_GOTO)8.goto
+$(HARNESS_GOTO).goto: $(HARNESS_GOTO)0800.goto
 	$(LITANI) add-job \
 	  --command 'cp $< $@' \
 	  --inputs $^ \
@@ -794,7 +812,7 @@ ifdef CBMCFLAGS
   ifeq ($(strip $(CODE_CONTRACTS)),)
     CBMCFLAGS += $(CBMC_UNWINDSET) $(CBMC_CPROVER_LIBRARY_UNWINDSET) $(CBMC_DEFAULT_UNWIND) $(CBMC_OPT_CONFIG_LIBRARY)
   else ifeq ($(strip $(USE_DYNAMIC_FRAMES)),)
-    CBMCFLAGS += $(CBMC_CPROVER_LIBRARY_UNWINDSET) $(CBMC_DEFAULT_UNWIND) $(CBMC_OPT_CONFIG_LIBRARY)
+    CBMCFLAGS += $(CBMC_CPROVER_LIBRARY_UNWINDSET) $(CBMC_OPT_CONFIG_LIBRARY)
   endif
 endif
 
