@@ -120,7 +120,7 @@ jobs:
       - name: Set up CBMC runner
         uses: FreeRTOS/CI-CD-Github-Actions/set_up_cbmc_runner@main
         with:
-          cbmc_version: "5.73.0"
+          cbmc_version: "latest"
           cadical_tag: "latest"
           kissat_tag: "latest"
       - name: Run CBMC
