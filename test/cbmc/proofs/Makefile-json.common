@@ -16,10 +16,13 @@ endif
 INCLUDES += -I$(CBMC_ROOT)/include
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
+PROOF_SOURCES += $(PROOF_SOURCE)/core_json_contracts.c
 
 PROJECT_SOURCES += $(PROOFDIR)/core_json.c
 
 CHECKFLAGS += --pointer-primitive-check
+
+CBMCFLAGS += --slice-formula
 
 include ../Makefile.common
 

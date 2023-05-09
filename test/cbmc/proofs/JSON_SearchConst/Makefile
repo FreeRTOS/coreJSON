@@ -7,7 +7,7 @@ HARNESS_FILE= $(PROOF_UID)_harness
 
 USE_DYNAMIC_FRAMES = 1
 
-CBMC_OBJECT_BITS = 12
+CBMC_OBJECT_BITS = 11
 
 UNWINDSET += multiSearch.0:$(CBMC_MAX_QUERYKEYLENGTH)
 UNWINDSET += skipQueryPart.0:$(CBMC_MAX_QUERYKEYLENGTH)
@@ -19,6 +19,8 @@ USE_FUNCTION_CONTRACTS += skipCollection
 USE_FUNCTION_CONTRACTS += skipDigits
 USE_FUNCTION_CONTRACTS += skipSpace
 USE_FUNCTION_CONTRACTS += skipString
+
+USE_EXTERNAL_SAT_SOLVER ?= --external-sat-solver cadical
 
 include ../Makefile-json.common
 
