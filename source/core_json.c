@@ -640,14 +640,26 @@ static bool skipAnyLiteral( const char * buf,
                             size_t * start,
                             size_t max )
 {
-    bool ret = false;
+    bool ret;
 
 #define skipLit_( x ) \
     ( skipLiteral( buf, start, max, ( x ), ( sizeof( x ) - 1UL ) ) == true )
 
-    if( skipLit_( "true" ) || skipLit_( "false" ) || skipLit_( "null" ) )
+    if( skipLit_( "true" ) )
     {
         ret = true;
+    }
+    else if( skipLit_( "false" ) )
+    {
+        ret = true;
+    }
+    else if( skipLit_( "null" ) )
+    {
+        ret = true;
+    }
+    else
+    {
+        ret = false;
     }
 
     return ret;
@@ -849,13 +861,23 @@ static bool skipAnyScalar( const char * buf,
                            size_t * start,
                            size_t max )
 {
-    bool ret = false;
+    bool ret;
 
-    if( ( skipString( buf, start, max ) == true ) ||
-        ( skipAnyLiteral( buf, start, max ) == true ) ||
-        ( skipNumber( buf, start, max ) == true ) )
+    if( skipString( buf, start, max ) == true )
     {
         ret = true;
+    }
+    else if( skipAnyLiteral( buf, start, max ) == true )
+    {
+        ret = true;
+    }
+    else if( skipNumber( buf, start, max ) == true )
+    {
+        ret = true;
+    }
+    else
+    {
+        ret = false;
     }
 
     return ret;
@@ -1204,8 +1226,12 @@ static bool nextValue( const char * buf,
     i = *start;
     valueStart = i;
 
-    if( ( skipAnyScalar( buf, &i, max ) == true ) ||
-        ( skipCollection( buf, &i, max ) == JSONSuccess ) )
+    if( skipAnyScalar( buf, &i, max ) == true )
+    {
+        *value = valueStart;
+        *valueLength = i - valueStart;
+    }
+    else if( skipCollection( buf, &i, max ) == JSONSuccess )
     {
         *value = valueStart;
         *valueLength = i - valueStart;
