@@ -26,6 +26,6 @@ _Ref 14.3.1_
 - MISRA C-2012 Rule 14.3 False positive as the static analysis tool believes
         i can never be larger than SIZE_MAX - HEX_ESCAPE_LENGTH. This can be proven as
         a bug by setting i to be 18446744073709551615UL at initial assignment, then require
-        start != NULL before assigning the vaue of i to start. This creates a case
+        start != NULL before assigning the value of i to start. This creates a case
         where i should be large enough to hit the else statement, but the tool still flags
         this as invariant.
