@@ -36,19 +36,19 @@
  */
 
 /* Valid allocated buffer up to size max. */
-bool isValidBoundedBuffer( char * buf,
-                           size_t max )
+bool isValidBuffer( const char * buf,
+                    size_t max )
 {
-    return ( 0 < max && max < CBMC_MAX_BUFSIZE )
+    return ( 0U < max )
            & ( allocated( buf, max ) );
 }
 
 /* Valid allocated buffer up to size max and allocated start index. */
-bool isValidBoundedBufferWithStartIndex( char * buf,
-                                         size_t max,
-                                         size_t * start )
+bool isValidBufferWithStartIndex( const char * buf,
+                                  size_t max,
+                                  size_t * start )
 {
-    return isValidBoundedBuffer( buf, max )
+    return isValidBuffer( buf, max )
            & ( allocated( start, sizeof( *start ) ) );
 }
 
@@ -61,17 +61,15 @@ bool isValidStart( size_t start,
            ( ( old_start < max ) ? ( start <= max ) : ( start == old_start ) );
 }
 
-bool JSON_SearchConstPreconditions( char * buf,
+bool JSON_SearchConstPreconditions( const char * buf,
                                     size_t max,
-                                    char * query,
+                                    const char * query,
                                     size_t queryLength,
-                                    char ** outValue,
+                                    const char ** outValue,
                                     size_t * outValueLength,
                                     JSONTypes_t * outType )
 {
-    return ( max < CBMC_MAX_BUFSIZE )
-           & ( queryLength < CBMC_MAX_QUERYKEYLENGTH )
-           & ( buf == NULL || allocated( buf, max ) )
+    return ( buf == NULL || allocated( buf, max ) )
            & ( query == NULL || allocated( query, queryLength ) )
            & ( outValue == NULL || allocated( outValue, sizeof( *outValue ) ) )
            & ( outValueLength == NULL || allocated( outValueLength, sizeof( *outValueLength ) ) )
@@ -79,8 +77,8 @@ bool JSON_SearchConstPreconditions( char * buf,
 }
 
 bool JSON_SearchConstPostconditions( JSONStatus_t result,
-                                     char * buf,
-                                     char ** outValue,
+                                     const char * buf,
+                                     const char ** outValue,
                                      size_t * outValueLength,
                                      size_t max )
 {
@@ -96,13 +94,13 @@ bool JSON_SearchConstPostconditions( JSONStatus_t result,
     return validity;
 }
 
-bool JSON_IteratePreconditions( char * buf,
+bool JSON_IteratePreconditions( const char * buf,
                                 size_t max,
                                 size_t * start,
                                 size_t * next,
                                 JSONPair_t * outPair )
 {
-    return ( 0 < max && max < CBMC_MAX_BUFSIZE )
+    return ( 0 < max )
            & ( buf == NULL || allocated( buf, max ) )
            & ( start == NULL || allocated( start, sizeof( *start ) ) )
            & ( next == NULL || allocated( next, sizeof( *next ) ) )
@@ -112,7 +110,7 @@ bool JSON_IteratePreconditions( char * buf,
 }
 
 bool JSON_IteratePostconditions( JSONStatus_t result,
-                                 char * buf,
+                                 const char * buf,
                                  size_t max,
                                  JSONPair_t * outPair )
 {
@@ -129,26 +127,25 @@ bool JSON_IteratePostconditions( JSONStatus_t result,
     return validity;
 }
 
-JSONStatus_t JSON_ValidatePreconditions( char * buf,
+JSONStatus_t JSON_ValidatePreconditions( const char * buf,
                                          size_t max )
 {
-    return ( max < CBMC_MAX_BUFSIZE )
-           & ( buf == NULL || allocated( buf, max ) );
+    return( buf == NULL || allocated( buf, max ) );
 }
 
-bool arraySearchPreconditions( char * buf,
+bool arraySearchPreconditions( const char * buf,
                                size_t max,
                                size_t * outValue,
                                size_t * outValueLength )
 {
-    return ( isValidBoundedBuffer( buf, max ) )
+    return ( isValidBuffer( buf, max ) )
            & ( allocated( outValue, sizeof( *outValue ) ) )
            & ( allocated( outValueLength, sizeof( *outValueLength ) ) )
            & ( *outValueLength <= max );
 }
 
 bool arraySearchPostconditions( bool result,
-                                char * buf,
+                                const char * buf,
                                 size_t max,
                                 size_t * outValue,
                                 size_t * outValueLength,
@@ -159,7 +156,7 @@ bool arraySearchPostconditions( bool result,
 
     if( result )
     {
-        validity = ( 0 <= *outValue && *outValue < max ) &&
+        validity = ( *outValue < max ) &&
                    ( 0 < *outValueLength && *outValueLength <= max - *outValue ) &&
                    IMPLIES( buf[ *outValue ] == '"', ( 2 <= *outValueLength && *outValueLength <= max - *outValue ) );
     }
@@ -172,7 +169,7 @@ bool arraySearchPostconditions( bool result,
     return validity;
 }
 
-bool objectSearchPreconditions( char * buf,
+bool objectSearchPreconditions( const char * buf,
                                 size_t max,
                                 const char * query,
                                 size_t queryLength,
@@ -180,11 +177,10 @@ bool objectSearchPreconditions( char * buf,
                                 size_t * outValueLength )
 {
     return arraySearchPreconditions( buf, max, outValue, outValueLength )
-           & ( queryLength < CBMC_MAX_QUERYKEYLENGTH )
            & ( allocated( query, queryLength ) );
 }
 
-bool multiSearchPreconditions( char * buf,
+bool multiSearchPreconditions( const char * buf,
                                size_t max,
                                const char * query,
                                size_t queryLength,
@@ -199,7 +195,7 @@ bool multiSearchPreconditions( char * buf,
 }
 
 bool multiSearchPostconditions( JSONStatus_t result,
-                                char * buf,
+                                const char * buf,
                                 size_t max,
                                 size_t * outValue,
                                 size_t * outValueLength,
@@ -213,7 +209,7 @@ bool multiSearchPostconditions( JSONStatus_t result,
 }
 
 bool skipPostconditions( bool result,
-                         char * buf,
+                         const char * buf,
                          size_t * start,
                          size_t old_start,
                          size_t max,
@@ -226,7 +222,7 @@ bool skipPostconditions( bool result,
 }
 
 bool skipCollectionPostconditions( JSONStatus_t result,
-                                   char * buf,
+                                   const char * buf,
                                    size_t * start,
                                    size_t old_start,
                                    size_t max )
@@ -237,17 +233,17 @@ bool skipCollectionPostconditions( JSONStatus_t result,
     return validity;
 }
 
-bool skipScalarsPreconditions( char * buf,
+bool skipScalarsPreconditions( const char * buf,
                                size_t * start,
                                size_t max,
                                char mode )
 {
     return ( ( mode == '{' ) || ( mode == '[' ) )
-           & isValidBoundedBufferWithStartIndex( buf, max, start );
+           & isValidBufferWithStartIndex( buf, max, start );
 }
 
 bool skipAnyScalarPostconditions( bool result,
-                                  char * buf,
+                                  const char * buf,
                                   size_t * start,
                                   size_t old_start,
                                   size_t max )
@@ -258,17 +254,17 @@ bool skipAnyScalarPostconditions( bool result,
     return validity;
 }
 
-bool skipDigitsPreconditions( char * buf,
+bool skipDigitsPreconditions( const char * buf,
                               size_t * start,
                               size_t max,
                               int32_t * outValue )
 {
     return ( outValue == NULL || allocated( outValue, sizeof( *outValue ) ) )
-           & isValidBoundedBufferWithStartIndex( buf, max, start );
+           & isValidBufferWithStartIndex( buf, max, start );
 }
 
 bool skipDigitsPostconditions( bool result,
-                               char * buf,
+                               const char * buf,
                                size_t * start,
                                size_t old_start,
                                size_t max,

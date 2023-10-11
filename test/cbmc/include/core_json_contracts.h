@@ -87,93 +87,93 @@
  * These are declarations for all predicates used in coreJSON function contracts.
  */
 
-bool isValidBoundedBuffer( char * buf,
-                           size_t max );
-bool isValidBoundedBufferWithStartIndex( char * buf,
-                                         size_t max,
-                                         size_t * start );
+bool isValidBuffer( const char * buf,
+                    size_t max );
+bool isValidBufferWithStartIndex( const char * buf,
+                                  size_t max,
+                                  size_t * start );
 bool isValidStart( size_t start,
                    size_t old_start,
                    size_t max );
-bool JSON_SearchConstPreconditions( char * buf,
+bool JSON_SearchConstPreconditions( const char * buf,
                                     size_t max,
-                                    char * query,
+                                    const char * query,
                                     size_t queryLength,
-                                    char ** outValue,
+                                    const char ** outValue,
                                     size_t * outValueLength,
                                     JSONTypes_t * outType );
 bool JSON_SearchConstPostconditions( JSONStatus_t result,
-                                     char * buf,
-                                     char ** outValue,
+                                     const char * buf,
+                                     const char ** outValue,
                                      size_t * outValueLength,
                                      size_t max );
-bool JSON_IteratePreconditions( char * buf,
+bool JSON_IteratePreconditions( const char * buf,
                                 size_t max,
                                 size_t * start,
                                 size_t * next,
                                 JSONPair_t * outPair );
 bool JSON_IteratePostconditions( JSONStatus_t result,
-                                 char * buf,
+                                 const char * buf,
                                  size_t max,
                                  JSONPair_t * outPair );
-JSONStatus_t JSON_ValidatePreconditions( char * buf,
+JSONStatus_t JSON_ValidatePreconditions( const char * buf,
                                          size_t max );
-bool arraySearchPreconditions( char * buf,
+bool arraySearchPreconditions( const char * buf,
                                size_t max,
                                size_t * outValue,
                                size_t * outValueLength );
 bool arraySearchPostconditions( bool result,
-                                char * buf,
+                                const char * buf,
                                 size_t max,
                                 size_t * outValue,
                                 size_t * outValueLength,
                                 size_t old_outValue,
                                 size_t old_outValueLength );
-bool objectSearchPreconditions( char * buf,
+bool objectSearchPreconditions( const char * buf,
                                 size_t max,
                                 const char * query,
                                 size_t queryLength,
                                 size_t * outValue,
                                 size_t * outValueLength );
-bool multiSearchPreconditions( char * buf,
+bool multiSearchPreconditions( const char * buf,
                                size_t max,
                                const char * query,
                                size_t queryLength,
                                size_t * outValue,
                                size_t * outValueLength );
 bool multiSearchPostconditions( JSONStatus_t result,
-                                char * buf,
+                                const char * buf,
                                 size_t max,
                                 size_t * outValue,
                                 size_t * outValueLength,
                                 size_t old_outValue,
                                 size_t old_outValueLength );
 bool skipPostconditions( bool result,
-                         char * buf,
+                         const char * buf,
                          size_t * start,
                          size_t old_start,
                          size_t max,
                          size_t gap );
 bool skipCollectionPostconditions( JSONStatus_t result,
-                                   char * buf,
+                                   const char * buf,
                                    size_t * start,
                                    size_t old_start,
                                    size_t max );
-bool skipScalarsPreconditions( char * buf,
+bool skipScalarsPreconditions( const char * buf,
                                size_t * start,
                                size_t max,
                                char mode );
 bool skipAnyScalarPostconditions( bool result,
-                                  char * buf,
+                                  const char * buf,
                                   size_t * start,
                                   size_t old_start,
                                   size_t max );
-bool skipDigitsPreconditions( char * buf,
+bool skipDigitsPreconditions( const char * buf,
                               size_t * start,
                               size_t max,
                               int32_t * outValue );
 bool skipDigitsPostconditions( bool result,
-                               char * buf,
+                               const char * buf,
                                size_t * start,
                                size_t old_start,
                                size_t max,
@@ -256,7 +256,7 @@ ensures( multiSearchPostconditions( result, buf, max, outValue, outValueLength, 
 JSONStatus_t skipCollection( const char * buf,
                              size_t * start,
                              size_t max )
-requires( isValidBoundedBufferWithStartIndex( buf, max, start ) )
+requires( isValidBufferWithStartIndex( buf, max, start ) )
 assigns( *start )
 ensures( skipCollectionPostconditions( result, buf, start, old( *start ), max ) )
 ;
@@ -273,7 +273,7 @@ ensures( isValidStart( *start, old( *start ), max ) )
 void skipObjectScalars( const char * buf,
                         size_t * start,
                         size_t max )
-requires( isValidBoundedBufferWithStartIndex( buf, max, start ) )
+requires( isValidBufferWithStartIndex( buf, max, start ) )
 assigns( *start )
 ensures( isValidStart( *start, old( *start ), max ) )
 ;
@@ -281,7 +281,7 @@ ensures( isValidStart( *start, old( *start ), max ) )
 bool skipAnyScalar( const char * buf,
                     size_t * start,
                     size_t max )
-requires( isValidBoundedBufferWithStartIndex( buf, max, start ) )
+requires( isValidBufferWithStartIndex( buf, max, start ) )
 assigns( *start )
 ensures( skipAnyScalarPostconditions( result, buf, start, old( *start ), max ) )
 ;
@@ -289,7 +289,7 @@ ensures( skipAnyScalarPostconditions( result, buf, start, old( *start ), max ) )
 void skipSpace( const char * buf,
                 size_t * start,
                 size_t max )
-requires( isValidBoundedBufferWithStartIndex( buf, max, start ) )
+requires( isValidBufferWithStartIndex( buf, max, start ) )
 assigns( *start )
 ensures( isValidStart( *start, old( *start ), max ) )
 ;
@@ -297,7 +297,7 @@ ensures( isValidStart( *start, old( *start ), max ) )
 bool skipString( const char * buf,
                  size_t * start,
                  size_t max )
-requires( isValidBoundedBufferWithStartIndex( buf, max, start ) )
+requires( isValidBufferWithStartIndex( buf, max, start ) )
 assigns( *start )
 ensures( skipPostconditions( result, buf, start, old( *start ), max, 1 ) )
 ;
@@ -305,7 +305,7 @@ ensures( skipPostconditions( result, buf, start, old( *start ), max, 1 ) )
 bool skipEscape( const char * buf,
                  size_t * start,
                  size_t max )
-requires( isValidBoundedBufferWithStartIndex( buf, max, start ) )
+requires( isValidBufferWithStartIndex( buf, max, start ) )
 assigns( *start )
 ensures( skipPostconditions( result, buf, start, old( *start ), max, 1 ) )
 ;
@@ -313,7 +313,7 @@ ensures( skipPostconditions( result, buf, start, old( *start ), max, 1 ) )
 bool skipUTF8( const char * buf,
                size_t * start,
                size_t max )
-requires( isValidBoundedBufferWithStartIndex( buf, max, start ) )
+requires( isValidBufferWithStartIndex( buf, max, start ) )
 assigns( *start )
 ensures( skipPostconditions( result, buf, start, old( *start ), max, 0 ) )
 ;
