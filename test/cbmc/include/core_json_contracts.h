@@ -135,6 +135,19 @@ bool objectSearchPreconditions( char * buf,
                                 size_t queryLength,
                                 size_t * outValue,
                                 size_t * outValueLength );
+bool multiSearchPreconditions( char * buf,
+                               size_t max,
+                               const char * query,
+                               size_t queryLength,
+                               size_t * outValue,
+                               size_t * outValueLength );
+bool multiSearchPostconditions( JSONStatus_t result,
+                                char * buf,
+                                size_t max,
+                                size_t * outValue,
+                                size_t * outValueLength,
+                                size_t old_outValue,
+                                size_t old_outValueLength );
 bool skipPostconditions( bool result,
                          char * buf,
                          size_t * start,
@@ -227,6 +240,17 @@ bool objectSearch( const char * buf,
 requires( objectSearchPreconditions( buf, max, query, queryLength, outValue, outValueLength ) )
 assigns( *outValue, *outValueLength )
 ensures( arraySearchPostconditions( result, buf, max, outValue, outValueLength, old( *outValue ), old( *outValueLength ) ) )
+;
+
+JSONStatus_t multiSearch( const char * buf,
+                          size_t max,
+                          const char * query,
+                          size_t queryLength,
+                          size_t * outValue,
+                          size_t * outValueLength )
+requires( multiSearchPreconditions( buf, max, query, queryLength, outValue, outValueLength ) )
+assigns( *outValue, *outValueLength )
+ensures( multiSearchPostconditions( result, buf, max, outValue, outValueLength, old( *outValue ), old( *outValueLength ) ) )
 ;
 
 JSONStatus_t skipCollection( const char * buf,

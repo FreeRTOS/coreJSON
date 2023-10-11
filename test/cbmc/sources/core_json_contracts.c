@@ -184,6 +184,34 @@ bool objectSearchPreconditions( char * buf,
            & ( allocated( query, queryLength ) );
 }
 
+bool multiSearchPreconditions( char * buf,
+                               size_t max,
+                               const char * query,
+                               size_t queryLength,
+                               size_t * outValue,
+                               size_t * outValueLength )
+{
+    return ( isValidBuffer( buf, max ) )
+           & ( 0U < queryLength )
+           & ( allocated( query, queryLength ) )
+           & ( allocated( outValue, sizeof( *outValue ) ) )
+           & ( allocated( outValueLength, sizeof( *outValueLength ) ) );
+}
+
+bool multiSearchPostconditions( JSONStatus_t result,
+                                char * buf,
+                                size_t max,
+                                size_t * outValue,
+                                size_t * outValueLength,
+                                size_t old_outValue,
+                                size_t old_outValueLength )
+{
+    bool validity = isJSONSearchEnum( result ) &&
+                    arraySearchPostconditions( result == JSONSuccess, buf, max, outValue, outValueLength, old_outValue, old_outValueLength );
+
+    return validity;
+}
+
 bool skipPostconditions( bool result,
                          char * buf,
                          size_t * start,
