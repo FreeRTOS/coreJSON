@@ -161,3 +161,4 @@ jobs:
         uses: FreeRTOS/CI-CD-Github-Actions/run_cbmc@main
         with:
           proofs_dir: test/cbmc/proofs
+          run_cbmc_proofs_command: cd ../../../; git apply -v loop_invariants.patch; cd test/cbmc/proofs; ./run-cbmc-proofs.py
