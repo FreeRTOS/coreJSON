@@ -45,7 +45,7 @@
  * It is useful to set this to 1 while developing your application for
  * debugging purposes.
  */
-#define coreJSON_ASSERT_DEFINED    ( 1 )
+#define coreJSON_ASSERT_DEFINED    ( 0 )
 
 #if ( coreJSON_ASSERT_DEFINED == 1 )
 
