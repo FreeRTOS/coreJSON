@@ -52,8 +52,8 @@
  * @brief Define assert_param() to sit in a loop if an assertion fails */
     #define  assert_param( expr )    if( ( expr ) == ( bool ) 0 ) { for( ; ; ) {} }
 #else
-    /**
-     * @brief Define assert_param() as a NOP */
+/**
+ * @brief Define assert_param() as a NOP */
     #define  assert_param( expr )    ( ( void ) 0 )
 #endif
 
