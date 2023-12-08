@@ -40,6 +40,22 @@
 /* *INDENT-ON* */
 
 /**
+ * @brief When set to 1, config_assert is defined to sit in a loop if an
+ * assertion fails. When set to 0, config_assert() is defined as a NOP.
+ * It is useful to set this to 1 while developing your application for 
+ * debugging purposes.
+ */
+#define coreJSON_ASSERT_DEFINED ( 1 )
+
+#if ( coreJSON_ASSERT_DEFINED == 1 )
+     /* Define assert_param() to sit in a loop if an assertion fails */
+     #define  assert_param( expr ) if( ( expr ) == (bool) 0 ) { for( ;; ){} }
+#else
+    /* Define assert_param() as a NOP */
+     #define  assert_param(expr) ( ( void ) 0 )
+#endif
+
+/**
  * @ingroup json_enum_types
  * @brief Return codes from coreJSON library functions.
  */

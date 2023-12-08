@@ -27,7 +27,6 @@
  * @brief The source file that implements the user-facing functions in core_json.h.
  */
 
-#include <assert.h>
 #include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -75,7 +74,7 @@ static void skipSpace( const char * buf,
 {
     size_t i = 0U;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     for( i = *start; i < max; i++ )
     {
@@ -133,7 +132,7 @@ static bool shortestUTF8( size_t length,
     bool ret = false;
     uint32_t min = 0U, max = 0U;
 
-    assert( ( length >= 2U ) && ( length <= 4U ) );
+    assert_param( ( length >= 2U ) && ( length <= 4U ) );
 
     switch( length )
     {
@@ -192,13 +191,13 @@ static bool skipUTF8MultiByte( const char * buf,
     bool ret = false;
     size_t i = 0U, bitCount = 0U, j = 0U;
     uint32_t value = 0U;
-    char_ c = { 0 };
+    char_ c;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
-    assert( i < max );
-    assert( !isascii_( buf[ i ] ) );
+    assert_param( i < max );
+    assert_param( !isascii_( buf[ i ] ) );
 
     c.c = buf[ i ];
 
@@ -255,7 +254,7 @@ static bool skipUTF8( const char * buf,
 {
     bool ret = false;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     if( *start < max )
     {
@@ -283,7 +282,7 @@ static bool skipUTF8( const char * buf,
 #define NOT_A_HEX_CHAR    ( 0x10U )
 static uint8_t hexToInt( char c )
 {
-    char_ n = { 0 };
+    char_ n;
 
     n.c = c;
 
@@ -332,8 +331,8 @@ static bool skipOneHexEscape( const char * buf,
     size_t i = 0U, end = 0U;
     uint16_t value = 0U;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
-    assert( outValue != NULL );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( outValue != NULL );
 
     i = *start;
 #define HEX_ESCAPE_LENGTH    ( 6U )   /* e.g., \u1234 */
@@ -395,7 +394,7 @@ static bool skipHexEscape( const char * buf,
     size_t i = 0U;
     uint16_t value = 0U;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
 
@@ -446,7 +445,7 @@ static bool skipEscape( const char * buf,
     bool ret = false;
     size_t i = 0U;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
 
@@ -513,7 +512,7 @@ static bool skipString( const char * buf,
     bool ret = false;
     size_t i = 0;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
 
@@ -577,7 +576,7 @@ static bool strnEq( const char * a,
 {
     size_t i = 0U;
 
-    assert( ( a != NULL ) && ( b != NULL ) );
+    assert_param( ( a != NULL ) && ( b != NULL ) );
 
     for( i = 0; i < n; i++ )
     {
@@ -610,8 +609,8 @@ static bool skipLiteral( const char * buf,
 {
     bool ret = false;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
-    assert( literal != NULL );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( literal != NULL );
 
     if( ( *start < max ) && ( length <= ( max - *start ) ) )
     {
@@ -688,9 +687,9 @@ static bool skipDigits( const char * buf,
 {
     bool ret = false;
     size_t i = 0U, saveStart = 0U;
-    int32_t value = 0U;
+    int32_t value = 0;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     saveStart = *start;
 
@@ -743,7 +742,7 @@ static void skipDecimals( const char * buf,
 {
     size_t i = 0U;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
 
@@ -771,7 +770,7 @@ static void skipExponent( const char * buf,
 {
     size_t i = 0U;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
 
@@ -808,7 +807,7 @@ static bool skipNumber( const char * buf,
     bool ret = false;
     size_t i = 0U;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
 
@@ -904,7 +903,7 @@ static bool skipSpaceAndComma( const char * buf,
     bool ret = false;
     size_t i = 0U;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     skipSpace( buf, start, max );
     i = *start;
@@ -939,7 +938,7 @@ static void skipArrayScalars( const char * buf,
 {
     size_t i = 0U;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
 
@@ -981,7 +980,7 @@ static void skipObjectScalars( const char * buf,
     size_t i = 0U;
     bool comma = false;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
 
@@ -1036,7 +1035,7 @@ static void skipScalars( const char * buf,
                          size_t max,
                          char mode )
 {
-    assert( isOpenBracket_( mode ) );
+    assert_param( isOpenBracket_( mode ) );
 
     skipSpace( buf, start, max );
 
@@ -1077,7 +1076,7 @@ static JSONStatus_t skipCollection( const char * buf,
     int16_t depth = -1;
     size_t i = 0U;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
 
@@ -1222,8 +1221,8 @@ static bool nextValue( const char * buf,
     bool ret = true;
     size_t i = 0U, valueStart = 0U;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
-    assert( ( value != NULL ) && ( valueLength != NULL ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( value != NULL ) && ( valueLength != NULL ) );
 
     i = *start;
     valueStart = i;
@@ -1279,9 +1278,9 @@ static bool nextKeyValuePair( const char * buf,
     bool ret = true;
     size_t i = 0U, keyStart = 0U;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
-    assert( ( key != NULL ) && ( keyLength != NULL ) );
-    assert( ( value != NULL ) && ( valueLength != NULL ) );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
+    assert_param( ( key != NULL ) && ( keyLength != NULL ) );
+    assert_param( ( value != NULL ) && ( valueLength != NULL ) );
 
     i = *start;
     keyStart = i;
@@ -1352,8 +1351,8 @@ static bool objectSearch( const char * buf,
 
     size_t i = 0U, key = 0U, keyLength = 0U, value = 0U, valueLength = 0U;
 
-    assert( ( buf != NULL ) && ( query != NULL ) );
-    assert( ( outValue != NULL ) && ( outValueLength != NULL ) );
+    assert_param( ( buf != NULL ) && ( query != NULL ) );
+    assert_param( ( outValue != NULL ) && ( outValueLength != NULL ) );
 
     skipSpace( buf, &i, max );
 
@@ -1419,8 +1418,8 @@ static bool arraySearch( const char * buf,
     size_t i = 0U, value = 0U, valueLength = 0U;
     uint32_t currentIndex = 0U;
 
-    assert( buf != NULL );
-    assert( ( outValue != NULL ) && ( outValueLength != NULL ) );
+    assert_param( buf != NULL );
+    assert_param( ( outValue != NULL ) && ( outValueLength != NULL ) );
 
     skipSpace( buf, &i, max );
 
@@ -1487,8 +1486,8 @@ static bool skipQueryPart( const char * buf,
     bool ret = false;
     size_t i = 0U;
 
-    assert( ( buf != NULL ) && ( start != NULL ) && ( outLength != NULL ) );
-    assert( max > 0U );
+    assert_param( ( buf != NULL ) && ( start != NULL ) && ( outLength != NULL ) );
+    assert_param( max > 0U );
 
     i = *start;
 
@@ -1536,9 +1535,9 @@ static JSONStatus_t multiSearch( const char * buf,
     JSONStatus_t ret = JSONSuccess;
     size_t i = 0U, start = 0U, queryStart = 0U, value = 0U, length = max;
 
-    assert( ( buf != NULL ) && ( query != NULL ) );
-    assert( ( outValue != NULL ) && ( outValueLength != NULL ) );
-    assert( ( max > 0U ) && ( queryLength > 0U ) );
+    assert_param( ( buf != NULL ) && ( query != NULL ) );
+    assert_param( ( outValue != NULL ) && ( outValueLength != NULL ) );
+    assert_param( ( max > 0U ) && ( queryLength > 0U ) );
 
     while( i < queryLength )
     {
@@ -1748,10 +1747,10 @@ static JSONStatus_t iterate( const char * buf,
     JSONStatus_t ret = JSONNotFound;
     bool found = false;
 
-    assert( ( buf != NULL ) && ( max > 0U ) );
-    assert( ( start != NULL ) && ( next != NULL ) );
-    assert( ( outKey != NULL ) && ( outKeyLength != NULL ) );
-    assert( ( outValue != NULL ) && ( outValueLength != NULL ) );
+    assert_param( ( buf != NULL ) && ( max > 0U ) );
+    assert_param( ( start != NULL ) && ( next != NULL ) );
+    assert_param( ( outKey != NULL ) && ( outKeyLength != NULL ) );
+    assert_param( ( outValue != NULL ) && ( outValueLength != NULL ) );
 
     if( *start < max )
     {
