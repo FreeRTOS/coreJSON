@@ -30,6 +30,7 @@
 #ifndef CORE_JSON_H_
 #define CORE_JSON_H_
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -40,24 +41,13 @@
 /* *INDENT-ON* */
 
 /**
- * @brief When set to 1, config_assert is defined to sit in a loop if an
- * assertion fails. When set to 0, config_assert() is defined as a NOP.
- * It is useful to set this to 1 while developing your application for
- * debugging purposes.
- */
-#define coreJSON_ASSERT_DEFINED    ( 0 )
-
-#if ( coreJSON_ASSERT_DEFINED == 1 )
-
-/**
- * @brief Define assert_param() to sit in a loop if an assertion fails */
-    #define  assert_param( expr )    if( ( expr ) == ( bool ) 0 ) { for( ; ; ) {} }
-#else
-
-/**
- * @brief Define assert_param() as a NOP */
-    #define  assert_param( expr )    ( ( void ) 0 )
+ *  @brief By default, has the stand behavior of assert() for 
+ *  parameter checking. To swap out the assert(), define this
+ *  macro with the desired behavior.  */
+#ifndef coreJSON_ASSERT
+    #define coreJSON_ASSERT(expr) assert(expr)
 #endif
+
 
 /**
  * @ingroup json_enum_types
