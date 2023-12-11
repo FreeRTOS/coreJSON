@@ -41,11 +41,11 @@
 /* *INDENT-ON* */
 
 /**
- *  @brief By default, has the stand behavior of assert() for 
+ *  @brief By default, has the stand behavior of assert() for
  *  parameter checking. To swap out the assert(), define this
  *  macro with the desired behavior.  */
 #ifndef coreJSON_ASSERT
-    #define coreJSON_ASSERT(expr) assert(expr)
+    #define coreJSON_ASSERT( expr )    assert( expr )
 #endif
 
 
