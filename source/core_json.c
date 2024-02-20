@@ -688,7 +688,7 @@ static bool skipDigits( const char * buf,
 {
     bool ret = false;
     size_t i = 0U, saveStart = 0U;
-    int32_t value = 0U;
+    int32_t value = 0;
 
     assert( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
@@ -1711,11 +1711,10 @@ JSONStatus_t JSON_SearchT( char * buf,
                            size_t * outValueLength,
                            JSONTypes_t * outType )
 {
-    /* MISRA Ref 11.3.1 [Misaligned access] */
+    /* MISRA Ref 11.3.1 [Pointer conversion] */
     /* More details at: https://github.com/FreeRTOS/coreJSON/blob/main/MISRA.md#rule-113 */
     /* coverity[misra_c_2012_rule_11_3_violation] */
-    return JSON_SearchConst( ( const char * ) buf, max, query, queryLength,
-                             ( const char ** ) outValue, outValueLength, outType );
+    return JSON_SearchConst( ( const char * ) buf, max, query, queryLength, ( const char ** ) outValue, outValueLength, outType );
 }
 
 /** @cond DO_NOT_DOCUMENT */
