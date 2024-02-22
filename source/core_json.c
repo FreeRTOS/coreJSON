@@ -1710,11 +1710,10 @@ JSONStatus_t JSON_SearchT( char * buf,
                            size_t * outValueLength,
                            JSONTypes_t * outType )
 {
-    /* MISRA Ref 11.3.1 [Misaligned access] */
+    /* MISRA Ref 11.3.1 [Pointer conversion] */
     /* More details at: https://github.com/FreeRTOS/coreJSON/blob/main/MISRA.md#rule-113 */
     /* coverity[misra_c_2012_rule_11_3_violation] */
-    return JSON_SearchConst( ( const char * ) buf, max, query, queryLength,
-                             ( const char ** ) outValue, outValueLength, outType );
+    return JSON_SearchConst( ( const char * ) buf, max, query, queryLength, ( const char ** ) outValue, outValueLength, outType );
 }
 
 /** @cond DO_NOT_DOCUMENT */
