@@ -30,6 +30,7 @@
 #ifndef CORE_JSON_H_
 #define CORE_JSON_H_
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -38,6 +39,15 @@
     extern "C" {
 #endif
 /* *INDENT-ON* */
+
+/**
+ *  @brief By default, has the stand behavior of assert() for
+ *  parameter checking. To swap out the assert(), define this
+ *  macro with the desired behavior.  */
+#ifndef coreJSON_ASSERT
+    #define coreJSON_ASSERT( expr )    assert( expr )
+#endif
+
 
 /**
  * @ingroup json_enum_types
