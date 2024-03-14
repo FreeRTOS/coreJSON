@@ -1035,7 +1035,15 @@ static void skipScalars( const char * buf,
                          size_t max,
                          char mode )
 {
-    coreJSON_ASSERT( isOpenBracket_( mode ) );
+    bool modeIsOpenBracket = ( bool ) isOpenBracket_( mode );
+
+    /* assert function may be implemented in macro using a # or ## operator.
+     * Using a local variable here to prevent macro replacement is subjected
+     * to macro itself. */
+    coreJSON_ASSERT( modeIsOpenBracket != false );
+
+    /* Adding this line to avoid unused variable warning in release mode. */
+    ( void ) modeIsOpenBracket;
 
     skipSpace( buf, start, max );
 
