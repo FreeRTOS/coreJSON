@@ -3,8 +3,8 @@
 ## v3.3.0 (May 2024)
 - [#157](https://github.com/FreeRTOS/coreJSON/pull/157) MISRA C:2012 compliance check.
 - [#154](https://github.com/FreeRTOS/coreJSON/pull/154) Add ClusterFuzzLite setup.
-- [#144](https://github.com/FreeRTOS/coreJSON/pull/144) Upgrade to CBMC Strater Kit 2.10.
-- [#134](https://github.com/FreeRTOS/coreJSON/pull/134) Update doxygen version for documnetation.
+- [#144](https://github.com/FreeRTOS/coreJSON/pull/144) Upgrade to CBMC Starter Kit 2.10.
+- [#134](https://github.com/FreeRTOS/coreJSON/pull/134) Update doxygen version for documentation.
 - [#133](https://github.com/FreeRTOS/coreJSON/pull/133) Update Memory safety proofs to use function contracts.
 
 ## v3.2.0 (October 2022)
