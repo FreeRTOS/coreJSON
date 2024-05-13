@@ -1112,13 +1112,12 @@ static JSONStatus_t skipCollection( const char * buf,
             case '}':
             case ']':
 
-                if( ( depth > 0 ) && ( depth < JSON_MAX_DEPTH ) &&
+                if( ( depth > 0 ) &&
                     isMatchingBracket_( stack[ depth ], c ) )
                 {
                     depth--;
 
-                    if( ( skipSpaceAndComma( buf, &i, max ) == true ) &&
-                        isOpenBracket_( stack[ depth ] ) )
+                    if( skipSpaceAndComma( buf, &i, max ) == true )
                     {
                         skipScalars( buf, &i, max, stack[ depth ] );
                     }
@@ -1449,8 +1448,7 @@ static bool arraySearch( const char * buf,
                 break;
             }
 
-            if( ( skipSpaceAndComma( buf, &i, max ) != true ) ||
-                ( currentIndex == UINT32_MAX ) )
+            if( skipSpaceAndComma( buf, &i, max ) != true )
             {
                 break;
             }
