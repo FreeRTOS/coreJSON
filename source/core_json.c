@@ -930,7 +930,7 @@ static bool skipSpaceAndComma( const char * buf,
  * @param[in,out] start  The index at which to begin.
  * @param[in] max  The size of the buffer.
  *
- * @note Stops advance if a value is an object or an array.
+ * @note Stops advance if a value is an object or array.
  */
 static void skipArrayScalars( const char * buf,
                               size_t * start,
