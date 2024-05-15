@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.commit_id }}
       - name: Configure git identity
@@ -53,7 +53,7 @@ jobs:
       - name: Install ZIP tools
         run: sudo apt-get install zip unzip
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.commit_id }}
           path: coreJSON
@@ -91,7 +91,7 @@ jobs:
           ctest -E system --output-on-failure
           cd ..
       - name: Create artifact of ZIP
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: coreJSON-${{ github.event.inputs.version_number }}.zip
           path: zip-check/coreJSON-${{ github.event.inputs.version_number }}.zip
@@ -124,7 +124,7 @@ jobs:
           draft: false
           prerelease: false
       - name: Download ZIP artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: coreJSON-${{ github.event.inputs.version_number }}.zip
       - name: Upload Release Asset
