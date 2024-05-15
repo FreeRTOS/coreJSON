@@ -141,6 +141,13 @@ jobs:
           submodules: true
           fetch-depth: 0
 
+      # At time of writing the gitmodules are set not to pull
+      # Even when using fetch submodules. Need to run this command
+      # To force it to grab them.
+      - name: Perform Recursive Clone
+        shell: bash
+        run: git submodule update --checkout --init --recursive
+
       - name: Run manifest verifier
         uses: FreeRTOS/CI-CD-GitHub-Actions/manifest-verifier@main
         with:
