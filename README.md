@@ -123,7 +123,7 @@ repositories.
 
 ### Generating documentation
 
-The Doxygen references were created using Doxygen version 1.9.2. To generate the
+The Doxygen references were created using Doxygen version 1.9.6. To generate the
 Doxygen pages, please run the following command from the root of this
 repository:
 
