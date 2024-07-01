@@ -1121,10 +1121,12 @@ static JSONStatus_t skipCollection( const char * buf,
                 }
 
                 stack[ depth ] = c;
+
                 if( skipScalars( buf, &i, max, stack[ depth ] ) != true )
                 {
                     ret = JSONIllegalDocument;
                 }
+
                 break;
 
             case '}':

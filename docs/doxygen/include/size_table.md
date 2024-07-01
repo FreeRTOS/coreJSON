@@ -9,12 +9,12 @@
     </tr>
     <tr>
         <td>core_json.c</td>
-        <td><center>2.9K</center></td>
-        <td><center>2.4K</center></td>
+        <td><center>3.1K</center></td>
+        <td><center>2.5K</center></td>
     </tr>
     <tr>
         <td><b>Total estimates</b></td>
-        <td><b><center>2.9K</center></b></td>
-        <td><b><center>2.4K</center></b></td>
+        <td><b><center>3.1K</center></b></td>
+        <td><b><center>2.5K</center></b></td>
     </tr>
 </table>
