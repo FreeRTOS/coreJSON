@@ -261,7 +261,7 @@ assigns( *start )
 ensures( skipCollectionPostconditions( result, buf, start, old( *start ), max ) )
 ;
 
-void skipScalars( const char * buf,
+bool skipScalars( const char * buf,
                   size_t * start,
                   size_t max,
                   char mode )
@@ -270,7 +270,7 @@ assigns( *start )
 ensures( isValidStart( *start, old( *start ), max ) )
 ;
 
-void skipObjectScalars( const char * buf,
+bool skipObjectScalars( const char * buf,
                         size_t * start,
                         size_t max )
 requires( isValidBufferWithStartIndex( buf, max, start ) )
