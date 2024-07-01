@@ -123,7 +123,7 @@ index 901b2e1..8bdd89c 100644
      {
          if( skipAnyScalar( buf, &i, max ) != true )
          {
-@@ -986,6 +1037,13 @@ static void skipObjectScalars( const char * buf,
+@@ -986,6 +1037,13 @@ static bool skipObjectScalars( const char * buf,
      i = *start;
  
      while( i < max )

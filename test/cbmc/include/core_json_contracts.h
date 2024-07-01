@@ -270,7 +270,7 @@ assigns( *start )
 ensures( isValidStart( *start, old( *start ), max ) )
 ;
 
-void skipObjectScalars( const char * buf,
+bool skipObjectScalars( const char * buf,
                         size_t * start,
                         size_t max )
 requires( isValidBufferWithStartIndex( buf, max, start ) )

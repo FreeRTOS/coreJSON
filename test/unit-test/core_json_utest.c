@@ -168,6 +168,15 @@
 #define MISSING_VALUE_AFTER_KEY                            "{\"foo\":{\"bar\":}}"
 #define MISSING_VALUE_AFTER_KEY_LENGTH                     ( sizeof( MISSING_VALUE_AFTER_KEY ) - 1 )
 
+#define MISSING_KEY                                        "{\"foo\":\"bar\", {\"abc\":\"xyz\"}}"
+#define MISSING_KEY_LENGTH                                 ( sizeof( MISSING_KEY ) - 1 )
+
+#define MISSING_VALUE                                      "{\"foo\":{\"abc\":\"xyz\"}, \"bar\":}"
+#define MISSING_VALUE_LENGTH                               ( sizeof( MISSING_VALUE ) - 1 )
+
+#define MISSING_SEPERATOR                                  "{\"foo\" \"bar\"}"
+#define MISSING_SEPERATOR_LENGTH                           ( sizeof( MISSING_SEPERATOR ) - 1 )
+
 #define MISMATCHED_BRACKETS                                "{\"foo\":{\"bar\":\"xyz\"]}"
 #define MISMATCHED_BRACKETS_LENGTH                         ( sizeof( MISMATCHED_BRACKETS ) - 1 )
 
@@ -617,6 +626,18 @@ void test_JSON_Validate_Illegal_Documents( void )
 
     jsonStatus = JSON_Validate( MISSING_VALUE_AFTER_KEY,
                                 MISSING_VALUE_AFTER_KEY_LENGTH );
+    TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
+
+    jsonStatus = JSON_Validate( MISSING_KEY,
+                                MISSING_KEY_LENGTH );
+    TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
+
+    jsonStatus = JSON_Validate( MISSING_VALUE,
+                                MISSING_VALUE_LENGTH );
+    TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
+
+    jsonStatus = JSON_Validate( MISSING_SEPERATOR,
+                                MISSING_SEPERATOR_LENGTH );
     TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
 
     jsonStatus = JSON_Validate( MISMATCHED_BRACKETS,
