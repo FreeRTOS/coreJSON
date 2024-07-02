@@ -21,16 +21,10 @@ safety through the
 See memory requirements for this library
 [here](./docs/doxygen/include/size_table.md).
 
-**coreJSON v3.2.0
-[source code](https://github.com/FreeRTOS/coreJSON/tree/v3.2.0/source) is part
+**coreJSON v3.3.0
+[source code](https://github.com/FreeRTOS/coreJSON/tree/v3.3.0/source) is part
 of the
-[FreeRTOS 202210.00 LTS](https://github.com/FreeRTOS/FreeRTOS-LTS/tree/202210.00-LTS)
-release.**
-
-**coreJSON v3.0.0
-[source code](https://github.com/FreeRTOS/coreJSON/tree/v3.0.0/source) is part
-of the
-[FreeRTOS 202012.00 LTS](https://github.com/FreeRTOS/FreeRTOS-LTS/tree/202012.00-LTS)
+[FreeRTOS 202406.00 LTS](https://github.com/FreeRTOS/FreeRTOS-LTS/tree/202406.00-LTS)
 release.**
 
 ## Reference example
