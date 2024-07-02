@@ -971,14 +971,18 @@ static void skipArrayScalars( const char * buf,
  * @param[in,out] start  The index at which to begin.
  * @param[in] max  The size of the buffer.
  *
+ * @return true if a valid scalar key-value pairs were present;
+ * false otherwise.
+ *
  * @note Stops advance if a value is an object or array.
  */
-static void skipObjectScalars( const char * buf,
+static bool skipObjectScalars( const char * buf,
                                size_t * start,
                                size_t max )
 {
     size_t i = 0U;
     bool comma = false;
+    bool ret = true;
 
     coreJSON_ASSERT( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
@@ -988,6 +992,7 @@ static void skipObjectScalars( const char * buf,
     {
         if( skipString( buf, &i, max ) != true )
         {
+            ret = false;
             break;
         }
 
@@ -995,6 +1000,7 @@ static void skipObjectScalars( const char * buf,
 
         if( ( i < max ) && ( buf[ i ] != ':' ) )
         {
+            ret = false;
             break;
         }
 
@@ -1009,6 +1015,7 @@ static void skipObjectScalars( const char * buf,
 
         if( skipAnyScalar( buf, &i, max ) != true )
         {
+            ret = false;
             break;
         }
 
@@ -1020,6 +1027,8 @@ static void skipObjectScalars( const char * buf,
             break;
         }
     }
+
+    return ret;
 }
 
 /**
@@ -1029,13 +1038,17 @@ static void skipObjectScalars( const char * buf,
  * @param[in,out] start  The index at which to begin.
  * @param[in] max  The size of the buffer.
  * @param[in] mode  The first character of an array '[' or object '{'.
+ *
+ * @return true if a valid scalers were present;
+ * false otherwise.
  */
-static void skipScalars( const char * buf,
+static bool skipScalars( const char * buf,
                          size_t * start,
                          size_t max,
                          char mode )
 {
     bool modeIsOpenBracket = ( bool ) isOpenBracket_( mode );
+    bool ret = true;
 
     /* assert function may be implemented in macro using a # or ## operator.
      * Using a local variable here to prevent macro replacement is subjected
@@ -1053,8 +1066,10 @@ static void skipScalars( const char * buf,
     }
     else
     {
-        skipObjectScalars( buf, start, max );
+        ret = skipObjectScalars( buf, start, max );
     }
+
+    return ret;
 }
 
 /**
@@ -1106,7 +1121,12 @@ static JSONStatus_t skipCollection( const char * buf,
                 }
 
                 stack[ depth ] = c;
-                skipScalars( buf, &i, max, stack[ depth ] );
+
+                if( skipScalars( buf, &i, max, stack[ depth ] ) != true )
+                {
+                    ret = JSONIllegalDocument;
+                }
+
                 break;
 
             case '}':
@@ -1120,7 +1140,10 @@ static JSONStatus_t skipCollection( const char * buf,
                     if( ( skipSpaceAndComma( buf, &i, max ) == true ) &&
                         isOpenBracket_( stack[ depth ] ) )
                     {
-                        skipScalars( buf, &i, max, stack[ depth ] );
+                        if( skipScalars( buf, &i, max, stack[ depth ] ) != true )
+                        {
+                            ret = JSONIllegalDocument;
+                        }
                     }
 
                     break;
