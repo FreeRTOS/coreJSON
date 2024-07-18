@@ -147,7 +147,7 @@
 #define JSON_DOC_LEGAL_TRAILING_SPACE_LENGTH               ( sizeof( JSON_DOC_LEGAL_TRAILING_SPACE ) - 1 )
 
 #define JSON_DOC_LEGAL_EMPTY_OBJECT                        "{\"foo\":{}}"
-#define JSON_DOC_LEGAL_EMPTY_OBJECT_LENGTH                  ( sizeof( JSON_DOC_LEGAL_EMPTY_OBJECT ) - 1 )
+#define JSON_DOC_LEGAL_EMPTY_OBJECT_LENGTH                 ( sizeof( JSON_DOC_LEGAL_EMPTY_OBJECT ) - 1 )
 
 /* A single scalar is still considered a valid JSON document. */
 #define SINGLE_SCALAR                                      "\"l33t\""
