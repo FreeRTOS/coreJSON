@@ -980,13 +980,14 @@ static bool skipObjectScalars( const char * buf,
                                size_t * start,
                                size_t max )
 {
-    size_t i = 0U;
+    size_t i = 0U, origStart = 0U;
     bool comma = false;
     bool ret = true;
 
     coreJSON_ASSERT( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
+    origStart = *start;
 
     while( i < max )
     {
@@ -1026,6 +1027,12 @@ static bool skipObjectScalars( const char * buf,
         {
             break;
         }
+    }
+
+    /* An empty JSON object is valid. */
+    if( i == origStart )
+    {
+        ret = true;
     }
 
     return ret;
