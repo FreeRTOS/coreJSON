@@ -1,10 +1,10 @@
 diff --git a/source/core_json.c b/source/core_json.c
-index 18d9e76..0197de9 100644
+index d8694f0..761c44b 100644
 --- a/source/core_json.c
 +++ b/source/core_json.c
-@@ -61,6 +61,21 @@ typedef union
- #define isSquareOpen_( x )            ( ( x ) == '[' )
- #define isSquareClose_( x )           ( ( x ) == ']' )
+@@ -63,6 +63,21 @@ typedef union
+ #define isCurlyOpen_( x )             ( ( x ) == '{' )
+ #define isCurlyClose_( x )            ( ( x ) == '}' )
 
 +/**
 + * Renaming all loop-contract clauses from CBMC for readability.
@@ -24,7 +24,7 @@ index 18d9e76..0197de9 100644
  /**
   * @brief Advance buffer index beyond whitespace.
   *
-@@ -77,6 +92,9 @@ static void skipSpace( const char * buf,
+@@ -79,6 +94,9 @@ static void skipSpace( const char * buf,
      coreJSON_ASSERT( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
      for( i = *start; i < max; i++ )
@@ -34,7 +34,7 @@ index 18d9e76..0197de9 100644
      {
          if( !isspace_( buf[ i ] ) )
          {
-@@ -101,6 +119,13 @@ static size_t countHighBits( uint8_t c )
+@@ -103,6 +121,13 @@ static size_t countHighBits( uint8_t c )
      size_t i = 0;
 
      while( ( n & 0x80U ) != 0U )
@@ -48,7 +48,7 @@ index 18d9e76..0197de9 100644
      {
          i++;
          n = ( n & 0x7FU ) << 1U;
-@@ -209,6 +234,13 @@ static bool skipUTF8MultiByte( const char * buf,
+@@ -211,6 +236,13 @@ static bool skipUTF8MultiByte( const char * buf,
          /* The bit count is 1 greater than the number of bytes,
           * e.g., when j is 2, we skip one more byte. */
          for( j = bitCount - 1U; j > 0U; j-- )
@@ -62,7 +62,7 @@ index 18d9e76..0197de9 100644
          {
              i++;
 
-@@ -344,6 +376,12 @@ static bool skipOneHexEscape( const char * buf,
+@@ -346,6 +378,12 @@ static bool skipOneHexEscape( const char * buf,
      if( ( end < max ) && ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
      {
          for( i += 2U; i < end; i++ )
@@ -75,7 +75,7 @@ index 18d9e76..0197de9 100644
          {
              uint8_t n = hexToInt( buf[ i ] );
 
-@@ -521,6 +559,9 @@ static bool skipString( const char * buf,
+@@ -523,6 +561,9 @@ static bool skipString( const char * buf,
          i++;
 
          while( i < max )
@@ -85,7 +85,7 @@ index 18d9e76..0197de9 100644
          {
              if( buf[ i ] == '"' )
              {
-@@ -579,6 +620,9 @@ static bool strnEq( const char * a,
+@@ -581,6 +622,9 @@ static bool strnEq( const char * a,
      coreJSON_ASSERT( ( a != NULL ) && ( b != NULL ) );
 
      for( i = 0; i < n; i++ )
@@ -95,7 +95,7 @@ index 18d9e76..0197de9 100644
      {
          if( a[ i ] != b[ i ] )
          {
-@@ -694,6 +738,9 @@ static bool skipDigits( const char * buf,
+@@ -696,6 +740,9 @@ static bool skipDigits( const char * buf,
      saveStart = *start;
 
      for( i = *start; i < max; i++ )
@@ -105,7 +105,7 @@ index 18d9e76..0197de9 100644
      {
          if( !isdigit_( buf[ i ] ) )
          {
-@@ -943,6 +990,9 @@ static void skipArrayScalars( const char * buf,
+@@ -945,6 +992,9 @@ static void skipArrayScalars( const char * buf,
      i = *start;
 
      while( i < max )
@@ -115,8 +115,8 @@ index 18d9e76..0197de9 100644
      {
          if( skipAnyScalar( buf, &i, max ) != true )
          {
-@@ -990,6 +1040,13 @@ static bool skipObjectScalars( const char * buf,
-     origStart = *start;
+@@ -991,6 +1041,13 @@ static bool skipObjectScalars( const char * buf,
+     i = *start;
 
      while( i < max )
 +    assigns( i, *start, comma )
@@ -129,7 +129,7 @@ index 18d9e76..0197de9 100644
      {
          if( skipString( buf, &i, max ) != true )
          {
-@@ -1111,6 +1168,14 @@ static JSONStatus_t skipCollection( const char * buf,
+@@ -1118,6 +1175,14 @@ static JSONStatus_t skipCollection( const char * buf,
      i = *start;
 
      while( i < max )
@@ -144,7 +144,7 @@ index 18d9e76..0197de9 100644
      {
          c = buf[ i ];
          i++;
-@@ -1400,6 +1465,9 @@ static bool objectSearch( const char * buf,
+@@ -1407,6 +1472,9 @@ static bool objectSearch( const char * buf,
          skipSpace( buf, &i, max );
 
          while( i < max )
@@ -154,7 +154,7 @@ index 18d9e76..0197de9 100644
          {
              if( nextKeyValuePair( buf, &i, max, &key, &keyLength,
                                    &value, &valueLength ) != true )
-@@ -1467,6 +1535,9 @@ static bool arraySearch( const char * buf,
+@@ -1474,6 +1542,9 @@ static bool arraySearch( const char * buf,
          skipSpace( buf, &i, max );
 
          while( i < max )
@@ -164,7 +164,7 @@ index 18d9e76..0197de9 100644
          {
              if( nextValue( buf, &i, max, &value, &valueLength ) != true )
              {
-@@ -1532,6 +1603,9 @@ static bool skipQueryPart( const char * buf,
+@@ -1539,6 +1610,9 @@ static bool skipQueryPart( const char * buf,
      while( ( i < max ) &&
             !isSeparator_( buf[ i ] ) &&
             !isSquareOpen_( buf[ i ] ) )
@@ -174,7 +174,7 @@ index 18d9e76..0197de9 100644
      {
          i++;
      }
-@@ -1578,6 +1652,17 @@ static JSONStatus_t multiSearch( const char * buf,
+@@ -1585,6 +1659,17 @@ static JSONStatus_t multiSearch( const char * buf,
      coreJSON_ASSERT( ( max > 0U ) && ( queryLength > 0U ) );
 
      while( i < queryLength )
