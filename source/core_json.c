@@ -60,6 +60,8 @@ typedef union
 #define isMatchingBracket_( x, y )    ( isCurlyPair_( x, y ) || isSquarePair_( x, y ) )
 #define isSquareOpen_( x )            ( ( x ) == '[' )
 #define isSquareClose_( x )           ( ( x ) == ']' )
+#define isCurlyOpen_( x )             ( ( x ) == '{' )
+#define isCurlyClose_( x )            ( ( x ) == '}' )
 
 /**
  * @brief Advance buffer index beyond whitespace.
@@ -980,14 +982,13 @@ static bool skipObjectScalars( const char * buf,
                                size_t * start,
                                size_t max )
 {
-    size_t i = 0U, origStart = 0U;
+    size_t i = 0U;
     bool comma = false;
     bool ret = true;
 
     coreJSON_ASSERT( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
     i = *start;
-    origStart = *start;
 
     while( i < max )
     {
@@ -1029,12 +1030,6 @@ static bool skipObjectScalars( const char * buf,
         }
     }
 
-    /* An empty JSON object is valid. */
-    if( i == origStart )
-    {
-        ret = true;
-    }
-
     return ret;
 }
 
@@ -1054,6 +1049,7 @@ static bool skipScalars( const char * buf,
                          size_t max,
                          char mode )
 {
+    size_t i = 0U;
     bool modeIsOpenBracket = ( bool ) isOpenBracket_( mode );
     bool ret = true;
 
@@ -1067,13 +1063,24 @@ static bool skipScalars( const char * buf,
 
     skipSpace( buf, start, max );
 
-    if( mode == '[' )
+    i = *start;
+
+    if( i < max )
     {
-        skipArrayScalars( buf, start, max );
-    }
-    else
-    {
-        ret = skipObjectScalars( buf, start, max );
+        if( mode == '[' )
+        {
+            if( !isSquareClose_( buf[ i ] ) )
+            {
+                skipArrayScalars( buf, start, max );
+            }
+        }
+        else
+        {
+            if( !isCurlyClose_( buf[ i ] ) )
+            {
+                ret = skipObjectScalars( buf, start, max );
+            }
+        }
     }
 
     return ret;

@@ -149,6 +149,9 @@
 #define JSON_DOC_LEGAL_EMPTY_OBJECT                        "{\"foo\":{}}"
 #define JSON_DOC_LEGAL_EMPTY_OBJECT_LENGTH                 ( sizeof( JSON_DOC_LEGAL_EMPTY_OBJECT ) - 1 )
 
+#define JSON_DOC_LEGAL_EMPTY_ARRAY                         "{\"foo\":[]}"
+#define JSON_DOC_LEGAL_EMPTY_ARRAY_LENGTH                  ( sizeof( JSON_DOC_LEGAL_EMPTY_ARRAY ) - 1 )
+
 /* A single scalar is still considered a valid JSON document. */
 #define SINGLE_SCALAR                                      "\"l33t\""
 #define SINGLE_SCALAR_LENGTH                               ( sizeof( SINGLE_SCALAR ) - 1 )
@@ -569,6 +572,10 @@ void test_JSON_Validate_Legal_Documents( void )
 
     jsonStatus = JSON_Validate( JSON_DOC_LEGAL_EMPTY_OBJECT,
                                 JSON_DOC_LEGAL_EMPTY_OBJECT_LENGTH );
+    TEST_ASSERT_EQUAL( JSONSuccess, jsonStatus );
+
+    jsonStatus = JSON_Validate( JSON_DOC_LEGAL_EMPTY_ARRAY,
+                                JSON_DOC_LEGAL_EMPTY_ARRAY_LENGTH );
     TEST_ASSERT_EQUAL( JSONSuccess, jsonStatus );
 
     jsonStatus = JSON_Validate( JSON_DOC_MULTIPLE_VALID_ESCAPES,
