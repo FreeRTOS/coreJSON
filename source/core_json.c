@@ -60,6 +60,8 @@ typedef union
 #define isMatchingBracket_( x, y )    ( isCurlyPair_( x, y ) || isSquarePair_( x, y ) )
 #define isSquareOpen_( x )            ( ( x ) == '[' )
 #define isSquareClose_( x )           ( ( x ) == ']' )
+#define isCurlyOpen_( x )             ( ( x ) == '{' )
+#define isCurlyClose_( x )            ( ( x ) == '}' )
 
 /**
  * @brief Advance buffer index beyond whitespace.
@@ -1047,6 +1049,7 @@ static bool skipScalars( const char * buf,
                          size_t max,
                          char mode )
 {
+    size_t i = 0U;
     bool modeIsOpenBracket = ( bool ) isOpenBracket_( mode );
     bool ret = true;
 
@@ -1060,13 +1063,24 @@ static bool skipScalars( const char * buf,
 
     skipSpace( buf, start, max );
 
-    if( mode == '[' )
+    i = *start;
+
+    if( i < max )
     {
-        skipArrayScalars( buf, start, max );
-    }
-    else
-    {
-        ret = skipObjectScalars( buf, start, max );
+        if( mode == '[' )
+        {
+            if( !isSquareClose_( buf[ i ] ) )
+            {
+                skipArrayScalars( buf, start, max );
+            }
+        }
+        else
+        {
+            if( !isCurlyClose_( buf[ i ] ) )
+            {
+                ret = skipObjectScalars( buf, start, max );
+            }
+        }
     }
 
     return ret;
