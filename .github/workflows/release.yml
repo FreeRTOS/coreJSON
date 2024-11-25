@@ -24,17 +24,22 @@ jobs:
           git config --global user.name ${{ github.actor }}
           git config --global user.email ${{ github.actor }}@users.noreply.github.com
       - name: create a new branch that references commit id
-        run: git checkout -b ${{ github.event.inputs.version_number }} ${{ github.event.inputs.commit_id }}
+        env:
+          VERSION_NUMBER: ${{ github.event.inputs.version_number }}
+          COMMIT_ID: ${{ github.event.inputs.commit_id }}
+        run: git checkout -b "$VERSION_NUMBER" "$COMMIT_ID"
       - name: Generate SBOM
         uses: FreeRTOS/CI-CD-Github-Actions/sbom-generator@main
         with:
           repo_path: ./
           source_path: ./source
       - name: commit SBOM file
+        env:
+          VERSION_NUMBER: ${{ github.event.inputs.version_number }}
         run: |
           git add .
           git commit -m 'Update SBOM'
-          git push -u origin ${{ github.event.inputs.version_number }}
+          git push -u origin "$VERSION_NUMBER"
       - name: Tag Commit and Push to remote
         env:
           VERSION_NUMBER: ${{ github.event.inputs.version_number }}
@@ -68,8 +73,10 @@ jobs:
           cd coreJSON
           git submodule update --init --checkout --recursive
       - name: Create ZIP
+        env:
+          VERSION_NUMBER: ${{ github.event.inputs.version_number }}
         run: |
-          zip -r coreJSON-${{ github.event.inputs.version_number }}.zip coreJSON -x "*.git*"
+          zip -r coreJSON-"$VERSION_NUMBER".zip coreJSON -x "*.git*"
           ls ./
       - name: Validate created ZIP
         env:
@@ -83,8 +90,10 @@ jobs:
           diff -r -x "*.git*" coreJSON-"$VERSION_NUMBER"/coreJSON/ ../coreJSON/
           cd ../
       - name: Build
+        env:
+          VERSION_NUMBER: ${{ github.event.inputs.version_number }}
         run: |
-          cd zip-check/coreJSON-${{ github.event.inputs.version_number }}/coreJSON
+          cd zip-check/coreJSON-"$VERSION_NUMBER"/coreJSON
           sudo apt-get install -y lcov
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
@@ -93,8 +102,10 @@ jobs:
           -DCMAKE_C_FLAGS='--coverage -Wall -Wextra -Werror'
           make -C build/ all
       - name: Test
+        env:
+          VERSION_NUMBER: ${{ github.event.inputs.version_number }}
         run: |
-          cd zip-check/coreJSON-${{ github.event.inputs.version_number }}/coreJSON/build/
+          cd zip-check/coreJSON-"$VERSION_NUMBER"/coreJSON/build/
           ctest -E system --output-on-failure
           cd ..
       - name: Create artifact of ZIP
