@@ -124,6 +124,8 @@ jobs:
           ref: ${{ github.event.inputs.version_number }}
           add_release: "true"
   create-release:
+    permissions:
+      id-token: write
     needs:
       - create-zip
       - deploy-doxygen
@@ -155,3 +157,8 @@ jobs:
           asset_path: ./coreJSON-${{ github.event.inputs.version_number }}.zip
           asset_name: coreJSON-${{ github.event.inputs.version_number }}.zip
           asset_content_type: application/zip
+      - name: Backup Release Asset
+        uses: FreeRTOS/CI-CD-Github-Actions/artifact-backup@main
+        with:
+          artifact_path: ./coreJSON-${{ github.event.inputs.version_number }}.zip
+          release_tag: ${{ github.event.inputs.version_number }}
