@@ -960,6 +960,7 @@ static bool skipArrayScalars( const char * buf,
             {
                 ret = false;
             }
+
             break;
         }
     }
@@ -1159,10 +1160,18 @@ static JSONStatus_t skipCollection( const char * buf,
                 {
                     depth--;
 
-                    if( ( skipSpaceAndComma( buf, &i, max ) == true ) &&
-                        isOpenBracket_( stack[ depth ] ) )
+                    if( skipSpaceAndComma( buf, &i, max ) == true )
                     {
                         if( skipScalars( buf, &i, max, stack[ depth ] ) != true )
+                        {
+                            ret = JSONIllegalDocument;
+                        }
+                    }
+                    else
+                    {
+                        /* After closing a nested collection, if there is no comma found when calling
+                         * skipSpaceAndComma, then we must be at the end of the parent collection. */
+                        if( ( i < max ) && !isMatchingBracket_( stack[ depth ], buf[ i ] ) )
                         {
                             ret = JSONIllegalDocument;
                         }
