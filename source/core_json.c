@@ -477,14 +477,6 @@ static bool skipEscape( const char * buf,
                 break;
 
             default:
-
-                /* a control character: (NUL,SPACE) */
-                if( iscntrl_( c ) )
-                {
-                    i += 2U;
-                    ret = true;
-                }
-
                 break;
         }
     }
