@@ -321,8 +321,6 @@ static uint8_t hexToInt( char c )
  *
  * @return true if a valid escape sequence was present;
  * false otherwise.
- *
- * @note For the sake of security, \u0000 is disallowed.
  */
 static bool skipOneHexEscape( const char * buf,
                               size_t * start,
@@ -358,7 +356,7 @@ static bool skipOneHexEscape( const char * buf,
         }
     }
 
-    if( ( i == end ) && ( value > 0U ) )
+    if( i == end )
     {
         ret = true;
         *outValue = value;
@@ -382,8 +380,6 @@ static bool skipOneHexEscape( const char * buf,
  *
  * @return true if a valid escape sequence was present;
  * false otherwise.
- *
- * @note For the sake of security, \u0000 is disallowed.
  */
 #define isHighSurrogate( x )    ( ( ( x ) >= 0xD800U ) && ( ( x ) <= 0xDBFFU ) )
 #define isLowSurrogate( x )     ( ( ( x ) >= 0xDC00U ) && ( ( x ) <= 0xDFFFU ) )
@@ -437,8 +433,6 @@ static bool skipHexEscape( const char * buf,
  *
  * @return true if a valid escape sequence was present;
  * false otherwise.
- *
- * @note For the sake of security, \NUL is disallowed.
  */
 static bool skipEscape( const char * buf,
                         size_t * start,
@@ -457,9 +451,6 @@ static bool skipEscape( const char * buf,
 
         switch( c )
         {
-            case '\0':
-                break;
-
             case 'u':
                 ret = skipHexEscape( buf, &i, max );
                 break;
