@@ -934,11 +934,12 @@ static bool skipSpaceAndComma( const char * buf,
  *
  * @note Stops advance if a value is an object or array.
  */
-static void skipArrayScalars( const char * buf,
+static bool skipArrayScalars( const char * buf,
                               size_t * start,
                               size_t max )
 {
     size_t i = 0U;
+    bool ret = true;
 
     coreJSON_ASSERT( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
@@ -953,11 +954,18 @@ static void skipArrayScalars( const char * buf,
 
         if( skipSpaceAndComma( buf, &i, max ) != true )
         {
+            /* After parsing a scalar, we must either have a comma (followed by more content)
+             * or be at a closing bracket. If neither, the array is malformed. */
+            if( ( i >= max ) || !isSquareClose_( buf[ i ] ) )
+            {
+                ret = false;
+            }
             break;
         }
     }
 
     *start = i;
+    return ret;
 }
 
 /**
@@ -1071,7 +1079,7 @@ static bool skipScalars( const char * buf,
         {
             if( !isSquareClose_( buf[ i ] ) )
             {
-                skipArrayScalars( buf, start, max );
+                ret = skipArrayScalars( buf, start, max );
             }
         }
         else
