@@ -331,17 +331,16 @@ static bool skipOneHexEscape( const char * buf,
     size_t i = 0U, end = 0U;
     uint16_t value = 0U;
 
-    coreJSON_ASSERT( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
-    coreJSON_ASSERT( outValue != NULL );
+    coreJSON_ASSERT( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) && ( outValue != NULL ) );
 
     i = *start;
 #define HEX_ESCAPE_LENGTH    ( 6U )   /* e.g., \u1234 */
     /* MISRA Ref 14.3.1 [Configuration dependent invariant] */
     /* More details at: https://github.com/FreeRTOS/coreJSON/blob/main/MISRA.md#rule-143 */
     /* coverity[misra_c_2012_rule_14_3_violation] */
-    end = ( i <= ( SIZE_MAX - HEX_ESCAPE_LENGTH ) ) ? ( i + HEX_ESCAPE_LENGTH ) : SIZE_MAX;
+    end = i + HEX_ESCAPE_LENGTH;
 
-    if( ( end < max ) && ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
+    if( ( end > i ) && ( end < max ) && ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
     {
         for( i += 2U; i < end; i++ )
         {

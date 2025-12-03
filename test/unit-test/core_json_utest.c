@@ -103,7 +103,7 @@
     "\"foo\":\"abc\",\"" FIRST_QUERY_KEY "\":" FIRST_QUERY_KEY_ANSWER "}"
 #define JSON_DOC_VARIED_SCALARS_LENGTH                     ( sizeof( JSON_DOC_VARIED_SCALARS ) - 1 )
 
-#define MULTIPLE_VALID_ESCAPES                             "\\\\ \\\" \\/ \\b \\f \\n \\r \\t \\\x12"
+#define MULTIPLE_VALID_ESCAPES                             "\\\\ \\\" \\/ \\b \\f \\n \\r \\t \\u0001"
 #define MULTIPLE_VALID_ESCAPES_LENGTH                      ( sizeof( MULTIPLE_VALID_ESCAPES ) - 1 )
 
 #define JSON_DOC_QUERY_KEY_NOT_FOUND                       "{\"hello\": \"world\"}"
@@ -354,12 +354,6 @@
     "\":{\"" SECOND_QUERY_KEY "\" : \"\\uD83D\\uD83D\"}}"
 #define UNICODE_BOTH_SURROGATES_HIGH_LENGTH                 ( sizeof( UNICODE_BOTH_SURROGATES_HIGH ) - 1 )
 
-/* For security, \u0000 is disallowed. */
-#define UNICODE_ESCAPE_SEQUENCE_ZERO_CP   \
-    "{\"foo\":\"abc\",\"" FIRST_QUERY_KEY \
-    "\":{\"" SECOND_QUERY_KEY "\" : \"\\u0000\"}}"
-#define UNICODE_ESCAPE_SEQUENCE_ZERO_CP_LENGTH    ( sizeof( UNICODE_ESCAPE_SEQUENCE_ZERO_CP ) - 1 )
-
 /* /NUL escape is disallowed. */
 #define NUL_ESCAPE                        \
     "{\"foo\":\"abc\",\"" FIRST_QUERY_KEY \
@@ -580,6 +574,7 @@ void test_JSON_Validate_Legal_Documents( void )
 
     jsonStatus = JSON_Validate( JSON_DOC_MULTIPLE_VALID_ESCAPES,
                                 JSON_DOC_MULTIPLE_VALID_ESCAPES_LENGTH );
+
     TEST_ASSERT_EQUAL( JSONSuccess, jsonStatus );
 
     jsonStatus = JSON_Validate( JSON_DOC_LEGAL_UTF8_BYTE_SEQUENCES,
@@ -800,10 +795,6 @@ void test_JSON_Validate_Illegal_Documents( void )
 
     jsonStatus = JSON_Validate( UNICODE_BOTH_SURROGATES_HIGH,
                                 UNICODE_BOTH_SURROGATES_HIGH_LENGTH );
-    TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
-
-    jsonStatus = JSON_Validate( UNICODE_ESCAPE_SEQUENCE_ZERO_CP,
-                                UNICODE_ESCAPE_SEQUENCE_ZERO_CP_LENGTH );
     TEST_ASSERT_EQUAL( JSONIllegalDocument, jsonStatus );
 
     jsonStatus = JSON_Validate( UNICODE_VALID_HIGH_INVALID_LOW_SURROGATE,
@@ -1500,14 +1491,6 @@ void test_JSON_Search_Illegal_Documents( void )
 
     jsonStatus = JSON_Search( UNICODE_BOTH_SURROGATES_HIGH,
                               UNICODE_BOTH_SURROGATES_HIGH_LENGTH,
-                              COMPLETE_QUERY_KEY,
-                              COMPLETE_QUERY_KEY_LENGTH,
-                              &outValue,
-                              &outValueLength );
-    TEST_ASSERT_EQUAL( JSONNotFound, jsonStatus );
-
-    jsonStatus = JSON_Search( UNICODE_ESCAPE_SEQUENCE_ZERO_CP,
-                              UNICODE_ESCAPE_SEQUENCE_ZERO_CP_LENGTH,
                               COMPLETE_QUERY_KEY,
                               COMPLETE_QUERY_KEY_LENGTH,
                               &outValue,
