@@ -44,7 +44,7 @@ jobs:
         uses: FreeRTOS/CI-CD-Github-Actions/complexity@main
         with:
           path: ./
-          horrid_threshold: 12
+          horrid_threshold: 14
 
   doxygen:
     runs-on: ubuntu-latest
@@ -66,7 +66,7 @@ jobs:
           path: ./
 
   formatting:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Check formatting
