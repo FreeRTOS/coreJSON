@@ -12,5 +12,6 @@ USE_EXTERNAL_SAT_SOLVER ?= --external-sat-solver cadical
 
 USE_FUNCTION_CONTRACTS += skipAnyScalar
 USE_FUNCTION_CONTRACTS += skipCollection
+USE_FUNCTION_CONTRACTS += skipSpace
 
 include ../Makefile-json.common

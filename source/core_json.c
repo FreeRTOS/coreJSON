@@ -321,8 +321,6 @@ static uint8_t hexToInt( char c )
  *
  * @return true if a valid escape sequence was present;
  * false otherwise.
- *
- * @note For the sake of security, \u0000 is disallowed.
  */
 static bool skipOneHexEscape( const char * buf,
                               size_t * start,
@@ -333,17 +331,16 @@ static bool skipOneHexEscape( const char * buf,
     size_t i = 0U, end = 0U;
     uint16_t value = 0U;
 
-    coreJSON_ASSERT( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
-    coreJSON_ASSERT( outValue != NULL );
+    coreJSON_ASSERT( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) && ( outValue != NULL ) );
 
     i = *start;
 #define HEX_ESCAPE_LENGTH    ( 6U )   /* e.g., \u1234 */
     /* MISRA Ref 14.3.1 [Configuration dependent invariant] */
     /* More details at: https://github.com/FreeRTOS/coreJSON/blob/main/MISRA.md#rule-143 */
     /* coverity[misra_c_2012_rule_14_3_violation] */
-    end = ( i <= ( SIZE_MAX - HEX_ESCAPE_LENGTH ) ) ? ( i + HEX_ESCAPE_LENGTH ) : SIZE_MAX;
+    end = i + HEX_ESCAPE_LENGTH;
 
-    if( ( end < max ) && ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
+    if( ( end > i ) && ( end < max ) && ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
     {
         for( i += 2U; i < end; i++ )
         {
@@ -358,7 +355,7 @@ static bool skipOneHexEscape( const char * buf,
         }
     }
 
-    if( ( i == end ) && ( value > 0U ) )
+    if( i == end )
     {
         ret = true;
         *outValue = value;
@@ -382,8 +379,6 @@ static bool skipOneHexEscape( const char * buf,
  *
  * @return true if a valid escape sequence was present;
  * false otherwise.
- *
- * @note For the sake of security, \u0000 is disallowed.
  */
 #define isHighSurrogate( x )    ( ( ( x ) >= 0xD800U ) && ( ( x ) <= 0xDBFFU ) )
 #define isLowSurrogate( x )     ( ( ( x ) >= 0xDC00U ) && ( ( x ) <= 0xDFFFU ) )
@@ -437,8 +432,6 @@ static bool skipHexEscape( const char * buf,
  *
  * @return true if a valid escape sequence was present;
  * false otherwise.
- *
- * @note For the sake of security, \NUL is disallowed.
  */
 static bool skipEscape( const char * buf,
                         size_t * start,
@@ -457,9 +450,6 @@ static bool skipEscape( const char * buf,
 
         switch( c )
         {
-            case '\0':
-                break;
-
             case 'u':
                 ret = skipHexEscape( buf, &i, max );
                 break;
@@ -477,14 +467,6 @@ static bool skipEscape( const char * buf,
                 break;
 
             default:
-
-                /* a control character: (NUL,SPACE) */
-                if( iscntrl_( c ) )
-                {
-                    i += 2U;
-                    ret = true;
-                }
-
                 break;
         }
     }
@@ -934,11 +916,12 @@ static bool skipSpaceAndComma( const char * buf,
  *
  * @note Stops advance if a value is an object or array.
  */
-static void skipArrayScalars( const char * buf,
+static bool skipArrayScalars( const char * buf,
                               size_t * start,
                               size_t max )
 {
     size_t i = 0U;
+    bool ret = true;
 
     coreJSON_ASSERT( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
 
@@ -953,11 +936,19 @@ static void skipArrayScalars( const char * buf,
 
         if( skipSpaceAndComma( buf, &i, max ) != true )
         {
+            /* After parsing a scalar, we must either have a comma (followed by more content)
+             * or be at a closing bracket. If neither, the array is malformed. */
+            if( ( i >= max ) || !isSquareClose_( buf[ i ] ) )
+            {
+                ret = false;
+            }
+
             break;
         }
     }
 
     *start = i;
+    return ret;
 }
 
 /**
@@ -1071,7 +1062,7 @@ static bool skipScalars( const char * buf,
         {
             if( !isSquareClose_( buf[ i ] ) )
             {
-                skipArrayScalars( buf, start, max );
+                ret = skipArrayScalars( buf, start, max );
             }
         }
         else
@@ -1151,10 +1142,18 @@ static JSONStatus_t skipCollection( const char * buf,
                 {
                     depth--;
 
-                    if( ( skipSpaceAndComma( buf, &i, max ) == true ) &&
-                        isOpenBracket_( stack[ depth ] ) )
+                    if( skipSpaceAndComma( buf, &i, max ) == true )
                     {
                         if( skipScalars( buf, &i, max, stack[ depth ] ) != true )
+                        {
+                            ret = JSONIllegalDocument;
+                        }
+                    }
+                    else
+                    {
+                        /* After closing a nested collection, if there is no comma found when calling
+                         * skipSpaceAndComma, then we must be at the end of the parent collection. */
+                        if( ( i < max ) && !isMatchingBracket_( stack[ depth ], buf[ i ] ) )
                         {
                             ret = JSONIllegalDocument;
                         }

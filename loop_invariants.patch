@@ -1,11 +1,11 @@
 diff --git a/source/core_json.c b/source/core_json.c
-index d8694f0..761c44b 100644
+index a01c393..ad48f28 100644
 --- a/source/core_json.c
 +++ b/source/core_json.c
 @@ -63,6 +63,21 @@ typedef union
  #define isCurlyOpen_( x )             ( ( x ) == '{' )
  #define isCurlyClose_( x )            ( ( x ) == '}' )
-
+ 
 +/**
 + * Renaming all loop-contract clauses from CBMC for readability.
 + * For more information about loop contracts in CBMC, see
@@ -26,7 +26,7 @@ index d8694f0..761c44b 100644
   *
 @@ -79,6 +94,9 @@ static void skipSpace( const char * buf,
      coreJSON_ASSERT( ( buf != NULL ) && ( start != NULL ) && ( max > 0U ) );
-
+ 
      for( i = *start; i < max; i++ )
 +    assigns( i )
 +    loopInvariant( *start <= i && i <= max )
@@ -36,7 +36,7 @@ index d8694f0..761c44b 100644
          {
 @@ -103,6 +121,13 @@ static size_t countHighBits( uint8_t c )
      size_t i = 0;
-
+ 
      while( ( n & 0x80U ) != 0U )
 +    assigns( i, n )
 +    loopInvariant (
@@ -61,9 +61,9 @@ index d8694f0..761c44b 100644
 +        decreases( j )
          {
              i++;
-
-@@ -346,6 +378,12 @@ static bool skipOneHexEscape( const char * buf,
-     if( ( end < max ) && ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
+ 
+@@ -343,6 +375,12 @@ static bool skipOneHexEscape( const char * buf,
+     if( ( end > i ) && ( end < max ) && ( buf[ i ] == '\\' ) && ( buf[ i + 1U ] == 'u' ) )
      {
          for( i += 2U; i < end; i++ )
 +        assigns( value, i )
@@ -74,10 +74,10 @@ index d8694f0..761c44b 100644
 +        decreases( end - i )
          {
              uint8_t n = hexToInt( buf[ i ] );
-
-@@ -523,6 +561,9 @@ static bool skipString( const char * buf,
+ 
+@@ -505,6 +543,9 @@ static bool skipString( const char * buf,
          i++;
-
+ 
          while( i < max )
 +        assigns( i )
 +        loopInvariant( *start + 1U <= i && i <= max )
@@ -85,9 +85,9 @@ index d8694f0..761c44b 100644
          {
              if( buf[ i ] == '"' )
              {
-@@ -581,6 +622,9 @@ static bool strnEq( const char * a,
+@@ -563,6 +604,9 @@ static bool strnEq( const char * a,
      coreJSON_ASSERT( ( a != NULL ) && ( b != NULL ) );
-
+ 
      for( i = 0; i < n; i++ )
 +    assigns( i )
 +    loopInvariant( i <= n )
@@ -95,9 +95,9 @@ index d8694f0..761c44b 100644
      {
          if( a[ i ] != b[ i ] )
          {
-@@ -696,6 +740,9 @@ static bool skipDigits( const char * buf,
+@@ -678,6 +722,9 @@ static bool skipDigits( const char * buf,
      saveStart = *start;
-
+ 
      for( i = *start; i < max; i++ )
 +    assigns( value, i )
 +    loopInvariant( *start <= i && i <= max )
@@ -105,9 +105,9 @@ index d8694f0..761c44b 100644
      {
          if( !isdigit_( buf[ i ] ) )
          {
-@@ -945,6 +992,9 @@ static void skipArrayScalars( const char * buf,
+@@ -928,6 +975,9 @@ static bool skipArrayScalars( const char * buf,
      i = *start;
-
+ 
      while( i < max )
 +    assigns( i )
 +    loopInvariant( *start <= i && i <= max )
@@ -115,9 +115,9 @@ index d8694f0..761c44b 100644
      {
          if( skipAnyScalar( buf, &i, max ) != true )
          {
-@@ -991,6 +1041,13 @@ static bool skipObjectScalars( const char * buf,
+@@ -982,6 +1032,13 @@ static bool skipObjectScalars( const char * buf,
      i = *start;
-
+ 
      while( i < max )
 +    assigns( i, *start, comma )
 +    loopInvariant(
@@ -129,11 +129,11 @@ index d8694f0..761c44b 100644
      {
          if( skipString( buf, &i, max ) != true )
          {
-@@ -1118,6 +1175,14 @@ static JSONStatus_t skipCollection( const char * buf,
+@@ -1109,6 +1166,14 @@ static JSONStatus_t skipCollection( const char * buf,
      i = *start;
-
+ 
      while( i < max )
-+    assigns( i, depth, c, __CPROVER_object_whole( stack ), ret )
++    assigns( i, depth, c, ret, __CPROVER_object_whole( stack ) )
 +    loopInvariant(
 +        -1 <= depth && depth <= JSON_MAX_DEPTH
 +        && *start <= i && i <= max
@@ -144,9 +144,17 @@ index d8694f0..761c44b 100644
      {
          c = buf[ i ];
          i++;
-@@ -1407,6 +1472,9 @@ static bool objectSearch( const char * buf,
+@@ -1144,6 +1209,7 @@ static JSONStatus_t skipCollection( const char * buf,
+ 
+                     if( skipSpaceAndComma( buf, &i, max ) == true )
+                     {
++                        __CPROVER_assume( isOpenBracket_(stack[depth]));
+                         if( skipScalars( buf, &i, max, stack[ depth ] ) != true )
+                         {
+                             ret = JSONIllegalDocument;
+@@ -1406,6 +1472,9 @@ static bool objectSearch( const char * buf,
          skipSpace( buf, &i, max );
-
+ 
          while( i < max )
 +        assigns( i, key, keyLength, value, valueLength )
 +        loopInvariant( __CPROVER_loop_entry( i ) <= i && i <= max )
@@ -154,9 +162,9 @@ index d8694f0..761c44b 100644
          {
              if( nextKeyValuePair( buf, &i, max, &key, &keyLength,
                                    &value, &valueLength ) != true )
-@@ -1474,6 +1542,9 @@ static bool arraySearch( const char * buf,
+@@ -1473,6 +1542,9 @@ static bool arraySearch( const char * buf,
          skipSpace( buf, &i, max );
-
+ 
          while( i < max )
 +        assigns( i, currentIndex, value, valueLength )
 +        loopInvariant( __CPROVER_loop_entry( i ) <= i && i <= max && currentIndex < i )
@@ -164,7 +172,7 @@ index d8694f0..761c44b 100644
          {
              if( nextValue( buf, &i, max, &value, &valueLength ) != true )
              {
-@@ -1539,6 +1610,9 @@ static bool skipQueryPart( const char * buf,
+@@ -1538,6 +1610,9 @@ static bool skipQueryPart( const char * buf,
      while( ( i < max ) &&
             !isSeparator_( buf[ i ] ) &&
             !isSquareOpen_( buf[ i ] ) )
@@ -174,9 +182,9 @@ index d8694f0..761c44b 100644
      {
          i++;
      }
-@@ -1585,6 +1659,17 @@ static JSONStatus_t multiSearch( const char * buf,
+@@ -1584,6 +1659,17 @@ static JSONStatus_t multiSearch( const char * buf,
      coreJSON_ASSERT( ( max > 0U ) && ( queryLength > 0U ) );
-
+ 
      while( i < queryLength )
 +    assigns( i, start, queryStart, value, length )
 +    loopInvariant(
@@ -191,4 +199,4 @@ index d8694f0..761c44b 100644
 +    decreases( queryLength - i )
      {
          bool found = false;
-
+ 
