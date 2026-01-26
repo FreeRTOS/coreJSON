@@ -41,6 +41,16 @@
 /* *INDENT-ON* */
 
 /**
+ * @cond DOXYGEN_IGNORE
+ * The current version of this library.
+ *
+ * If JSON_LIBRARY_VERSION ends with + it represents the version in development
+ * after the numbered release.
+ */
+#define JSON_LIBRARY_VERSION    "v2.3.1+"
+/** @endcond */
+
+/**
  *  @brief By default, has the stand behavior of assert() for
  *  parameter checking. To swap out the assert(), define this
  *  macro with the desired behavior.  */
