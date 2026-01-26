@@ -1,5 +1,5 @@
 /*
- * coreJSON v3.3.0
+ * coreJSON
  * Copyright (C) 2023 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
