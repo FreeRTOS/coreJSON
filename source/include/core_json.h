@@ -1,5 +1,5 @@
 /*
- * coreJSON v3.3.0
+ * coreJSON
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -39,6 +39,16 @@
     extern "C" {
 #endif
 /* *INDENT-ON* */
+
+/**
+ * @cond DOXYGEN_IGNORE
+ * The current version of this library.
+ *
+ * If JSON_LIBRARY_VERSION ends with + it represents the version in development
+ * after the numbered release.
+ */
+#define JSON_LIBRARY_VERSION    "v3.3.0+"
+/** @endcond */
 
 /**
  *  @brief By default, has the stand behavior of assert() for
