@@ -1,10 +1,10 @@
 name : "coreJSON"
-version: "v3.3.0"
+version: "v3.3.0+"
 description: |
   "A parser strictly enforcing the ECMA-404 JSON standard, suitable for microcontrollers. \n"
 license: "MIT"
 
-dependencies:
+testDependencies:
   - name: "Unity"
     version: v2.6.0
     license: "MIT"
