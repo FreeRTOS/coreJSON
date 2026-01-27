@@ -1,4 +1,9 @@
 name: Doxygen Generation
+
+# Needs this to write to gh-pages branch.
+permissions:
+  contents: write
+
 on:
   push:
     branches: [main]
