@@ -47,7 +47,7 @@
  * If JSON_LIBRARY_VERSION ends with + it represents the version in development
  * after the numbered release.
  */
-#define JSON_LIBRARY_VERSION    "v3.3.0+"
+#define JSON_LIBRARY_VERSION    "v3.3.1"
 /** @endcond */
 
 /**
