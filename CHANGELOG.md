@@ -1,5 +1,21 @@
 # Change Log for coreJSON Library
 
+## v3.3.1 (January 2026)
+- [#184](https://github.com/FreeRTOS/coreJSON/pull/184) Add write permissions to doxygen generation workflow on main.
+- [#182](https://github.com/FreeRTOS/coreJSON/pull/182) Update manifest to list unity as a test dependency.
+- [#181](https://github.com/FreeRTOS/coreJSON/pull/181) Add CMakeLists.txt for coreJSON library.
+- [#180](https://github.com/FreeRTOS/coreJSON/pull/180) Remove version numbers from headers. Add library version define.
+- [#179](https://github.com/FreeRTOS/coreJSON/pull/179) Fix JSON validation issues concerning missing commas, escaped control characters, and hex escaped 0 value.
+- [#174](https://github.com/FreeRTOS/coreJSON/pull/174) Remove formatting bot workflow.
+- [#173](https://github.com/FreeRTOS/coreJSON/pull/173) Follow Security Guide to update YAML files.
+- [#172](https://github.com/FreeRTOS/coreJSON/pull/172) Update GitHub Actions workflows as per security guidelines.
+- [#171](https://github.com/FreeRTOS/coreJSON/pull/171) Fix link.
+- [#170](https://github.com/FreeRTOS/coreJSON/pull/170) Adjust proof tooling to support CBMC v6.
+- [#169](https://github.com/FreeRTOS/coreJSON/pull/169) Treat empty JSON object in key-value pair as valid.
+- [#167](https://github.com/FreeRTOS/coreJSON/pull/167) Correctly detect missing key in a key-value pair.
+- [#166](https://github.com/FreeRTOS/coreJSON/pull/166) Update LTS 202406 information.
+- [#164](https://github.com/FreeRTOS/coreJSON/pull/164) Use CBMC version 5.95.1.
+
 ## v3.3.0 (May 2024)
 - [#157](https://github.com/FreeRTOS/coreJSON/pull/157) MISRA C:2012 compliance check.
 - [#154](https://github.com/FreeRTOS/coreJSON/pull/154) Add ClusterFuzzLite setup.
